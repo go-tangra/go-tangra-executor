@@ -87,8 +87,13 @@ func (s *ClientService) FetchScript(ctx context.Context, req *executorV1.FetchSc
 
 // StreamCommands opens a server-side stream for the client to receive execution commands
 func (s *ClientService) StreamCommands(req *executorV1.StreamCommandsRequest, stream executorV1.ExecutorClientService_StreamCommandsServer) error {
-	clientID := req.ClientId
-	s.log.Infof("Client %s connected to command stream", clientID)
+	// Use the mTLS CN as the registry key so it matches TriggerExecution lookups.
+	// Fall back to req.ClientId if CN is unavailable.
+	clientID := getClientCN(stream.Context())
+	if clientID == "" {
+		clientID = req.ClientId
+	}
+	s.log.Infof("Client %s (machine-id: %s) connected to command stream", clientID, req.ClientId)
 
 	ch := s.cmdReg.Register(clientID)
 	defer func() {
