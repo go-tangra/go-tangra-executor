@@ -900,3 +900,221 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ReportResultResponseValidationError{}
+
+// Validate checks the field values on SubmitExecutionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SubmitExecutionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SubmitExecutionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SubmitExecutionRequestMultiError, or nil if none found.
+func (m *SubmitExecutionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SubmitExecutionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ScriptId
+
+	// no validation rules for ExitCode
+
+	// no validation rules for Output
+
+	// no validation rules for ErrorOutput
+
+	// no validation rules for DurationMs
+
+	if len(errors) > 0 {
+		return SubmitExecutionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// SubmitExecutionRequestMultiError is an error wrapping multiple validation
+// errors returned by SubmitExecutionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type SubmitExecutionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SubmitExecutionRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SubmitExecutionRequestMultiError) AllErrors() []error { return m }
+
+// SubmitExecutionRequestValidationError is the validation error returned by
+// SubmitExecutionRequest.Validate if the designated constraints aren't met.
+type SubmitExecutionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SubmitExecutionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SubmitExecutionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SubmitExecutionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SubmitExecutionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SubmitExecutionRequestValidationError) ErrorName() string {
+	return "SubmitExecutionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SubmitExecutionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSubmitExecutionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SubmitExecutionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SubmitExecutionRequestValidationError{}
+
+// Validate checks the field values on SubmitExecutionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *SubmitExecutionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on SubmitExecutionResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// SubmitExecutionResponseMultiError, or nil if none found.
+func (m *SubmitExecutionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *SubmitExecutionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ExecutionId
+
+	// no validation rules for Recorded
+
+	if len(errors) > 0 {
+		return SubmitExecutionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// SubmitExecutionResponseMultiError is an error wrapping multiple validation
+// errors returned by SubmitExecutionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type SubmitExecutionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m SubmitExecutionResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m SubmitExecutionResponseMultiError) AllErrors() []error { return m }
+
+// SubmitExecutionResponseValidationError is the validation error returned by
+// SubmitExecutionResponse.Validate if the designated constraints aren't met.
+type SubmitExecutionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e SubmitExecutionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e SubmitExecutionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e SubmitExecutionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e SubmitExecutionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e SubmitExecutionResponseValidationError) ErrorName() string {
+	return "SubmitExecutionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e SubmitExecutionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sSubmitExecutionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = SubmitExecutionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = SubmitExecutionResponseValidationError{}

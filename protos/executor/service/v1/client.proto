@@ -47,6 +47,14 @@ service ExecutorClientService {
       body: "*"
     };
   }
+
+  // Submit a complete execution log (client-pull scenario)
+  rpc SubmitExecution(SubmitExecutionRequest) returns (SubmitExecutionResponse) {
+    option (google.api.http) = {
+      post: "/v1/client/executions"
+      body: "*"
+    };
+  }
 }
 
 // Fetch script request
@@ -112,4 +120,23 @@ message ReportResultRequest {
 
 message ReportResultResponse {
   bool recorded = 1 [json_name = "recorded"];
+}
+
+// Submit execution request (client-pull: creates log + stores result in one shot)
+message SubmitExecutionRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  int32 exit_code = 2 [json_name = "exitCode"];
+  string output = 3 [json_name = "output"];
+  string error_output = 4 [json_name = "errorOutput"];
+  int64 duration_ms = 5 [json_name = "durationMs"];
+}
+
+message SubmitExecutionResponse {
+  string execution_id = 1 [json_name = "executionId"];
+  bool recorded = 2 [json_name = "recorded"];
 }

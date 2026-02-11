@@ -131,6 +131,61 @@ func (s *ClientService) AckCommand(ctx context.Context, req *executorV1.AckComma
 	return &executorV1.AckCommandResponse{Acknowledged: true}, nil
 }
 
+// SubmitExecution creates a complete execution log in one shot (client-pull scenario)
+func (s *ClientService) SubmitExecution(ctx context.Context, req *executorV1.SubmitExecutionRequest) (*executorV1.SubmitExecutionResponse, error) {
+	clientCN := getMetadataValue(ctx, "x-md-global-client-cn")
+
+	// Look up the script
+	script, err := s.scriptRepo.GetByID(ctx, req.ScriptId)
+	if err != nil {
+		return nil, err
+	}
+	if script == nil {
+		return nil, executorV1.ErrorScriptNotFound("script not found")
+	}
+
+	// Validate assignment
+	if clientCN != "" {
+		assigned, aErr := s.assignRepo.ExistsAnyTenant(ctx, req.ScriptId, clientCN)
+		if aErr != nil {
+			return nil, aErr
+		}
+		if !assigned {
+			return nil, executorV1.ErrorClientNotAssigned("script is not assigned to this client")
+		}
+	}
+
+	// Determine status from exit code
+	status := "COMPLETED"
+	if req.ExitCode != 0 {
+		status = "FAILED"
+	}
+
+	tenantID := uint32(0)
+	if script.TenantID != nil {
+		tenantID = *script.TenantID
+	}
+
+	// Create execution log
+	execLog, err := s.execRepo.Create(
+		ctx, tenantID, script.ID, script.Name,
+		clientCN, script.ContentHash, "CLIENT_PULL", status, nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Store result
+	if err := s.execRepo.UpdateResult(ctx, execLog.ID, int(req.ExitCode), req.Output, req.ErrorOutput, req.DurationMs); err != nil {
+		return nil, err
+	}
+
+	return &executorV1.SubmitExecutionResponse{
+		ExecutionId: execLog.ID,
+		Recorded:    true,
+	}, nil
+}
+
 // ReportResult stores execution results from the client
 func (s *ClientService) ReportResult(ctx context.Context, req *executorV1.ReportResultRequest) (*executorV1.ReportResultResponse, error) {
 	entity, err := s.execRepo.GetByID(ctx, req.ExecutionId)

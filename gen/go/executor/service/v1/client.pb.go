@@ -517,6 +517,135 @@ func (x *ReportResultResponse) GetRecorded() bool {
 	return false
 }
 
+// Submit execution request (client-pull: creates log + stores result in one shot)
+type SubmitExecutionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ScriptId      string                 `protobuf:"bytes,1,opt,name=script_id,json=scriptId,proto3" json:"script_id,omitempty"`
+	ExitCode      int32                  `protobuf:"varint,2,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`
+	Output        string                 `protobuf:"bytes,3,opt,name=output,proto3" json:"output,omitempty"`
+	ErrorOutput   string                 `protobuf:"bytes,4,opt,name=error_output,json=errorOutput,proto3" json:"error_output,omitempty"`
+	DurationMs    int64                  `protobuf:"varint,5,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitExecutionRequest) Reset() {
+	*x = SubmitExecutionRequest{}
+	mi := &file_executor_service_v1_client_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitExecutionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitExecutionRequest) ProtoMessage() {}
+
+func (x *SubmitExecutionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_executor_service_v1_client_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitExecutionRequest.ProtoReflect.Descriptor instead.
+func (*SubmitExecutionRequest) Descriptor() ([]byte, []int) {
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SubmitExecutionRequest) GetScriptId() string {
+	if x != nil {
+		return x.ScriptId
+	}
+	return ""
+}
+
+func (x *SubmitExecutionRequest) GetExitCode() int32 {
+	if x != nil {
+		return x.ExitCode
+	}
+	return 0
+}
+
+func (x *SubmitExecutionRequest) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	return ""
+}
+
+func (x *SubmitExecutionRequest) GetErrorOutput() string {
+	if x != nil {
+		return x.ErrorOutput
+	}
+	return ""
+}
+
+func (x *SubmitExecutionRequest) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+type SubmitExecutionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ExecutionId   string                 `protobuf:"bytes,1,opt,name=execution_id,json=executionId,proto3" json:"execution_id,omitempty"`
+	Recorded      bool                   `protobuf:"varint,2,opt,name=recorded,proto3" json:"recorded,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitExecutionResponse) Reset() {
+	*x = SubmitExecutionResponse{}
+	mi := &file_executor_service_v1_client_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitExecutionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitExecutionResponse) ProtoMessage() {}
+
+func (x *SubmitExecutionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_executor_service_v1_client_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitExecutionResponse.ProtoReflect.Descriptor instead.
+func (*SubmitExecutionResponse) Descriptor() ([]byte, []int) {
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SubmitExecutionResponse) GetExecutionId() string {
+	if x != nil {
+		return x.ExecutionId
+	}
+	return ""
+}
+
+func (x *SubmitExecutionResponse) GetRecorded() bool {
+	if x != nil {
+		return x.Recorded
+	}
+	return false
+}
+
 var File_executor_service_v1_client_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_client_proto_rawDesc = "" +
@@ -562,13 +691,24 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\vduration_ms\x18\x05 \x01(\x03R\n" +
 	"durationMs\"2\n" +
 	"\x14ReportResultResponse\x12\x1a\n" +
-	"\brecorded\x18\x01 \x01(\bR\brecorded2\xba\x04\n" +
+	"\brecorded\x18\x01 \x01(\bR\brecorded\"\xbc\x01\n" +
+	"\x16SubmitExecutionRequest\x12)\n" +
+	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\x12\x1b\n" +
+	"\texit_code\x18\x02 \x01(\x05R\bexitCode\x12\x16\n" +
+	"\x06output\x18\x03 \x01(\tR\x06output\x12!\n" +
+	"\ferror_output\x18\x04 \x01(\tR\verrorOutput\x12\x1f\n" +
+	"\vduration_ms\x18\x05 \x01(\x03R\n" +
+	"durationMs\"X\n" +
+	"\x17SubmitExecutionResponse\x12!\n" +
+	"\fexecution_id\x18\x01 \x01(\tR\vexecutionId\x12\x1a\n" +
+	"\brecorded\x18\x02 \x01(\bR\brecorded2\xcb\x05\n" +
 	"\x15ExecutorClientService\x12\x88\x01\n" +
 	"\vFetchScript\x12'.executor.service.v1.FetchScriptRequest\x1a(.executor.service.v1.FetchScriptResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/client/scripts/{script_id}\x12g\n" +
 	"\x0eStreamCommands\x12*.executor.service.v1.StreamCommandsRequest\x1a%.executor.service.v1.ExecutionCommand\"\x000\x01\x12\x8e\x01\n" +
 	"\n" +
 	"AckCommand\x12&.executor.service.v1.AckCommandRequest\x1a'.executor.service.v1.AckCommandResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/client/commands/{command_id}/ack\x12\x9b\x01\n" +
-	"\fReportResult\x12(.executor.service.v1.ReportResultRequest\x1a).executor.service.v1.ReportResultResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/v1/client/executions/{execution_id}/resultB\xe3\x01\n" +
+	"\fReportResult\x12(.executor.service.v1.ReportResultRequest\x1a).executor.service.v1.ReportResultResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/v1/client/executions/{execution_id}/result\x12\x8e\x01\n" +
+	"\x0fSubmitExecution\x12+.executor.service.v1.SubmitExecutionRequest\x1a,.executor.service.v1.SubmitExecutionResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/v1/client/executionsB\xe3\x01\n" +
 	"\x17com.executor.service.v1B\vClientProtoP\x01ZMgithub.com/go-tangra/go-tangra-executor/gen/go/executor/service/v1;executorpb\xa2\x02\x03ESX\xaa\x02\x13Executor.Service.V1\xca\x02\x13Executor\\Service\\V1\xe2\x02\x1fExecutor\\Service\\V1\\GPBMetadata\xea\x02\x15Executor::Service::V1b\x06proto3"
 
 var (
@@ -583,34 +723,38 @@ func file_executor_service_v1_client_proto_rawDescGZIP() []byte {
 	return file_executor_service_v1_client_proto_rawDescData
 }
 
-var file_executor_service_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_executor_service_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_executor_service_v1_client_proto_goTypes = []any{
-	(*ExecutionCommand)(nil),      // 0: executor.service.v1.ExecutionCommand
-	(*FetchScriptRequest)(nil),    // 1: executor.service.v1.FetchScriptRequest
-	(*FetchScriptResponse)(nil),   // 2: executor.service.v1.FetchScriptResponse
-	(*StreamCommandsRequest)(nil), // 3: executor.service.v1.StreamCommandsRequest
-	(*AckCommandRequest)(nil),     // 4: executor.service.v1.AckCommandRequest
-	(*AckCommandResponse)(nil),    // 5: executor.service.v1.AckCommandResponse
-	(*ReportResultRequest)(nil),   // 6: executor.service.v1.ReportResultRequest
-	(*ReportResultResponse)(nil),  // 7: executor.service.v1.ReportResultResponse
-	(ScriptType)(0),               // 8: executor.service.v1.ScriptType
+	(*ExecutionCommand)(nil),        // 0: executor.service.v1.ExecutionCommand
+	(*FetchScriptRequest)(nil),      // 1: executor.service.v1.FetchScriptRequest
+	(*FetchScriptResponse)(nil),     // 2: executor.service.v1.FetchScriptResponse
+	(*StreamCommandsRequest)(nil),   // 3: executor.service.v1.StreamCommandsRequest
+	(*AckCommandRequest)(nil),       // 4: executor.service.v1.AckCommandRequest
+	(*AckCommandResponse)(nil),      // 5: executor.service.v1.AckCommandResponse
+	(*ReportResultRequest)(nil),     // 6: executor.service.v1.ReportResultRequest
+	(*ReportResultResponse)(nil),    // 7: executor.service.v1.ReportResultResponse
+	(*SubmitExecutionRequest)(nil),  // 8: executor.service.v1.SubmitExecutionRequest
+	(*SubmitExecutionResponse)(nil), // 9: executor.service.v1.SubmitExecutionResponse
+	(ScriptType)(0),                 // 10: executor.service.v1.ScriptType
 }
 var file_executor_service_v1_client_proto_depIdxs = []int32{
-	8, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
-	8, // 1: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
-	1, // 2: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
-	3, // 3: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
-	4, // 4: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
-	6, // 5: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
-	2, // 6: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
-	0, // 7: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
-	5, // 8: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
-	7, // 9: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
-	6, // [6:10] is the sub-list for method output_type
-	2, // [2:6] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	10, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
+	10, // 1: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
+	1,  // 2: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
+	3,  // 3: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
+	4,  // 4: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
+	6,  // 5: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
+	8,  // 6: executor.service.v1.ExecutorClientService.SubmitExecution:input_type -> executor.service.v1.SubmitExecutionRequest
+	2,  // 7: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
+	0,  // 8: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
+	5,  // 9: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
+	7,  // 10: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
+	9,  // 11: executor.service.v1.ExecutorClientService.SubmitExecution:output_type -> executor.service.v1.SubmitExecutionResponse
+	7,  // [7:12] is the sub-list for method output_type
+	2,  // [2:7] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_executor_service_v1_client_proto_init() }
@@ -626,7 +770,7 @@ func file_executor_service_v1_client_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_executor_service_v1_client_proto_rawDesc), len(file_executor_service_v1_client_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   8,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -22,6 +22,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationExecutorClientServiceAckCommand = "/executor.service.v1.ExecutorClientService/AckCommand"
 const OperationExecutorClientServiceFetchScript = "/executor.service.v1.ExecutorClientService/FetchScript"
 const OperationExecutorClientServiceReportResult = "/executor.service.v1.ExecutorClientService/ReportResult"
+const OperationExecutorClientServiceSubmitExecution = "/executor.service.v1.ExecutorClientService/SubmitExecution"
 
 type ExecutorClientServiceHTTPServer interface {
 	// AckCommand Acknowledge a command (accepted or rejected)
@@ -30,6 +31,8 @@ type ExecutorClientServiceHTTPServer interface {
 	FetchScript(context.Context, *FetchScriptRequest) (*FetchScriptResponse, error)
 	// ReportResult Report execution result
 	ReportResult(context.Context, *ReportResultRequest) (*ReportResultResponse, error)
+	// SubmitExecution Submit a complete execution log (client-pull scenario)
+	SubmitExecution(context.Context, *SubmitExecutionRequest) (*SubmitExecutionResponse, error)
 }
 
 func RegisterExecutorClientServiceHTTPServer(s *http.Server, srv ExecutorClientServiceHTTPServer) {
@@ -37,6 +40,7 @@ func RegisterExecutorClientServiceHTTPServer(s *http.Server, srv ExecutorClientS
 	r.GET("/v1/client/scripts/{script_id}", _ExecutorClientService_FetchScript0_HTTP_Handler(srv))
 	r.POST("/v1/client/commands/{command_id}/ack", _ExecutorClientService_AckCommand0_HTTP_Handler(srv))
 	r.POST("/v1/client/executions/{execution_id}/result", _ExecutorClientService_ReportResult0_HTTP_Handler(srv))
+	r.POST("/v1/client/executions", _ExecutorClientService_SubmitExecution0_HTTP_Handler(srv))
 }
 
 func _ExecutorClientService_FetchScript0_HTTP_Handler(srv ExecutorClientServiceHTTPServer) func(ctx http.Context) error {
@@ -111,6 +115,28 @@ func _ExecutorClientService_ReportResult0_HTTP_Handler(srv ExecutorClientService
 	}
 }
 
+func _ExecutorClientService_SubmitExecution0_HTTP_Handler(srv ExecutorClientServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SubmitExecutionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationExecutorClientServiceSubmitExecution)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SubmitExecution(ctx, req.(*SubmitExecutionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SubmitExecutionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ExecutorClientServiceHTTPClient interface {
 	// AckCommand Acknowledge a command (accepted or rejected)
 	AckCommand(ctx context.Context, req *AckCommandRequest, opts ...http.CallOption) (rsp *AckCommandResponse, err error)
@@ -118,6 +144,8 @@ type ExecutorClientServiceHTTPClient interface {
 	FetchScript(ctx context.Context, req *FetchScriptRequest, opts ...http.CallOption) (rsp *FetchScriptResponse, err error)
 	// ReportResult Report execution result
 	ReportResult(ctx context.Context, req *ReportResultRequest, opts ...http.CallOption) (rsp *ReportResultResponse, err error)
+	// SubmitExecution Submit a complete execution log (client-pull scenario)
+	SubmitExecution(ctx context.Context, req *SubmitExecutionRequest, opts ...http.CallOption) (rsp *SubmitExecutionResponse, err error)
 }
 
 type ExecutorClientServiceHTTPClientImpl struct {
@@ -162,6 +190,20 @@ func (c *ExecutorClientServiceHTTPClientImpl) ReportResult(ctx context.Context, 
 	pattern := "/v1/client/executions/{execution_id}/result"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationExecutorClientServiceReportResult))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SubmitExecution Submit a complete execution log (client-pull scenario)
+func (c *ExecutorClientServiceHTTPClientImpl) SubmitExecution(ctx context.Context, in *SubmitExecutionRequest, opts ...http.CallOption) (*SubmitExecutionResponse, error) {
+	var out SubmitExecutionResponse
+	pattern := "/v1/client/executions"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationExecutorClientServiceSubmitExecution))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

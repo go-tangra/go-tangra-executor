@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExecutorClientService_FetchScript_FullMethodName    = "/executor.service.v1.ExecutorClientService/FetchScript"
-	ExecutorClientService_StreamCommands_FullMethodName = "/executor.service.v1.ExecutorClientService/StreamCommands"
-	ExecutorClientService_AckCommand_FullMethodName     = "/executor.service.v1.ExecutorClientService/AckCommand"
-	ExecutorClientService_ReportResult_FullMethodName   = "/executor.service.v1.ExecutorClientService/ReportResult"
+	ExecutorClientService_FetchScript_FullMethodName     = "/executor.service.v1.ExecutorClientService/FetchScript"
+	ExecutorClientService_StreamCommands_FullMethodName  = "/executor.service.v1.ExecutorClientService/StreamCommands"
+	ExecutorClientService_AckCommand_FullMethodName      = "/executor.service.v1.ExecutorClientService/AckCommand"
+	ExecutorClientService_ReportResult_FullMethodName    = "/executor.service.v1.ExecutorClientService/ReportResult"
+	ExecutorClientService_SubmitExecution_FullMethodName = "/executor.service.v1.ExecutorClientService/SubmitExecution"
 )
 
 // ExecutorClientServiceClient is the client API for ExecutorClientService service.
@@ -39,6 +40,8 @@ type ExecutorClientServiceClient interface {
 	AckCommand(ctx context.Context, in *AckCommandRequest, opts ...grpc.CallOption) (*AckCommandResponse, error)
 	// Report execution result
 	ReportResult(ctx context.Context, in *ReportResultRequest, opts ...grpc.CallOption) (*ReportResultResponse, error)
+	// Submit a complete execution log (client-pull scenario)
+	SubmitExecution(ctx context.Context, in *SubmitExecutionRequest, opts ...grpc.CallOption) (*SubmitExecutionResponse, error)
 }
 
 type executorClientServiceClient struct {
@@ -98,6 +101,16 @@ func (c *executorClientServiceClient) ReportResult(ctx context.Context, in *Repo
 	return out, nil
 }
 
+func (c *executorClientServiceClient) SubmitExecution(ctx context.Context, in *SubmitExecutionRequest, opts ...grpc.CallOption) (*SubmitExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitExecutionResponse)
+	err := c.cc.Invoke(ctx, ExecutorClientService_SubmitExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExecutorClientServiceServer is the server API for ExecutorClientService service.
 // All implementations must embed UnimplementedExecutorClientServiceServer
 // for forward compatibility.
@@ -112,6 +125,8 @@ type ExecutorClientServiceServer interface {
 	AckCommand(context.Context, *AckCommandRequest) (*AckCommandResponse, error)
 	// Report execution result
 	ReportResult(context.Context, *ReportResultRequest) (*ReportResultResponse, error)
+	// Submit a complete execution log (client-pull scenario)
+	SubmitExecution(context.Context, *SubmitExecutionRequest) (*SubmitExecutionResponse, error)
 	mustEmbedUnimplementedExecutorClientServiceServer()
 }
 
@@ -133,6 +148,9 @@ func (UnimplementedExecutorClientServiceServer) AckCommand(context.Context, *Ack
 }
 func (UnimplementedExecutorClientServiceServer) ReportResult(context.Context, *ReportResultRequest) (*ReportResultResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReportResult not implemented")
+}
+func (UnimplementedExecutorClientServiceServer) SubmitExecution(context.Context, *SubmitExecutionRequest) (*SubmitExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SubmitExecution not implemented")
 }
 func (UnimplementedExecutorClientServiceServer) mustEmbedUnimplementedExecutorClientServiceServer() {}
 func (UnimplementedExecutorClientServiceServer) testEmbeddedByValue()                               {}
@@ -220,6 +238,24 @@ func _ExecutorClientService_ReportResult_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExecutorClientService_SubmitExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExecutorClientServiceServer).SubmitExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExecutorClientService_SubmitExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExecutorClientServiceServer).SubmitExecution(ctx, req.(*SubmitExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ExecutorClientService_ServiceDesc is the grpc.ServiceDesc for ExecutorClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -238,6 +274,10 @@ var ExecutorClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReportResult",
 			Handler:    _ExecutorClientService_ReportResult_Handler,
+		},
+		{
+			MethodName: "SubmitExecution",
+			Handler:    _ExecutorClientService_SubmitExecution_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{
