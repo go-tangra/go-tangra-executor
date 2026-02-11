@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
 
+	"github.com/go-tangra/go-tangra-common/middleware/mtls"
 	"github.com/go-tangra/go-tangra-executor/internal/data"
 
 	executorV1 "github.com/go-tangra/go-tangra-executor/gen/go/executor/service/v1"
@@ -39,10 +40,18 @@ func NewClientService(
 	}
 }
 
+// getClientCN extracts the client CN: first from gRPC metadata (admin-gateway proxied),
+// then from the mTLS peer certificate context (direct client calls).
+func getClientCN(ctx context.Context) string {
+	if cn := getMetadataValue(ctx, "x-md-global-client-cn"); cn != "" {
+		return cn
+	}
+	return mtls.GetClientID(ctx)
+}
+
 // FetchScript returns script content + hash, validating that the client is assigned
 func (s *ClientService) FetchScript(ctx context.Context, req *executorV1.FetchScriptRequest) (*executorV1.FetchScriptResponse, error) {
-	// Get mTLS client CN from context metadata
-	clientCN := getMetadataValue(ctx, "x-md-global-client-cn")
+	clientCN := getClientCN(ctx)
 
 	script, err := s.scriptRepo.GetByID(ctx, req.ScriptId)
 	if err != nil {
@@ -133,7 +142,7 @@ func (s *ClientService) AckCommand(ctx context.Context, req *executorV1.AckComma
 
 // SubmitExecution creates a complete execution log in one shot (client-pull scenario)
 func (s *ClientService) SubmitExecution(ctx context.Context, req *executorV1.SubmitExecutionRequest) (*executorV1.SubmitExecutionResponse, error) {
-	clientCN := getMetadataValue(ctx, "x-md-global-client-cn")
+	clientCN := getClientCN(ctx)
 
 	// Look up the script
 	script, err := s.scriptRepo.GetByID(ctx, req.ScriptId)
