@@ -5,6 +5,8 @@ import (
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/peer"
 
 	"github.com/go-tangra/go-tangra-common/middleware/mtls"
 	"github.com/go-tangra/go-tangra-executor/internal/data"
@@ -41,12 +43,31 @@ func NewClientService(
 }
 
 // getClientCN extracts the client CN: first from gRPC metadata (admin-gateway proxied),
-// then from the mTLS peer certificate context (direct client calls).
+// then from the mTLS peer certificate context (direct client calls via unary middleware).
 func getClientCN(ctx context.Context) string {
 	if cn := getMetadataValue(ctx, "x-md-global-client-cn"); cn != "" {
 		return cn
 	}
 	return mtls.GetClientID(ctx)
+}
+
+// getPeerCN extracts the CN directly from the gRPC peer TLS certificate.
+// This works for streaming RPCs where the Kratos unary mTLS middleware doesn't run.
+func getPeerCN(ctx context.Context) string {
+	// First try the middleware-set context (works for unary RPCs)
+	if cn := getClientCN(ctx); cn != "" {
+		return cn
+	}
+	// Fall back to extracting directly from peer TLS info (works for streaming RPCs)
+	p, ok := peer.FromContext(ctx)
+	if !ok || p.AuthInfo == nil {
+		return ""
+	}
+	tlsInfo, ok := p.AuthInfo.(credentials.TLSInfo)
+	if !ok || len(tlsInfo.State.PeerCertificates) == 0 {
+		return ""
+	}
+	return tlsInfo.State.PeerCertificates[0].Subject.CommonName
 }
 
 // FetchScript returns script content + hash, validating that the client is assigned
@@ -88,8 +109,9 @@ func (s *ClientService) FetchScript(ctx context.Context, req *executorV1.FetchSc
 // StreamCommands opens a server-side stream for the client to receive execution commands
 func (s *ClientService) StreamCommands(req *executorV1.StreamCommandsRequest, stream executorV1.ExecutorClientService_StreamCommandsServer) error {
 	// Use the mTLS CN as the registry key so it matches TriggerExecution lookups.
-	// Fall back to req.ClientId if CN is unavailable.
-	clientID := getClientCN(stream.Context())
+	// getPeerCN extracts CN directly from the TLS peer cert, which works for
+	// streaming RPCs where the Kratos unary mTLS middleware doesn't run.
+	clientID := getPeerCN(stream.Context())
 	if clientID == "" {
 		clientID = req.ClientId
 	}
