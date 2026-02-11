@@ -1,0 +1,352 @@
+openapi: 3.0.3
+info:
+  title: Executor Service API
+  description: Remote script execution management with hash verification and audit logging
+  version: 1.0.0
+
+paths:
+  /v1/scripts:
+    post:
+      summary: Create a new script
+      operationId: CreateScript
+      tags: [Scripts]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateScriptRequest'
+      responses:
+        '200':
+          description: Script created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateScriptResponse'
+    get:
+      summary: List scripts
+      operationId: ListScripts
+      tags: [Scripts]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: pageSize
+          in: query
+          schema: { type: integer }
+        - name: scriptType
+          in: query
+          schema: { type: string, enum: [BASH, JAVASCRIPT, LUA] }
+        - name: name
+          in: query
+          schema: { type: string }
+        - name: enabled
+          in: query
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: List of scripts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListScriptsResponse'
+
+  /v1/scripts/{id}:
+    get:
+      summary: Get a script by ID
+      operationId: GetScript
+      tags: [Scripts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Script details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetScriptResponse'
+    put:
+      summary: Update a script
+      operationId: UpdateScript
+      tags: [Scripts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateScriptRequest'
+      responses:
+        '200':
+          description: Script updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateScriptResponse'
+    delete:
+      summary: Delete a script
+      operationId: DeleteScript
+      tags: [Scripts]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Script deleted
+
+  /v1/scripts/{scriptId}/assignments:
+    post:
+      summary: Assign script to client
+      operationId: AssignScript
+      tags: [Assignments]
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId: { type: string }
+      responses:
+        '200':
+          description: Assignment created
+    get:
+      summary: List assignments for a script
+      operationId: ListAssignments
+      tags: [Assignments]
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of assignments
+
+  /v1/scripts/{scriptId}/assignments/{clientId}:
+    delete:
+      summary: Unassign script from client
+      operationId: UnassignScript
+      tags: [Assignments]
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          schema: { type: string }
+        - name: clientId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Assignment deleted
+
+  /v1/clients/{clientId}/scripts:
+    get:
+      summary: List scripts assigned to a client
+      operationId: ListClientScripts
+      tags: [Assignments]
+      parameters:
+        - name: clientId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of assigned scripts
+
+  /v1/scripts/{scriptId}/execute:
+    post:
+      summary: Trigger script execution on a client
+      operationId: TriggerExecution
+      tags: [Executions]
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId: { type: string }
+      responses:
+        '200':
+          description: Execution triggered
+
+  /v1/executions:
+    get:
+      summary: List executions
+      operationId: ListExecutions
+      tags: [Executions]
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer }
+        - name: pageSize
+          in: query
+          schema: { type: integer }
+        - name: scriptId
+          in: query
+          schema: { type: string }
+        - name: clientId
+          in: query
+          schema: { type: string }
+        - name: status
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: List of executions
+
+  /v1/executions/{id}:
+    get:
+      summary: Get execution details
+      operationId: GetExecution
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Execution details
+
+  /v1/executions/{id}/output:
+    get:
+      summary: Get execution output
+      operationId: GetExecutionOutput
+      tags: [Executions]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Execution output
+
+  /v1/client/scripts/{scriptId}:
+    get:
+      summary: Fetch script for execution (client-facing)
+      operationId: FetchScript
+      tags: [Client]
+      parameters:
+        - name: scriptId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Script content and hash
+
+  /v1/client/commands/{commandId}/ack:
+    post:
+      summary: Acknowledge a command
+      operationId: AckCommand
+      tags: [Client]
+      parameters:
+        - name: commandId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Command acknowledged
+
+  /v1/client/executions/{executionId}/result:
+    post:
+      summary: Report execution result
+      operationId: ReportResult
+      tags: [Client]
+      parameters:
+        - name: executionId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Result recorded
+
+components:
+  schemas:
+    CreateScriptRequest:
+      type: object
+      required: [name, scriptType, content]
+      properties:
+        name: { type: string }
+        description: { type: string }
+        scriptType: { type: string, enum: [BASH, JAVASCRIPT, LUA] }
+        content: { type: string }
+        enabled: { type: boolean }
+
+    CreateScriptResponse:
+      type: object
+      properties:
+        script:
+          $ref: '#/components/schemas/Script'
+
+    GetScriptResponse:
+      type: object
+      properties:
+        script:
+          $ref: '#/components/schemas/Script'
+
+    ListScriptsResponse:
+      type: object
+      properties:
+        scripts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Script'
+        total: { type: integer }
+
+    UpdateScriptRequest:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        content: { type: string }
+        enabled: { type: boolean }
+        password: { type: string }
+
+    UpdateScriptResponse:
+      type: object
+      properties:
+        script:
+          $ref: '#/components/schemas/Script'
+
+    Script:
+      type: object
+      properties:
+        id: { type: string }
+        tenantId: { type: integer }
+        name: { type: string }
+        description: { type: string }
+        scriptType: { type: string }
+        content: { type: string }
+        contentHash: { type: string }
+        version: { type: integer }
+        enabled: { type: boolean }
+        createdBy: { type: integer }
+        updatedBy: { type: integer }
+        createTime: { type: string, format: date-time }
+        updateTime: { type: string, format: date-time }

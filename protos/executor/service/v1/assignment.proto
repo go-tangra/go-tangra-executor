@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+import "executor/service/v1/script.proto";
+
+// Script assignment entity
+message ScriptAssignment {
+  string id = 1 [json_name = "id"];
+  uint32 tenant_id = 2 [json_name = "tenantId"];
+  string script_id = 3 [json_name = "scriptId"];
+  string client_id = 4 [json_name = "clientId"];
+  optional uint32 created_by = 5 [json_name = "createdBy"];
+  google.protobuf.Timestamp create_time = 6 [json_name = "createTime"];
+  // Optionally populated when listing
+  optional Script script = 7 [json_name = "script"];
+}
+
+// Assignment management service
+service ExecutorAssignmentService {
+  // Assign a script to a client
+  rpc AssignScript(AssignScriptRequest) returns (AssignScriptResponse) {
+    option (google.api.http) = {
+      post: "/v1/scripts/{script_id}/assignments"
+      body: "*"
+    };
+  }
+
+  // Unassign a script from a client
+  rpc UnassignScript(UnassignScriptRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/scripts/{script_id}/assignments/{client_id}"
+    };
+  }
+
+  // List assignments for a script
+  rpc ListAssignments(ListAssignmentsRequest) returns (ListAssignmentsResponse) {
+    option (google.api.http) = {
+      get: "/v1/scripts/{script_id}/assignments"
+    };
+  }
+
+  // List scripts assigned to a client
+  rpc ListClientScripts(ListClientScriptsRequest) returns (ListClientScriptsResponse) {
+    option (google.api.http) = {
+      get: "/v1/clients/{client_id}/scripts"
+    };
+  }
+}
+
+// Assign script request
+message AssignScriptRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  string client_id = 2 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+message AssignScriptResponse {
+  ScriptAssignment assignment = 1 [json_name = "assignment"];
+}
+
+// Unassign script request
+message UnassignScriptRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  string client_id = 2 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+// List assignments request
+message ListAssignmentsRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}
+
+message ListAssignmentsResponse {
+  repeated ScriptAssignment assignments = 1 [json_name = "assignments"];
+}
+
+// List client scripts request
+message ListClientScriptsRequest {
+  string client_id = 1 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+message ListClientScriptsResponse {
+  repeated ScriptAssignment assignments = 1 [json_name = "assignments"];
+}

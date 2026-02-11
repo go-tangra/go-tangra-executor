@@ -1,0 +1,96 @@
+# Executor Module Menu Definitions
+# This file defines the menu structure for the Executor module
+# Used by admin service for dynamic menu registration
+
+module:
+  id: executor
+  name: Executor
+  description: Remote script execution management with hash verification and audit logging
+
+menus:
+  - id: executor
+    parent_id: null
+    type: CATALOG
+    name: Executor
+    path: /executor
+    icon: lucide:terminal
+    order: 500
+    authority:
+      - platform:admin
+      - tenant:manager
+
+  - id: executor-scripts
+    parent_id: executor
+    type: MENU
+    name: Scripts
+    path: scripts
+    component: app/executor/scripts/index.vue
+    icon: lucide:file-code
+    order: 1
+    authority:
+      - platform:admin
+      - tenant:manager
+
+  - id: executor-executions
+    parent_id: executor
+    type: MENU
+    name: Executions
+    path: executions
+    component: app/executor/executions/index.vue
+    icon: lucide:play
+    order: 2
+    authority:
+      - platform:admin
+      - tenant:manager
+
+permission_groups:
+  - name: Executor
+    module: executor
+    description: Executor Module Permissions
+    permissions:
+      - name: View Scripts
+        code: executor.script.view
+        description: View scripts list
+      - name: Manage Scripts
+        code: executor.script.manage
+        description: Create, update, and delete scripts
+      - name: Manage Assignments
+        code: executor.assignment.manage
+        description: Assign and unassign scripts to clients
+      - name: Trigger Execution
+        code: executor.execution.trigger
+        description: Trigger script execution on clients
+      - name: View Executions
+        code: executor.execution.view
+        description: View execution logs and output
+
+roles:
+  - name: Executor Administrator
+    code: executor.admin
+    description: Full access to Executor module
+    is_system: true
+    permissions:
+      - executor.script.view
+      - executor.script.manage
+      - executor.assignment.manage
+      - executor.execution.trigger
+      - executor.execution.view
+
+  - name: Executor Operator
+    code: executor.operator
+    description: Can manage scripts, assignments, and trigger executions
+    is_system: true
+    permissions:
+      - executor.script.view
+      - executor.script.manage
+      - executor.assignment.manage
+      - executor.execution.trigger
+      - executor.execution.view
+
+  - name: Executor Viewer
+    code: executor.viewer
+    description: Read-only access to Executor module
+    is_system: true
+    permissions:
+      - executor.script.view
+      - executor.execution.view

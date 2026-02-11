@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+// How execution was triggered
+enum TriggerType {
+  TRIGGER_TYPE_UNSPECIFIED = 0;
+  TRIGGER_TYPE_CLIENT_PULL = 1;
+  TRIGGER_TYPE_UI_PUSH = 2;
+}
+
+// Execution status
+enum ExecutionStatus {
+  EXECUTION_STATUS_UNSPECIFIED = 0;
+  EXECUTION_STATUS_PENDING = 1;
+  EXECUTION_STATUS_RUNNING = 2;
+  EXECUTION_STATUS_COMPLETED = 3;
+  EXECUTION_STATUS_FAILED = 4;
+  EXECUTION_STATUS_REJECTED_HASH_MISMATCH = 5;
+  EXECUTION_STATUS_REJECTED_NOT_APPROVED = 6;
+  EXECUTION_STATUS_CLIENT_OFFLINE = 7;
+}
+
+// Execution log entity
+message ExecutionLog {
+  string id = 1 [json_name = "id"];
+  uint32 tenant_id = 2 [json_name = "tenantId"];
+  string script_id = 3 [json_name = "scriptId"];
+  string script_name = 4 [json_name = "scriptName"];
+  string client_id = 5 [json_name = "clientId"];
+  string script_hash = 6 [json_name = "scriptHash"];
+  TriggerType trigger_type = 7 [json_name = "triggerType"];
+  ExecutionStatus status = 8 [json_name = "status"];
+  optional int32 exit_code = 9 [json_name = "exitCode"];
+  optional string output = 10 [json_name = "output"];
+  optional string error_output = 11 [json_name = "errorOutput"];
+  optional string rejection_reason = 12 [json_name = "rejectionReason"];
+  optional google.protobuf.Timestamp started_at = 13 [json_name = "startedAt"];
+  optional google.protobuf.Timestamp completed_at = 14 [json_name = "completedAt"];
+  optional int64 duration_ms = 15 [json_name = "durationMs"];
+  optional uint32 created_by = 16 [json_name = "createdBy"];
+  google.protobuf.Timestamp create_time = 17 [json_name = "createTime"];
+}
+
+// Execution management service (UI/admin facing)
+service ExecutorExecutionService {
+  // Trigger script execution on a client (UI-push)
+  rpc TriggerExecution(TriggerExecutionRequest) returns (TriggerExecutionResponse) {
+    option (google.api.http) = {
+      post: "/v1/scripts/{script_id}/execute"
+      body: "*"
+    };
+  }
+
+  // Get execution details
+  rpc GetExecution(GetExecutionRequest) returns (GetExecutionResponse) {
+    option (google.api.http) = {
+      get: "/v1/executions/{id}"
+    };
+  }
+
+  // List executions
+  rpc ListExecutions(ListExecutionsRequest) returns (ListExecutionsResponse) {
+    option (google.api.http) = {
+      get: "/v1/executions"
+    };
+  }
+
+  // Get execution output (full stdout/stderr)
+  rpc GetExecutionOutput(GetExecutionOutputRequest) returns (GetExecutionOutputResponse) {
+    option (google.api.http) = {
+      get: "/v1/executions/{id}/output"
+    };
+  }
+}
+
+// Trigger execution request
+message TriggerExecutionRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  string client_id = 2 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+message TriggerExecutionResponse {
+  ExecutionLog execution = 1 [json_name = "execution"];
+}
+
+// Get execution request
+message GetExecutionRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}
+
+message GetExecutionResponse {
+  ExecutionLog execution = 1 [json_name = "execution"];
+}
+
+// List executions request
+message ListExecutionsRequest {
+  optional uint32 page = 1 [json_name = "page"];
+  optional uint32 page_size = 2 [json_name = "pageSize"];
+  optional string script_id = 3 [json_name = "scriptId"];
+  optional string client_id = 4 [json_name = "clientId"];
+  optional ExecutionStatus status = 5 [json_name = "status"];
+}
+
+message ListExecutionsResponse {
+  repeated ExecutionLog executions = 1 [json_name = "executions"];
+  uint32 total = 2 [json_name = "total"];
+}
+
+// Get execution output request
+message GetExecutionOutputRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}
+
+message GetExecutionOutputResponse {
+  string output = 1 [json_name = "output"];
+  string error_output = 2 [json_name = "errorOutput"];
+  optional int32 exit_code = 3 [json_name = "exitCode"];
+}

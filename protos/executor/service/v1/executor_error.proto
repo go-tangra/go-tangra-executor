@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "errors/errors.proto";
+
+enum ExecutorErrorReason {
+  option (errors.default_code) = 500;
+
+  // 400 - Bad Request
+  BAD_REQUEST = 0 [(errors.code) = 400];
+  INVALID_SCRIPT_TYPE = 1 [(errors.code) = 400];
+  INVALID_SCRIPT_CONTENT = 2 [(errors.code) = 400];
+  PASSWORD_REQUIRED = 3 [(errors.code) = 400];
+
+  // 401 - Unauthorized
+  UNAUTHORIZED = 100 [(errors.code) = 401];
+  PASSWORD_VERIFICATION_FAILED = 101 [(errors.code) = 401];
+
+  // 403 - Forbidden
+  FORBIDDEN = 300 [(errors.code) = 403];
+  CLIENT_NOT_ASSIGNED = 301 [(errors.code) = 403];
+
+  // 404 - Not Found
+  NOT_FOUND = 400 [(errors.code) = 404];
+  SCRIPT_NOT_FOUND = 401 [(errors.code) = 404];
+  ASSIGNMENT_NOT_FOUND = 402 [(errors.code) = 404];
+  EXECUTION_NOT_FOUND = 403 [(errors.code) = 404];
+  COMMAND_NOT_FOUND = 404 [(errors.code) = 404];
+
+  // 409 - Conflict
+  ASSIGNMENT_ALREADY_EXISTS = 900 [(errors.code) = 409];
+  SCRIPT_DISABLED = 901 [(errors.code) = 409];
+
+  // 500 - Internal Server Error
+  INTERNAL_SERVER_ERROR = 2000 [(errors.code) = 500];
+  DATABASE_ERROR = 2001 [(errors.code) = 500];
+
+  // 503 - Service Unavailable
+  SERVICE_UNAVAILABLE = 2300 [(errors.code) = 503];
+  PORTAL_UNAVAILABLE = 2301 [(errors.code) = 503];
+  CLIENT_OFFLINE = 2302 [(errors.code) = 503];
+}

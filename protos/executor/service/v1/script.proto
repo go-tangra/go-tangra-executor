@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// Script type enum
+enum ScriptType {
+  SCRIPT_TYPE_UNSPECIFIED = 0;
+  SCRIPT_TYPE_BASH = 1;
+  SCRIPT_TYPE_JAVASCRIPT = 2;
+  SCRIPT_TYPE_LUA = 3;
+}
+
+// Script entity
+message Script {
+  string id = 1 [json_name = "id"];
+  uint32 tenant_id = 2 [json_name = "tenantId"];
+  string name = 3 [json_name = "name"];
+  string description = 4 [json_name = "description"];
+  ScriptType script_type = 5 [json_name = "scriptType"];
+  string content = 6 [json_name = "content"];
+  string content_hash = 7 [json_name = "contentHash"];
+  int32 version = 8 [json_name = "version"];
+  bool enabled = 9 [json_name = "enabled"];
+  optional uint32 created_by = 10 [json_name = "createdBy"];
+  optional uint32 updated_by = 11 [json_name = "updatedBy"];
+  google.protobuf.Timestamp create_time = 12 [json_name = "createTime"];
+  optional google.protobuf.Timestamp update_time = 13 [json_name = "updateTime"];
+}
+
+// Script management service
+service ExecutorScriptService {
+  // Create a new script
+  rpc CreateScript(CreateScriptRequest) returns (CreateScriptResponse) {
+    option (google.api.http) = {
+      post: "/v1/scripts"
+      body: "*"
+    };
+  }
+
+  // Get a script by ID
+  rpc GetScript(GetScriptRequest) returns (GetScriptResponse) {
+    option (google.api.http) = {
+      get: "/v1/scripts/{id}"
+    };
+  }
+
+  // List scripts
+  rpc ListScripts(ListScriptsRequest) returns (ListScriptsResponse) {
+    option (google.api.http) = {
+      get: "/v1/scripts"
+    };
+  }
+
+  // Update a script (password required when content changes)
+  rpc UpdateScript(UpdateScriptRequest) returns (UpdateScriptResponse) {
+    option (google.api.http) = {
+      put: "/v1/scripts/{id}"
+      body: "*"
+    };
+  }
+
+  // Delete a script
+  rpc DeleteScript(DeleteScriptRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/scripts/{id}"
+    };
+  }
+}
+
+// Create script request
+message CreateScriptRequest {
+  string name = 1 [
+    json_name = "name",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+
+  string description = 2 [
+    json_name = "description",
+    (buf.validate.field).string = {max_len: 2048}
+  ];
+
+  ScriptType script_type = 3 [
+    json_name = "scriptType",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).enum = {not_in: [0]}
+  ];
+
+  string content = 4 [
+    json_name = "content",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ];
+
+  bool enabled = 5 [json_name = "enabled"];
+}
+
+message CreateScriptResponse {
+  Script script = 1 [json_name = "script"];
+}
+
+// Get script request
+message GetScriptRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}
+
+message GetScriptResponse {
+  Script script = 1 [json_name = "script"];
+}
+
+// List scripts request
+message ListScriptsRequest {
+  optional uint32 page = 1 [json_name = "page"];
+  optional uint32 page_size = 2 [json_name = "pageSize"];
+  optional ScriptType script_type = 3 [json_name = "scriptType"];
+  optional string name = 4 [json_name = "name"];
+  optional bool enabled = 5 [json_name = "enabled"];
+}
+
+message ListScriptsResponse {
+  repeated Script scripts = 1 [json_name = "scripts"];
+  uint32 total = 2 [json_name = "total"];
+}
+
+// Update script request
+message UpdateScriptRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  optional string name = 2 [
+    json_name = "name",
+    (buf.validate.field).string = {max_len: 255}
+  ];
+
+  optional string description = 3 [
+    json_name = "description",
+    (buf.validate.field).string = {max_len: 2048}
+  ];
+
+  optional string content = 4 [json_name = "content"];
+
+  optional bool enabled = 5 [json_name = "enabled"];
+
+  // Password required when content changes
+  optional string password = 6 [json_name = "password"];
+}
+
+message UpdateScriptResponse {
+  Script script = 1 [json_name = "script"];
+}
+
+// Delete script request
+message DeleteScriptRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}

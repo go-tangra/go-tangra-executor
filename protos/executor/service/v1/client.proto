@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/timestamp.proto";
+
+import "executor/service/v1/script.proto";
+
+// Execution command sent to client via stream
+message ExecutionCommand {
+  string command_id = 1 [json_name = "commandId"];
+  string execution_id = 2 [json_name = "executionId"];
+  string script_id = 3 [json_name = "scriptId"];
+  string script_name = 4 [json_name = "scriptName"];
+  ScriptType script_type = 5 [json_name = "scriptType"];
+  string content = 6 [json_name = "content"];
+  string content_hash = 7 [json_name = "contentHash"];
+}
+
+// Client-facing service (called by go-tangra-client daemon)
+service ExecutorClientService {
+  // Fetch a script (validates mTLS CN assignment)
+  rpc FetchScript(FetchScriptRequest) returns (FetchScriptResponse) {
+    option (google.api.http) = {
+      get: "/v1/client/scripts/{script_id}"
+    };
+  }
+
+  // Stream execution commands (server-side streaming)
+  rpc StreamCommands(StreamCommandsRequest) returns (stream ExecutionCommand) {}
+
+  // Acknowledge a command (accepted or rejected)
+  rpc AckCommand(AckCommandRequest) returns (AckCommandResponse) {
+    option (google.api.http) = {
+      post: "/v1/client/commands/{command_id}/ack"
+      body: "*"
+    };
+  }
+
+  // Report execution result
+  rpc ReportResult(ReportResultRequest) returns (ReportResultResponse) {
+    option (google.api.http) = {
+      post: "/v1/client/executions/{execution_id}/result"
+      body: "*"
+    };
+  }
+}
+
+// Fetch script request
+message FetchScriptRequest {
+  string script_id = 1 [
+    json_name = "scriptId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+}
+
+message FetchScriptResponse {
+  string script_id = 1 [json_name = "scriptId"];
+  string script_name = 2 [json_name = "scriptName"];
+  ScriptType script_type = 3 [json_name = "scriptType"];
+  string content = 4 [json_name = "content"];
+  string content_hash = 5 [json_name = "contentHash"];
+  int32 version = 6 [json_name = "version"];
+}
+
+// Stream commands request
+message StreamCommandsRequest {
+  string client_id = 1 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+// Ack command request
+message AckCommandRequest {
+  string command_id = 1 [
+    json_name = "commandId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  bool accepted = 2 [json_name = "accepted"];
+
+  optional string rejection_reason = 3 [
+    json_name = "rejectionReason",
+    (buf.validate.field).string = {max_len: 1024}
+  ];
+}
+
+message AckCommandResponse {
+  bool acknowledged = 1 [json_name = "acknowledged"];
+}
+
+// Report result request
+message ReportResultRequest {
+  string execution_id = 1 [
+    json_name = "executionId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+
+  int32 exit_code = 2 [json_name = "exitCode"];
+  string output = 3 [json_name = "output"];
+  string error_output = 4 [json_name = "errorOutput"];
+  int64 duration_ms = 5 [json_name = "durationMs"];
+}
+
+message ReportResultResponse {
+  bool recorded = 1 [json_name = "recorded"];
+}
