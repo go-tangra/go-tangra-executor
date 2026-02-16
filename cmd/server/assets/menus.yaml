@@ -43,6 +43,81 @@ menus:
       - platform:admin
       - tenant:manager
 
+dashboard_widgets:
+  - id: executor.total_scripts
+    name: Scripts
+    description: Active and total script counts
+    icon: lucide:file-code
+    widget_type: stat_card
+    data_source:
+      endpoint: /admin/v1/modules/executor/v1/statistics
+      method: GET
+    data_mapping:
+      value_path: enabledScripts
+      total_path: totalScripts
+      label: Active Scripts
+    default_size:
+      width: 3
+      height: 1
+    tags: [executor, overview]
+    authority: [platform:admin, tenant:manager]
+
+  - id: executor.execution_success
+    name: Execution Success Rate
+    description: Percentage of successful executions
+    icon: lucide:gauge
+    widget_type: gauge
+    data_source:
+      endpoint: /admin/v1/modules/executor/v1/statistics
+      method: GET
+    data_mapping:
+      value_path: successRate
+      label: Success Rate
+    default_size:
+      width: 4
+      height: 2
+    tags: [executor, chart]
+    authority: [platform:admin, tenant:manager]
+
+  - id: executor.total_executions
+    name: Executions
+    description: Completed and total execution counts
+    icon: lucide:play
+    widget_type: stat_card
+    data_source:
+      endpoint: /admin/v1/modules/executor/v1/statistics
+      method: GET
+    data_mapping:
+      value_path: completedExecutions
+      total_path: totalExecutions
+      label: Completed
+    default_size:
+      width: 3
+      height: 1
+    tags: [executor, overview]
+    authority: [platform:admin, tenant:manager]
+
+  - id: executor.recent_errors
+    name: Recent Execution Errors
+    description: Most recent script execution failures
+    icon: lucide:alert-triangle
+    widget_type: list
+    data_source:
+      endpoint: /admin/v1/modules/executor/v1/statistics
+      method: GET
+    data_mapping:
+      items_path: recentErrors
+      title_field: scriptName
+      subtitle_field: clientId
+      detail_field: errorOutput
+      time_field: createdAt
+      status_field: status
+    default_size:
+      width: 4
+      height: 2
+    tags: [executor, errors]
+    authority: [platform:admin, tenant:manager]
+
 permission_groups:
   - name: Executor
     module: executor

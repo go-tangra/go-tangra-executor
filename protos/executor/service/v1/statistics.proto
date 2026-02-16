@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// Executor Statistics Service provides aggregated statistics about the execution system
+service ExecutorStatisticsService {
+  // GetStatistics returns comprehensive statistics about the Executor system
+  rpc GetStatistics (GetStatisticsRequest) returns (GetStatisticsResponse) {
+    option (google.api.http) = {
+      get: "/v1/statistics"
+    };
+  }
+}
+
+// GetStatisticsRequest is the request message for GetStatistics
+message GetStatisticsRequest {
+  // Filter by specific tenant ID (optional, admin only)
+  optional uint32 tenant_id = 1;
+}
+
+// GetStatisticsResponse is the response message for GetStatistics
+message GetStatisticsResponse {
+  // Scripts
+  int64 total_scripts = 1;
+  int64 enabled_scripts = 2;
+  int64 disabled_scripts = 3;
+
+  // Assignments
+  int64 total_assignments = 4;
+
+  // Executions
+  int64 total_executions = 5;
+  int64 completed_executions = 6;
+  int64 failed_executions = 7;
+  int64 pending_executions = 8;
+  int64 running_executions = 9;
+  int64 rejected_executions = 10;
+
+  // Rates
+  double success_rate = 11;
+
+  // Time-based
+  int64 executions_last_24h = 12;
+  int64 executions_last_7d = 13;
+
+  // Recent errors
+  repeated RecentError recent_errors = 14;
+}
+
+// RecentError represents a recent execution failure
+message RecentError {
+  string execution_id = 1;
+  string script_name = 2;
+  string client_id = 3;
+  string error_output = 4;
+  string status = 5;
+  google.protobuf.Timestamp created_at = 6;
+}

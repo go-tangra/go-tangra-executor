@@ -87,10 +87,16 @@ func (s *ExecutionService) TriggerExecution(ctx context.Context, req *executorV1
 	if sendErr := s.cmdReg.Send(req.ClientId, cmd); sendErr != nil {
 		// Client not connected — update status
 		s.log.Warnf("Client %s not connected: %v", req.ClientId, sendErr)
-		_ = s.execRepo.UpdateStatus(ctx, execLog.ID, "CLIENT_OFFLINE")
+		if updateErr := s.execRepo.UpdateStatus(ctx, execLog.ID, "CLIENT_OFFLINE"); updateErr != nil {
+			s.log.Errorf("failed to update execution %s status to CLIENT_OFFLINE: %v", execLog.ID, updateErr)
+		}
 
 		// Re-fetch to get updated status
-		execLog, _ = s.execRepo.GetByID(ctx, execLog.ID)
+		if updated, fetchErr := s.execRepo.GetByID(ctx, execLog.ID); fetchErr != nil {
+			s.log.Errorf("failed to re-fetch execution %s: %v", execLog.ID, fetchErr)
+		} else {
+			execLog = updated
+		}
 	}
 
 	return &executorV1.TriggerExecutionResponse{

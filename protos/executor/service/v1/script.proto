@@ -7,6 +7,7 @@ import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "redact/v3/redact.proto";
 
 // Script type enum
 enum ScriptType {
@@ -23,8 +24,8 @@ message Script {
   string name = 3 [json_name = "name"];
   string description = 4 [json_name = "description"];
   ScriptType script_type = 5 [json_name = "scriptType"];
-  string content = 6 [json_name = "content"];
-  string content_hash = 7 [json_name = "contentHash"];
+  string content = 6 [json_name = "content", (redact.v3.value).string = ""];
+  string content_hash = 7 [json_name = "contentHash", (redact.v3.value).string = ""];
   int32 version = 8 [json_name = "version"];
   bool enabled = 9 [json_name = "enabled"];
   optional uint32 created_by = 10 [json_name = "createdBy"];
@@ -95,7 +96,8 @@ message CreateScriptRequest {
   string content = 4 [
     json_name = "content",
     (google.api.field_behavior) = REQUIRED,
-    (buf.validate.field).string = {min_len: 1}
+    (buf.validate.field).string = {min_len: 1},
+    (redact.v3.value).string = ""
   ];
 
   bool enabled = 5 [json_name = "enabled"];
@@ -150,12 +152,12 @@ message UpdateScriptRequest {
     (buf.validate.field).string = {max_len: 2048}
   ];
 
-  optional string content = 4 [json_name = "content"];
+  optional string content = 4 [json_name = "content", (redact.v3.value).string = ""];
 
   optional bool enabled = 5 [json_name = "enabled"];
 
   // Password required when content changes
-  optional string password = 6 [json_name = "password"];
+  optional string password = 6 [json_name = "password", (redact.v3.value).string = ""];
 }
 
 message UpdateScriptResponse {

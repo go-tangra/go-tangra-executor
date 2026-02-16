@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
+import "redact/v3/redact.proto";
 
 import "executor/service/v1/script.proto";
 
@@ -16,8 +17,8 @@ message ExecutionCommand {
   string script_id = 3 [json_name = "scriptId"];
   string script_name = 4 [json_name = "scriptName"];
   ScriptType script_type = 5 [json_name = "scriptType"];
-  string content = 6 [json_name = "content"];
-  string content_hash = 7 [json_name = "contentHash"];
+  string content = 6 [json_name = "content", (redact.v3.value).string = ""];
+  string content_hash = 7 [json_name = "contentHash", (redact.v3.value).string = ""];
 }
 
 // Client-facing service (called by go-tangra-client daemon)
@@ -70,8 +71,8 @@ message FetchScriptResponse {
   string script_id = 1 [json_name = "scriptId"];
   string script_name = 2 [json_name = "scriptName"];
   ScriptType script_type = 3 [json_name = "scriptType"];
-  string content = 4 [json_name = "content"];
-  string content_hash = 5 [json_name = "contentHash"];
+  string content = 4 [json_name = "content", (redact.v3.value).string = ""];
+  string content_hash = 5 [json_name = "contentHash", (redact.v3.value).string = ""];
   int32 version = 6 [json_name = "version"];
 }
 
@@ -113,8 +114,8 @@ message ReportResultRequest {
   ];
 
   int32 exit_code = 2 [json_name = "exitCode"];
-  string output = 3 [json_name = "output"];
-  string error_output = 4 [json_name = "errorOutput"];
+  string output = 3 [json_name = "output", (redact.v3.value).string = ""];
+  string error_output = 4 [json_name = "errorOutput", (redact.v3.value).string = ""];
   int64 duration_ms = 5 [json_name = "durationMs"];
 }
 
@@ -131,8 +132,8 @@ message SubmitExecutionRequest {
   ];
 
   int32 exit_code = 2 [json_name = "exitCode"];
-  string output = 3 [json_name = "output"];
-  string error_output = 4 [json_name = "errorOutput"];
+  string output = 3 [json_name = "output", (redact.v3.value).string = ""];
+  string error_output = 4 [json_name = "errorOutput", (redact.v3.value).string = ""];
   int64 duration_ms = 5 [json_name = "durationMs"];
 }
 

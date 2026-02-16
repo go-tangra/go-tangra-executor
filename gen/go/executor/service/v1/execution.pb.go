@@ -8,6 +8,7 @@ package executorpb
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/menta2k/protoc-gen-redact/v3/redact/v3"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -736,22 +737,22 @@ var File_executor_service_v1_execution_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_execution_proto_rawDesc = "" +
 	"\n" +
-	"#executor/service/v1/execution.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xda\x06\n" +
+	"#executor/service/v1/execution.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\"\xf2\x06\n" +
 	"\fExecutionLog\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\rR\btenantId\x12\x1b\n" +
 	"\tscript_id\x18\x03 \x01(\tR\bscriptId\x12\x1f\n" +
 	"\vscript_name\x18\x04 \x01(\tR\n" +
 	"scriptName\x12\x1b\n" +
-	"\tclient_id\x18\x05 \x01(\tR\bclientId\x12\x1f\n" +
-	"\vscript_hash\x18\x06 \x01(\tR\n" +
+	"\tclient_id\x18\x05 \x01(\tR\bclientId\x12'\n" +
+	"\vscript_hash\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00R\n" +
 	"scriptHash\x12C\n" +
 	"\ftrigger_type\x18\a \x01(\x0e2 .executor.service.v1.TriggerTypeR\vtriggerType\x12<\n" +
 	"\x06status\x18\b \x01(\x0e2$.executor.service.v1.ExecutionStatusR\x06status\x12 \n" +
-	"\texit_code\x18\t \x01(\x05H\x00R\bexitCode\x88\x01\x01\x12\x1b\n" +
+	"\texit_code\x18\t \x01(\x05H\x00R\bexitCode\x88\x01\x01\x12#\n" +
 	"\x06output\x18\n" +
-	" \x01(\tH\x01R\x06output\x88\x01\x01\x12&\n" +
-	"\ferror_output\x18\v \x01(\tH\x02R\verrorOutput\x88\x01\x01\x12.\n" +
+	" \x01(\tB\x06ڶ\x1a\x02z\x00H\x01R\x06output\x88\x01\x01\x12.\n" +
+	"\ferror_output\x18\v \x01(\tB\x06ڶ\x1a\x02z\x00H\x02R\verrorOutput\x88\x01\x01\x12.\n" +
 	"\x10rejection_reason\x18\f \x01(\tH\x03R\x0frejectionReason\x88\x01\x01\x12>\n" +
 	"\n" +
 	"started_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampH\x04R\tstartedAt\x88\x01\x01\x12B\n" +
@@ -800,10 +801,10 @@ const file_executor_service_v1_execution_proto_rawDesc = "" +
 	"executions\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\rR\x05total\"9\n" +
 	"\x19GetExecutionOutputRequest\x12\x1c\n" +
-	"\x02id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\x02id\"\x87\x01\n" +
-	"\x1aGetExecutionOutputResponse\x12\x16\n" +
-	"\x06output\x18\x01 \x01(\tR\x06output\x12!\n" +
-	"\ferror_output\x18\x02 \x01(\tR\verrorOutput\x12 \n" +
+	"\x02id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\x02id\"\x97\x01\n" +
+	"\x1aGetExecutionOutputResponse\x12\x1e\n" +
+	"\x06output\x18\x01 \x01(\tB\x06ڶ\x1a\x02z\x00R\x06output\x12)\n" +
+	"\ferror_output\x18\x02 \x01(\tB\x06ڶ\x1a\x02z\x00R\verrorOutput\x12 \n" +
 	"\texit_code\x18\x03 \x01(\x05H\x00R\bexitCode\x88\x01\x01B\f\n" +
 	"\n" +
 	"_exit_code*c\n" +

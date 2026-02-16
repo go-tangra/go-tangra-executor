@@ -6,6 +6,7 @@ import "buf/validate/validate.proto";
 import "google/api/annotations.proto";
 import "google/api/field_behavior.proto";
 import "google/protobuf/timestamp.proto";
+import "redact/v3/redact.proto";
 
 // How execution was triggered
 enum TriggerType {
@@ -33,12 +34,12 @@ message ExecutionLog {
   string script_id = 3 [json_name = "scriptId"];
   string script_name = 4 [json_name = "scriptName"];
   string client_id = 5 [json_name = "clientId"];
-  string script_hash = 6 [json_name = "scriptHash"];
+  string script_hash = 6 [json_name = "scriptHash", (redact.v3.value).string = ""];
   TriggerType trigger_type = 7 [json_name = "triggerType"];
   ExecutionStatus status = 8 [json_name = "status"];
   optional int32 exit_code = 9 [json_name = "exitCode"];
-  optional string output = 10 [json_name = "output"];
-  optional string error_output = 11 [json_name = "errorOutput"];
+  optional string output = 10 [json_name = "output", (redact.v3.value).string = ""];
+  optional string error_output = 11 [json_name = "errorOutput", (redact.v3.value).string = ""];
   optional string rejection_reason = 12 [json_name = "rejectionReason"];
   optional google.protobuf.Timestamp started_at = 13 [json_name = "startedAt"];
   optional google.protobuf.Timestamp completed_at = 14 [json_name = "completedAt"];
@@ -135,7 +136,7 @@ message GetExecutionOutputRequest {
 }
 
 message GetExecutionOutputResponse {
-  string output = 1 [json_name = "output"];
-  string error_output = 2 [json_name = "errorOutput"];
+  string output = 1 [json_name = "output", (redact.v3.value).string = ""];
+  string error_output = 2 [json_name = "errorOutput", (redact.v3.value).string = ""];
   optional int32 exit_code = 3 [json_name = "exitCode"];
 }

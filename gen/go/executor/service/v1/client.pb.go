@@ -8,6 +8,7 @@ package executorpb
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/menta2k/protoc-gen-redact/v3/redact/v3"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -650,7 +651,7 @@ var File_executor_service_v1_client_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\n" +
-	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a executor/service/v1/script.proto\"\x91\x02\n" +
+	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\x1a executor/service/v1/script.proto\"\xa1\x02\n" +
 	"\x10ExecutionCommand\x12\x1d\n" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tR\tcommandId\x12!\n" +
@@ -659,19 +660,19 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\vscript_name\x18\x04 \x01(\tR\n" +
 	"scriptName\x12@\n" +
 	"\vscript_type\x18\x05 \x01(\x0e2\x1f.executor.service.v1.ScriptTypeR\n" +
-	"scriptType\x12\x18\n" +
-	"\acontent\x18\x06 \x01(\tR\acontent\x12!\n" +
-	"\fcontent_hash\x18\a \x01(\tR\vcontentHash\"?\n" +
+	"scriptType\x12 \n" +
+	"\acontent\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
+	"\fcontent_hash\x18\a \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\"?\n" +
 	"\x12FetchScriptRequest\x12)\n" +
-	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\"\xec\x01\n" +
+	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\"\xfc\x01\n" +
 	"\x13FetchScriptResponse\x12\x1b\n" +
 	"\tscript_id\x18\x01 \x01(\tR\bscriptId\x12\x1f\n" +
 	"\vscript_name\x18\x02 \x01(\tR\n" +
 	"scriptName\x12@\n" +
 	"\vscript_type\x18\x03 \x01(\x0e2\x1f.executor.service.v1.ScriptTypeR\n" +
-	"scriptType\x12\x18\n" +
-	"\acontent\x18\x04 \x01(\tR\acontent\x12!\n" +
-	"\fcontent_hash\x18\x05 \x01(\tR\vcontentHash\x12\x18\n" +
+	"scriptType\x12 \n" +
+	"\acontent\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
+	"\fcontent_hash\x18\x05 \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12\x18\n" +
 	"\aversion\x18\x06 \x01(\x05R\aversion\"C\n" +
 	"\x15StreamCommandsRequest\x12*\n" +
 	"\tclient_id\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\bclientId\"\xab\x01\n" +
@@ -682,21 +683,21 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\x10rejection_reason\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\x80\bH\x00R\x0frejectionReason\x88\x01\x01B\x13\n" +
 	"\x11_rejection_reason\"8\n" +
 	"\x12AckCommandResponse\x12\"\n" +
-	"\facknowledged\x18\x01 \x01(\bR\facknowledged\"\xbf\x01\n" +
+	"\facknowledged\x18\x01 \x01(\bR\facknowledged\"\xcf\x01\n" +
 	"\x13ReportResultRequest\x12/\n" +
 	"\fexecution_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\vexecutionId\x12\x1b\n" +
-	"\texit_code\x18\x02 \x01(\x05R\bexitCode\x12\x16\n" +
-	"\x06output\x18\x03 \x01(\tR\x06output\x12!\n" +
-	"\ferror_output\x18\x04 \x01(\tR\verrorOutput\x12\x1f\n" +
+	"\texit_code\x18\x02 \x01(\x05R\bexitCode\x12\x1e\n" +
+	"\x06output\x18\x03 \x01(\tB\x06ڶ\x1a\x02z\x00R\x06output\x12)\n" +
+	"\ferror_output\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00R\verrorOutput\x12\x1f\n" +
 	"\vduration_ms\x18\x05 \x01(\x03R\n" +
 	"durationMs\"2\n" +
 	"\x14ReportResultResponse\x12\x1a\n" +
-	"\brecorded\x18\x01 \x01(\bR\brecorded\"\xbc\x01\n" +
+	"\brecorded\x18\x01 \x01(\bR\brecorded\"\xcc\x01\n" +
 	"\x16SubmitExecutionRequest\x12)\n" +
 	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\x12\x1b\n" +
-	"\texit_code\x18\x02 \x01(\x05R\bexitCode\x12\x16\n" +
-	"\x06output\x18\x03 \x01(\tR\x06output\x12!\n" +
-	"\ferror_output\x18\x04 \x01(\tR\verrorOutput\x12\x1f\n" +
+	"\texit_code\x18\x02 \x01(\x05R\bexitCode\x12\x1e\n" +
+	"\x06output\x18\x03 \x01(\tB\x06ڶ\x1a\x02z\x00R\x06output\x12)\n" +
+	"\ferror_output\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00R\verrorOutput\x12\x1f\n" +
 	"\vduration_ms\x18\x05 \x01(\x03R\n" +
 	"durationMs\"X\n" +
 	"\x17SubmitExecutionResponse\x12!\n" +

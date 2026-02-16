@@ -8,6 +8,7 @@ package executorpb
 
 import (
 	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
+	_ "github.com/menta2k/protoc-gen-redact/v3/redact/v3"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -737,16 +738,16 @@ var File_executor_service_v1_script_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_script_proto_rawDesc = "" +
 	"\n" +
-	" executor/service/v1/script.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x93\x04\n" +
+	" executor/service/v1/script.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\"\xa3\x04\n" +
 	"\x06Script\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
 	"\ttenant_id\x18\x02 \x01(\rR\btenantId\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x04 \x01(\tR\vdescription\x12@\n" +
 	"\vscript_type\x18\x05 \x01(\x0e2\x1f.executor.service.v1.ScriptTypeR\n" +
-	"scriptType\x12\x18\n" +
-	"\acontent\x18\x06 \x01(\tR\acontent\x12!\n" +
-	"\fcontent_hash\x18\a \x01(\tR\vcontentHash\x12\x18\n" +
+	"scriptType\x12 \n" +
+	"\acontent\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
+	"\fcontent_hash\x18\a \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12\x18\n" +
 	"\aversion\x18\b \x01(\x05R\aversion\x12\x18\n" +
 	"\aenabled\x18\t \x01(\bR\aenabled\x12\"\n" +
 	"\n" +
@@ -760,14 +761,13 @@ const file_executor_service_v1_script_proto_rawDesc = "" +
 	"updateTime\x88\x01\x01B\r\n" +
 	"\v_created_byB\r\n" +
 	"\v_updated_byB\x0e\n" +
-	"\f_update_time\"\xf3\x01\n" +
+	"\f_update_time\"\xf9\x01\n" +
 	"\x13CreateScriptRequest\x12!\n" +
 	"\x04name\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\x04name\x12*\n" +
 	"\vdescription\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\x80\x10R\vdescription\x12M\n" +
 	"\vscript_type\x18\x03 \x01(\x0e2\x1f.executor.service.v1.ScriptTypeB\v\xe0A\x02\xbaH\x05\x82\x01\x02 \x00R\n" +
-	"scriptType\x12$\n" +
-	"\acontent\x18\x04 \x01(\tB\n" +
-	"\xe0A\x02\xbaH\x04r\x02\x10\x01R\acontent\x12\x18\n" +
+	"scriptType\x12*\n" +
+	"\acontent\x18\x04 \x01(\tB\x10\xe0A\x02\xbaH\x04r\x02\x10\x01ڶ\x1a\x02z\x00R\acontent\x12\x18\n" +
 	"\aenabled\x18\x05 \x01(\bR\aenabled\"K\n" +
 	"\x14CreateScriptResponse\x123\n" +
 	"\x06script\x18\x01 \x01(\v2\x1b.executor.service.v1.ScriptR\x06script\"0\n" +
@@ -791,14 +791,14 @@ const file_executor_service_v1_script_proto_rawDesc = "" +
 	"\b_enabled\"b\n" +
 	"\x13ListScriptsResponse\x125\n" +
 	"\ascripts\x18\x01 \x03(\v2\x1b.executor.service.v1.ScriptR\ascripts\x12\x14\n" +
-	"\x05total\x18\x02 \x01(\rR\x05total\"\xa4\x02\n" +
+	"\x05total\x18\x02 \x01(\rR\x05total\"\xb4\x02\n" +
 	"\x13UpdateScriptRequest\x12\x1c\n" +
 	"\x02id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\x02id\x12!\n" +
 	"\x04name\x18\x02 \x01(\tB\b\xbaH\x05r\x03\x18\xff\x01H\x00R\x04name\x88\x01\x01\x12/\n" +
-	"\vdescription\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\x80\x10H\x01R\vdescription\x88\x01\x01\x12\x1d\n" +
-	"\acontent\x18\x04 \x01(\tH\x02R\acontent\x88\x01\x01\x12\x1d\n" +
-	"\aenabled\x18\x05 \x01(\bH\x03R\aenabled\x88\x01\x01\x12\x1f\n" +
-	"\bpassword\x18\x06 \x01(\tH\x04R\bpassword\x88\x01\x01B\a\n" +
+	"\vdescription\x18\x03 \x01(\tB\b\xbaH\x05r\x03\x18\x80\x10H\x01R\vdescription\x88\x01\x01\x12%\n" +
+	"\acontent\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00H\x02R\acontent\x88\x01\x01\x12\x1d\n" +
+	"\aenabled\x18\x05 \x01(\bH\x03R\aenabled\x88\x01\x01\x12'\n" +
+	"\bpassword\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00H\x04R\bpassword\x88\x01\x01B\a\n" +
 	"\x05_nameB\x0e\n" +
 	"\f_descriptionB\n" +
 	"\n" +

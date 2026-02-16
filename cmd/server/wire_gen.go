@@ -40,7 +40,9 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	commandRegistry := service.NewCommandRegistry()
 	executionService := service.NewExecutionService(context, scriptRepo, assignmentRepo, executionLogRepo, commandRegistry)
 	clientService := service.NewClientService(context, scriptRepo, assignmentRepo, executionLogRepo, commandRegistry)
-	grpcServer := server.NewGRPCServer(context, certManager, scriptService, assignmentService, executionService, clientService)
+	statisticsRepo := data.NewStatisticsRepo(context, entClient)
+	statisticsService := service.NewStatisticsService(context, statisticsRepo)
+	grpcServer := server.NewGRPCServer(context, certManager, scriptService, assignmentService, executionService, clientService, statisticsService)
 	app := newApp(context, grpcServer)
 	return app, func() {
 		cleanup2()

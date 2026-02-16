@@ -40,6 +40,7 @@ func NewGRPCServer(
 	assignSvc *service.AssignmentService,
 	execSvc *service.ExecutionService,
 	clientSvc *service.ClientService,
+	statsSvc *service.StatisticsService,
 ) *grpc.Server {
 	cfg := ctx.GetConfig()
 	l := ctx.NewLoggerHelper("executor/grpc")
@@ -102,11 +103,12 @@ func NewGRPCServer(
 
 	srv := grpc.NewServer(opts...)
 
-	// Register services
-	executorV1.RegisterExecutorScriptServiceServer(srv, scriptSvc)
-	executorV1.RegisterExecutorAssignmentServiceServer(srv, assignSvc)
-	executorV1.RegisterExecutorExecutionServiceServer(srv, execSvc)
-	executorV1.RegisterExecutorClientServiceServer(srv, clientSvc)
+	// Register services with redacted wrappers to prevent sensitive data from leaking in logs
+	executorV1.RegisterRedactedExecutorScriptServiceServer(srv, scriptSvc, nil)
+	executorV1.RegisterRedactedExecutorAssignmentServiceServer(srv, assignSvc, nil)
+	executorV1.RegisterRedactedExecutorExecutionServiceServer(srv, execSvc, nil)
+	executorV1.RegisterRedactedExecutorClientServiceServer(srv, clientSvc, nil)
+	executorV1.RegisterRedactedExecutorStatisticsServiceServer(srv, statsSvc, nil)
 
 	return srv
 }

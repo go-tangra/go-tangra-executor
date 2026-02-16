@@ -173,7 +173,7 @@ func (s *ScriptService) DeleteScript(ctx context.Context, req *executorV1.Delete
 
 	// Delete associated assignments first
 	if delErr := s.assignRepo.DeleteByScriptID(ctx, req.Id); delErr != nil {
-		s.log.Warnf("Failed to delete assignments for script %s: %v", req.Id, delErr)
+		return nil, executorV1.ErrorInternalServerError("failed to delete assignments for script %s: %v", req.Id, delErr)
 	}
 
 	if err := s.scriptRepo.Delete(ctx, req.Id); err != nil {
