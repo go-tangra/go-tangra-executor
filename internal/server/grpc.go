@@ -41,6 +41,7 @@ func NewGRPCServer(
 	execSvc *service.ExecutionService,
 	clientSvc *service.ClientService,
 	statsSvc *service.StatisticsService,
+	backupSvc *service.BackupService,
 ) *grpc.Server {
 	cfg := ctx.GetConfig()
 	l := ctx.NewLoggerHelper("executor/grpc")
@@ -94,6 +95,8 @@ func NewGRPCServer(
 		audit.WithSkipOperations(
 			"/grpc.health.v1.Health/Check",
 			"/grpc.health.v1.Health/Watch",
+			"/executor.service.v1.BackupService/ExportBackup",
+			"/executor.service.v1.BackupService/ImportBackup",
 		),
 	))
 
@@ -109,6 +112,7 @@ func NewGRPCServer(
 	executorV1.RegisterRedactedExecutorExecutionServiceServer(srv, execSvc, nil)
 	executorV1.RegisterRedactedExecutorClientServiceServer(srv, clientSvc, nil)
 	executorV1.RegisterRedactedExecutorStatisticsServiceServer(srv, statsSvc, nil)
+	executorV1.RegisterRedactedBackupServiceServer(srv, backupSvc, nil)
 
 	return srv
 }
