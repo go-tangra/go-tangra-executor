@@ -1,11 +1,14 @@
 package server
 
 import (
+	"io/fs"
 	"net/http"
 	"os"
 
 	kratosHttp "github.com/go-kratos/kratos/v2/transport/http"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+
+	"github.com/go-tangra/go-tangra-executor/cmd/server/assets"
 )
 
 // NewHTTPServer creates an HTTP server for serving frontend assets (Module Federation remote)
@@ -29,15 +32,14 @@ func NewHTTPServer(
 		return ctx.JSON(http.StatusOK, map[string]string{"status": "ok"})
 	})
 
-	// Serve frontend static assets (Module Federation remote)
-	frontendDist := os.Getenv("FRONTEND_DIST_PATH")
-	if frontendDist == "" {
-		frontendDist = "/app/frontend-dist"
-	}
-	if info, err := os.Stat(frontendDist); err == nil && info.IsDir() {
-		fileServer := http.FileServer(http.Dir(frontendDist))
+	// Serve embedded frontend assets (Module Federation remote)
+	fsys, err := fs.Sub(assets.FrontendDist, "frontend-dist")
+	if err == nil {
+		fileServer := http.FileServer(http.FS(fsys))
 		srv.HandlePrefix("/", fileServer)
-		l.Infof("Serving frontend assets from %s", frontendDist)
+		l.Infof("Serving embedded frontend assets")
+	} else {
+		l.Warnf("Failed to load embedded frontend assets: %v", err)
 	}
 
 	l.Infof("HTTP server listening on %s", addr)
