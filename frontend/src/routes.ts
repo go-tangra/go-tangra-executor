@@ -4,7 +4,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/executor',
     name: 'Executor',
-    component: () => import('shell/vben/layouts').then((m) => m.BasicLayout),
+    component: () => import('shell/app-layout'),
     redirect: '/executor/scripts',
     meta: {
       order: 2050,
