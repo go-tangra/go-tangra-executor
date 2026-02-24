@@ -191,7 +191,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
               {{ $t('executor.page.execution.output') }}
             </h4>
             <pre
-              class="max-h-64 overflow-auto rounded p-3 font-mono text-xs" style="background-color: #111827; color: #4ade80"
+              class="max-h-64 overflow-auto rounded bg-gray-900 p-3 font-mono text-xs text-green-400"
             >{{ output.output }}</pre>
           </div>
           <div v-if="output.errorOutput">
@@ -199,7 +199,7 @@ const [Drawer, drawerApi] = useVbenDrawer({
               {{ $t('executor.page.execution.errorOutput') }}
             </h4>
             <pre
-              class="max-h-64 overflow-auto rounded p-3 font-mono text-xs" style="background-color: #111827; color: #f87171"
+              class="max-h-64 overflow-auto rounded bg-gray-900 p-3 font-mono text-xs text-red-400"
             >{{ output.errorOutput }}</pre>
           </div>
         </div>
