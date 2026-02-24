@@ -1,7 +1,4 @@
 module github.com/go-tangra/go-tangra-executor
-
-replace github.com/go-tangra/go-tangra-common => ../go-tangra-common
-
 go 1.25.4
 
 require (
