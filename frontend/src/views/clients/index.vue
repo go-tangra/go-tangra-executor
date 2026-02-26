@@ -95,23 +95,27 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
       title: $t('executor.page.client.clientId'),
       field: 'commonName',
       minWidth: 200,
+      sortable: true,
       slots: { default: 'commonName' },
     },
     {
       title: $t('executor.page.client.certStatus'),
       field: 'status',
       width: 120,
+      sortable: true,
       slots: { default: 'status' },
     },
     {
       title: $t('executor.page.client.certType'),
       field: 'certType',
       width: 120,
+      sortable: true,
     },
     {
       title: $t('executor.page.client.issuer'),
       field: 'issuerName',
       width: 180,
+      sortable: true,
     },
     {
       title: $t('ui.table.action'),
