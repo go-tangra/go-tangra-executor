@@ -78,6 +78,14 @@ service ExecutorExecutionService {
       get: "/v1/executions/{id}/output"
     };
   }
+
+  // Trigger a client self-update via the command stream
+  rpc TriggerClientUpdate(TriggerClientUpdateRequest) returns (TriggerClientUpdateResponse) {
+    option (google.api.http) = {
+      post: "/v1/clients/{client_id}/update"
+      body: "*"
+    };
+  }
 }
 
 // Trigger execution request
@@ -139,4 +147,20 @@ message GetExecutionOutputResponse {
   string output = 1 [json_name = "output", (redact.v3.value).string = ""];
   string error_output = 2 [json_name = "errorOutput", (redact.v3.value).string = ""];
   optional int32 exit_code = 3 [json_name = "exitCode"];
+}
+
+// Trigger client update request
+message TriggerClientUpdateRequest {
+  string client_id = 1 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+
+  string target_version = 2 [json_name = "targetVersion"]; // empty = latest
+}
+
+message TriggerClientUpdateResponse {
+  string command_id = 1 [json_name = "commandId"];
+  bool client_online = 2 [json_name = "clientOnline"];
 }

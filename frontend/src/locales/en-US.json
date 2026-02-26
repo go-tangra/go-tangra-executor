@@ -2,7 +2,8 @@
   "menu": {
     "executor": "Executor",
     "scripts": "Scripts",
-    "executions": "Executions"
+    "executions": "Executions",
+    "clients": "Clients"
   },
   "page": {
     "script": {
@@ -75,6 +76,23 @@
       "statusClientOffline": "Client Offline",
       "triggerClientPull": "Client Pull",
       "triggerUiPush": "UI Push"
+    },
+    "client": {
+      "title": "Clients",
+      "clientId": "Client ID",
+      "certStatus": "Certificate Status",
+      "certType": "Certificate Type",
+      "issuer": "Issuer",
+      "update": "Update",
+      "triggerUpdate": "Trigger Client Update",
+      "updateTitle": "Trigger Client Update",
+      "targetVersion": "Target Version (leave empty for latest)",
+      "targetVersionPlaceholder": "e.g. 1.2.0 (empty = latest)",
+      "updateTriggered": "Update command sent",
+      "updateCommandSent": "Command {commandId} sent to client",
+      "clientOffline": "Client is offline",
+      "clientOfflineDesc": "The update command was queued but the client is not currently connected",
+      "updateFailed": "Failed to trigger client update"
     }
   }
 }

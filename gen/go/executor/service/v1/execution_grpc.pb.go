@@ -19,10 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExecutorExecutionService_TriggerExecution_FullMethodName   = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
-	ExecutorExecutionService_GetExecution_FullMethodName       = "/executor.service.v1.ExecutorExecutionService/GetExecution"
-	ExecutorExecutionService_ListExecutions_FullMethodName     = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
-	ExecutorExecutionService_GetExecutionOutput_FullMethodName = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
+	ExecutorExecutionService_TriggerExecution_FullMethodName    = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
+	ExecutorExecutionService_GetExecution_FullMethodName        = "/executor.service.v1.ExecutorExecutionService/GetExecution"
+	ExecutorExecutionService_ListExecutions_FullMethodName      = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
+	ExecutorExecutionService_GetExecutionOutput_FullMethodName  = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
+	ExecutorExecutionService_TriggerClientUpdate_FullMethodName = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
 )
 
 // ExecutorExecutionServiceClient is the client API for ExecutorExecutionService service.
@@ -39,6 +40,8 @@ type ExecutorExecutionServiceClient interface {
 	ListExecutions(ctx context.Context, in *ListExecutionsRequest, opts ...grpc.CallOption) (*ListExecutionsResponse, error)
 	// Get execution output (full stdout/stderr)
 	GetExecutionOutput(ctx context.Context, in *GetExecutionOutputRequest, opts ...grpc.CallOption) (*GetExecutionOutputResponse, error)
+	// Trigger a client self-update via the command stream
+	TriggerClientUpdate(ctx context.Context, in *TriggerClientUpdateRequest, opts ...grpc.CallOption) (*TriggerClientUpdateResponse, error)
 }
 
 type executorExecutionServiceClient struct {
@@ -89,6 +92,16 @@ func (c *executorExecutionServiceClient) GetExecutionOutput(ctx context.Context,
 	return out, nil
 }
 
+func (c *executorExecutionServiceClient) TriggerClientUpdate(ctx context.Context, in *TriggerClientUpdateRequest, opts ...grpc.CallOption) (*TriggerClientUpdateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TriggerClientUpdateResponse)
+	err := c.cc.Invoke(ctx, ExecutorExecutionService_TriggerClientUpdate_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExecutorExecutionServiceServer is the server API for ExecutorExecutionService service.
 // All implementations must embed UnimplementedExecutorExecutionServiceServer
 // for forward compatibility.
@@ -103,6 +116,8 @@ type ExecutorExecutionServiceServer interface {
 	ListExecutions(context.Context, *ListExecutionsRequest) (*ListExecutionsResponse, error)
 	// Get execution output (full stdout/stderr)
 	GetExecutionOutput(context.Context, *GetExecutionOutputRequest) (*GetExecutionOutputResponse, error)
+	// Trigger a client self-update via the command stream
+	TriggerClientUpdate(context.Context, *TriggerClientUpdateRequest) (*TriggerClientUpdateResponse, error)
 	mustEmbedUnimplementedExecutorExecutionServiceServer()
 }
 
@@ -124,6 +139,9 @@ func (UnimplementedExecutorExecutionServiceServer) ListExecutions(context.Contex
 }
 func (UnimplementedExecutorExecutionServiceServer) GetExecutionOutput(context.Context, *GetExecutionOutputRequest) (*GetExecutionOutputResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetExecutionOutput not implemented")
+}
+func (UnimplementedExecutorExecutionServiceServer) TriggerClientUpdate(context.Context, *TriggerClientUpdateRequest) (*TriggerClientUpdateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TriggerClientUpdate not implemented")
 }
 func (UnimplementedExecutorExecutionServiceServer) mustEmbedUnimplementedExecutorExecutionServiceServer() {
 }
@@ -219,6 +237,24 @@ func _ExecutorExecutionService_GetExecutionOutput_Handler(srv interface{}, ctx c
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExecutorExecutionService_TriggerClientUpdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TriggerClientUpdateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExecutorExecutionServiceServer).TriggerClientUpdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExecutorExecutionService_TriggerClientUpdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExecutorExecutionServiceServer).TriggerClientUpdate(ctx, req.(*TriggerClientUpdateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ExecutorExecutionService_ServiceDesc is the grpc.ServiceDesc for ExecutorExecutionService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -241,6 +277,10 @@ var ExecutorExecutionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetExecutionOutput",
 			Handler:    _ExecutorExecutionService_GetExecutionOutput_Handler,
+		},
+		{
+			MethodName: "TriggerClientUpdate",
+			Handler:    _ExecutorExecutionService_TriggerClientUpdate_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

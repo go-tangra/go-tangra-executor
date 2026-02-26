@@ -34,6 +34,16 @@ const routes: RouteRecordRaw[] = [
         },
         component: () => import('./views/executions/index.vue'),
       },
+      {
+        path: 'clients',
+        name: 'ExecutorClients',
+        meta: {
+          icon: 'lucide:monitor',
+          title: 'executor.menu.clients',
+          authority: ['platform:admin', 'tenant:manager'],
+        },
+        component: () => import('./views/clients/index.vue'),
+      },
     ],
   },
 ];

@@ -118,6 +118,10 @@ func (x *ExecutionCommand) Redact() string {
 
 	// Redacting field: ContentHash
 	x.ContentHash = ``
+
+	// Safe field: CommandType
+
+	// Safe field: TargetVersion
 	return x.String()
 }
 

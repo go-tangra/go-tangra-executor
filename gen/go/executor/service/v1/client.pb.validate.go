@@ -71,6 +71,10 @@ func (m *ExecutionCommand) validate(all bool) error {
 
 	// no validation rules for ContentHash
 
+	// no validation rules for CommandType
+
+	// no validation rules for TargetVersion
+
 	if len(errors) > 0 {
 		return ExecutionCommandMultiError(errors)
 	}

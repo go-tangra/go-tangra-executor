@@ -104,6 +104,27 @@ func (s *ExecutionService) TriggerExecution(ctx context.Context, req *executorV1
 	}, nil
 }
 
+// TriggerClientUpdate sends a self-update command to a connected client
+func (s *ExecutionService) TriggerClientUpdate(ctx context.Context, req *executorV1.TriggerClientUpdateRequest) (*executorV1.TriggerClientUpdateResponse, error) {
+	commandID := uuid.New().String()
+	cmd := &executorV1.ExecutionCommand{
+		CommandId:     commandID,
+		CommandType:   executorV1.CommandType_COMMAND_TYPE_CLIENT_UPDATE,
+		TargetVersion: req.GetTargetVersion(),
+	}
+
+	clientOnline := true
+	if err := s.cmdReg.Send(req.GetClientId(), cmd); err != nil {
+		s.log.Warnf("Client %s not connected for update: %v", req.GetClientId(), err)
+		clientOnline = false
+	}
+
+	return &executorV1.TriggerClientUpdateResponse{
+		CommandId:    commandID,
+		ClientOnline: clientOnline,
+	}, nil
+}
+
 // GetExecution retrieves execution details
 func (s *ExecutionService) GetExecution(ctx context.Context, req *executorV1.GetExecutionRequest) (*executorV1.GetExecutionResponse, error) {
 	entity, err := s.execRepo.GetByID(ctx, req.Id)

@@ -1214,3 +1214,216 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GetExecutionOutputResponseValidationError{}
+
+// Validate checks the field values on TriggerClientUpdateRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TriggerClientUpdateRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TriggerClientUpdateRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TriggerClientUpdateRequestMultiError, or nil if none found.
+func (m *TriggerClientUpdateRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TriggerClientUpdateRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ClientId
+
+	// no validation rules for TargetVersion
+
+	if len(errors) > 0 {
+		return TriggerClientUpdateRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// TriggerClientUpdateRequestMultiError is an error wrapping multiple
+// validation errors returned by TriggerClientUpdateRequest.ValidateAll() if
+// the designated constraints aren't met.
+type TriggerClientUpdateRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TriggerClientUpdateRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TriggerClientUpdateRequestMultiError) AllErrors() []error { return m }
+
+// TriggerClientUpdateRequestValidationError is the validation error returned
+// by TriggerClientUpdateRequest.Validate if the designated constraints aren't met.
+type TriggerClientUpdateRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TriggerClientUpdateRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TriggerClientUpdateRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TriggerClientUpdateRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TriggerClientUpdateRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TriggerClientUpdateRequestValidationError) ErrorName() string {
+	return "TriggerClientUpdateRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TriggerClientUpdateRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTriggerClientUpdateRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TriggerClientUpdateRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TriggerClientUpdateRequestValidationError{}
+
+// Validate checks the field values on TriggerClientUpdateResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *TriggerClientUpdateResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on TriggerClientUpdateResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// TriggerClientUpdateResponseMultiError, or nil if none found.
+func (m *TriggerClientUpdateResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *TriggerClientUpdateResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for CommandId
+
+	// no validation rules for ClientOnline
+
+	if len(errors) > 0 {
+		return TriggerClientUpdateResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// TriggerClientUpdateResponseMultiError is an error wrapping multiple
+// validation errors returned by TriggerClientUpdateResponse.ValidateAll() if
+// the designated constraints aren't met.
+type TriggerClientUpdateResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m TriggerClientUpdateResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m TriggerClientUpdateResponseMultiError) AllErrors() []error { return m }
+
+// TriggerClientUpdateResponseValidationError is the validation error returned
+// by TriggerClientUpdateResponse.Validate if the designated constraints
+// aren't met.
+type TriggerClientUpdateResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e TriggerClientUpdateResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e TriggerClientUpdateResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e TriggerClientUpdateResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e TriggerClientUpdateResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e TriggerClientUpdateResponseValidationError) ErrorName() string {
+	return "TriggerClientUpdateResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e TriggerClientUpdateResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sTriggerClientUpdateResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = TriggerClientUpdateResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = TriggerClientUpdateResponseValidationError{}

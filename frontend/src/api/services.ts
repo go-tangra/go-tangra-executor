@@ -195,6 +195,28 @@ export const AssignmentService = {
     ),
 };
 
+// ==================== Client Update Types ====================
+
+export interface TriggerClientUpdateResponse {
+  commandId: string;
+  clientOnline: boolean;
+}
+
+// ==================== Client Update Service ====================
+
+export const ClientUpdateService = {
+  trigger: (
+    clientId: string,
+    targetVersion?: string,
+    options?: RequestOptions,
+  ) =>
+    executorApi.post<TriggerClientUpdateResponse>(
+      `/clients/${clientId}/update`,
+      { targetVersion: targetVersion || '' },
+      options,
+    ),
+};
+
 // ==================== Execution Service ====================
 
 export const ExecutionService = {

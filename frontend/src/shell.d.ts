@@ -18,6 +18,7 @@ declare module 'shell/vben/icons' {
   export const LucidePlus: Component;
   export const LucideUsers: Component;
   export const LucideCirclePlay: Component;
+  export const LucideRefreshCw: Component;
 }
 
 declare module 'shell/vben/layouts' {

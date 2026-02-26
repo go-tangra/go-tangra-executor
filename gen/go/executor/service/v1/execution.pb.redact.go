@@ -89,6 +89,17 @@ func (s *redactedExecutorExecutionServiceServer) GetExecutionOutput(ctx context.
 	return res, err
 }
 
+// TriggerClientUpdate is the redacted wrapper for the actual ExecutorExecutionServiceServer.TriggerClientUpdate method
+// Unary RPC
+func (s *redactedExecutorExecutionServiceServer) TriggerClientUpdate(ctx context.Context, in *TriggerClientUpdateRequest) (*TriggerClientUpdateResponse, error) {
+	res, err := s.srv.TriggerClientUpdate(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // Redact method implementation for ExecutionLog
 func (x *ExecutionLog) Redact() string {
 	if x == nil {
@@ -231,5 +242,29 @@ func (x *GetExecutionOutputResponse) Redact() string {
 	x.ErrorOutput = ``
 
 	// Safe field: ExitCode
+	return x.String()
+}
+
+// Redact method implementation for TriggerClientUpdateRequest
+func (x *TriggerClientUpdateRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: ClientId
+
+	// Safe field: TargetVersion
+	return x.String()
+}
+
+// Redact method implementation for TriggerClientUpdateResponse
+func (x *TriggerClientUpdateResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: CommandId
+
+	// Safe field: ClientOnline
 	return x.String()
 }

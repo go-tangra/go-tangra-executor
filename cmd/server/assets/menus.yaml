@@ -43,6 +43,18 @@ menus:
       - platform:admin
       - tenant:manager
 
+  - id: executor-clients
+    parent_id: executor
+    type: MENU
+    name: Clients
+    path: clients
+    component: app/executor/clients/index.vue
+    icon: lucide:monitor
+    order: 3
+    authority:
+      - platform:admin
+      - tenant:manager
+
 dashboard_widgets:
   - id: executor.total_scripts
     name: Scripts
@@ -138,6 +150,9 @@ permission_groups:
       - name: View Executions
         code: executor.execution.view
         description: View execution logs and output
+      - name: Trigger Client Update
+        code: executor.client.update
+        description: Trigger remote client self-update
 
 roles:
   - name: Executor Administrator
@@ -150,6 +165,7 @@ roles:
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
+      - executor.client.update
 
   - name: Executor Operator
     code: executor.operator
@@ -161,6 +177,7 @@ roles:
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
+      - executor.client.update
 
   - name: Executor Viewer
     code: executor.viewer

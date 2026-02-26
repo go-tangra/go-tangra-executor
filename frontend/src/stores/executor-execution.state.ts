@@ -2,9 +2,11 @@ import { defineStore } from 'pinia';
 
 import {
   ExecutionService,
+  ClientUpdateService,
   type ExecutionLog,
   type GetExecutionOutputResponse,
   type ListExecutionsResponse,
+  type TriggerClientUpdateResponse,
 } from '../api/services';
 
 export const useExecutorExecutionStore = defineStore(
@@ -46,6 +48,13 @@ export const useExecutorExecutionStore = defineStore(
       return await ExecutionService.getOutput(id);
     }
 
+    async function triggerClientUpdate(
+      clientId: string,
+      targetVersion?: string,
+    ): Promise<TriggerClientUpdateResponse> {
+      return await ClientUpdateService.trigger(clientId, targetVersion);
+    }
+
     function $reset() {}
 
     return {
@@ -54,6 +63,7 @@ export const useExecutorExecutionStore = defineStore(
       getExecution,
       listExecutions,
       getExecutionOutput,
+      triggerClientUpdate,
     };
   },
 );

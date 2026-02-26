@@ -25,6 +25,53 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Type of command sent to a client
+type CommandType int32
+
+const (
+	CommandType_COMMAND_TYPE_SCRIPT_EXECUTION CommandType = 0 // default, backward compatible
+	CommandType_COMMAND_TYPE_CLIENT_UPDATE    CommandType = 1 // trigger client self-update
+)
+
+// Enum value maps for CommandType.
+var (
+	CommandType_name = map[int32]string{
+		0: "COMMAND_TYPE_SCRIPT_EXECUTION",
+		1: "COMMAND_TYPE_CLIENT_UPDATE",
+	}
+	CommandType_value = map[string]int32{
+		"COMMAND_TYPE_SCRIPT_EXECUTION": 0,
+		"COMMAND_TYPE_CLIENT_UPDATE":    1,
+	}
+)
+
+func (x CommandType) Enum() *CommandType {
+	p := new(CommandType)
+	*p = x
+	return p
+}
+
+func (x CommandType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (CommandType) Descriptor() protoreflect.EnumDescriptor {
+	return file_executor_service_v1_client_proto_enumTypes[0].Descriptor()
+}
+
+func (CommandType) Type() protoreflect.EnumType {
+	return &file_executor_service_v1_client_proto_enumTypes[0]
+}
+
+func (x CommandType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use CommandType.Descriptor instead.
+func (CommandType) EnumDescriptor() ([]byte, []int) {
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{0}
+}
+
 // Execution command sent to client via stream
 type ExecutionCommand struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -35,6 +82,8 @@ type ExecutionCommand struct {
 	ScriptType    ScriptType             `protobuf:"varint,5,opt,name=script_type,json=scriptType,proto3,enum=executor.service.v1.ScriptType" json:"script_type,omitempty"`
 	Content       string                 `protobuf:"bytes,6,opt,name=content,proto3" json:"content,omitempty"`
 	ContentHash   string                 `protobuf:"bytes,7,opt,name=content_hash,json=contentHash,proto3" json:"content_hash,omitempty"`
+	CommandType   CommandType            `protobuf:"varint,8,opt,name=command_type,json=commandType,proto3,enum=executor.service.v1.CommandType" json:"command_type,omitempty"`
+	TargetVersion string                 `protobuf:"bytes,9,opt,name=target_version,json=targetVersion,proto3" json:"target_version,omitempty"` // empty = latest
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -114,6 +163,20 @@ func (x *ExecutionCommand) GetContent() string {
 func (x *ExecutionCommand) GetContentHash() string {
 	if x != nil {
 		return x.ContentHash
+	}
+	return ""
+}
+
+func (x *ExecutionCommand) GetCommandType() CommandType {
+	if x != nil {
+		return x.CommandType
+	}
+	return CommandType_COMMAND_TYPE_SCRIPT_EXECUTION
+}
+
+func (x *ExecutionCommand) GetTargetVersion() string {
+	if x != nil {
+		return x.TargetVersion
 	}
 	return ""
 }
@@ -651,7 +714,7 @@ var File_executor_service_v1_client_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\n" +
-	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\x1a executor/service/v1/script.proto\"\xa1\x02\n" +
+	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\x1a executor/service/v1/script.proto\"\x8d\x03\n" +
 	"\x10ExecutionCommand\x12\x1d\n" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tR\tcommandId\x12!\n" +
@@ -662,7 +725,9 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\vscript_type\x18\x05 \x01(\x0e2\x1f.executor.service.v1.ScriptTypeR\n" +
 	"scriptType\x12 \n" +
 	"\acontent\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
-	"\fcontent_hash\x18\a \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\"?\n" +
+	"\fcontent_hash\x18\a \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12C\n" +
+	"\fcommand_type\x18\b \x01(\x0e2 .executor.service.v1.CommandTypeR\vcommandType\x12%\n" +
+	"\x0etarget_version\x18\t \x01(\tR\rtargetVersion\"?\n" +
 	"\x12FetchScriptRequest\x12)\n" +
 	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\"\xfc\x01\n" +
 	"\x13FetchScriptResponse\x12\x1b\n" +
@@ -702,7 +767,10 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"durationMs\"X\n" +
 	"\x17SubmitExecutionResponse\x12!\n" +
 	"\fexecution_id\x18\x01 \x01(\tR\vexecutionId\x12\x1a\n" +
-	"\brecorded\x18\x02 \x01(\bR\brecorded2\xcb\x05\n" +
+	"\brecorded\x18\x02 \x01(\bR\brecorded*P\n" +
+	"\vCommandType\x12!\n" +
+	"\x1dCOMMAND_TYPE_SCRIPT_EXECUTION\x10\x00\x12\x1e\n" +
+	"\x1aCOMMAND_TYPE_CLIENT_UPDATE\x10\x012\xcb\x05\n" +
 	"\x15ExecutorClientService\x12\x88\x01\n" +
 	"\vFetchScript\x12'.executor.service.v1.FetchScriptRequest\x1a(.executor.service.v1.FetchScriptResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/client/scripts/{script_id}\x12g\n" +
 	"\x0eStreamCommands\x12*.executor.service.v1.StreamCommandsRequest\x1a%.executor.service.v1.ExecutionCommand\"\x000\x01\x12\x8e\x01\n" +
@@ -724,38 +792,41 @@ func file_executor_service_v1_client_proto_rawDescGZIP() []byte {
 	return file_executor_service_v1_client_proto_rawDescData
 }
 
+var file_executor_service_v1_client_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_executor_service_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_executor_service_v1_client_proto_goTypes = []any{
-	(*ExecutionCommand)(nil),        // 0: executor.service.v1.ExecutionCommand
-	(*FetchScriptRequest)(nil),      // 1: executor.service.v1.FetchScriptRequest
-	(*FetchScriptResponse)(nil),     // 2: executor.service.v1.FetchScriptResponse
-	(*StreamCommandsRequest)(nil),   // 3: executor.service.v1.StreamCommandsRequest
-	(*AckCommandRequest)(nil),       // 4: executor.service.v1.AckCommandRequest
-	(*AckCommandResponse)(nil),      // 5: executor.service.v1.AckCommandResponse
-	(*ReportResultRequest)(nil),     // 6: executor.service.v1.ReportResultRequest
-	(*ReportResultResponse)(nil),    // 7: executor.service.v1.ReportResultResponse
-	(*SubmitExecutionRequest)(nil),  // 8: executor.service.v1.SubmitExecutionRequest
-	(*SubmitExecutionResponse)(nil), // 9: executor.service.v1.SubmitExecutionResponse
-	(ScriptType)(0),                 // 10: executor.service.v1.ScriptType
+	(CommandType)(0),                // 0: executor.service.v1.CommandType
+	(*ExecutionCommand)(nil),        // 1: executor.service.v1.ExecutionCommand
+	(*FetchScriptRequest)(nil),      // 2: executor.service.v1.FetchScriptRequest
+	(*FetchScriptResponse)(nil),     // 3: executor.service.v1.FetchScriptResponse
+	(*StreamCommandsRequest)(nil),   // 4: executor.service.v1.StreamCommandsRequest
+	(*AckCommandRequest)(nil),       // 5: executor.service.v1.AckCommandRequest
+	(*AckCommandResponse)(nil),      // 6: executor.service.v1.AckCommandResponse
+	(*ReportResultRequest)(nil),     // 7: executor.service.v1.ReportResultRequest
+	(*ReportResultResponse)(nil),    // 8: executor.service.v1.ReportResultResponse
+	(*SubmitExecutionRequest)(nil),  // 9: executor.service.v1.SubmitExecutionRequest
+	(*SubmitExecutionResponse)(nil), // 10: executor.service.v1.SubmitExecutionResponse
+	(ScriptType)(0),                 // 11: executor.service.v1.ScriptType
 }
 var file_executor_service_v1_client_proto_depIdxs = []int32{
-	10, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
-	10, // 1: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
-	1,  // 2: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
-	3,  // 3: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
-	4,  // 4: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
-	6,  // 5: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
-	8,  // 6: executor.service.v1.ExecutorClientService.SubmitExecution:input_type -> executor.service.v1.SubmitExecutionRequest
-	2,  // 7: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
-	0,  // 8: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
-	5,  // 9: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
-	7,  // 10: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
-	9,  // 11: executor.service.v1.ExecutorClientService.SubmitExecution:output_type -> executor.service.v1.SubmitExecutionResponse
-	7,  // [7:12] is the sub-list for method output_type
-	2,  // [2:7] is the sub-list for method input_type
-	2,  // [2:2] is the sub-list for extension type_name
-	2,  // [2:2] is the sub-list for extension extendee
-	0,  // [0:2] is the sub-list for field type_name
+	11, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
+	0,  // 1: executor.service.v1.ExecutionCommand.command_type:type_name -> executor.service.v1.CommandType
+	11, // 2: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
+	2,  // 3: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
+	4,  // 4: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
+	5,  // 5: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
+	7,  // 6: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
+	9,  // 7: executor.service.v1.ExecutorClientService.SubmitExecution:input_type -> executor.service.v1.SubmitExecutionRequest
+	3,  // 8: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
+	1,  // 9: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
+	6,  // 10: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
+	8,  // 11: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
+	10, // 12: executor.service.v1.ExecutorClientService.SubmitExecution:output_type -> executor.service.v1.SubmitExecutionResponse
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_executor_service_v1_client_proto_init() }
@@ -770,13 +841,14 @@ func file_executor_service_v1_client_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_executor_service_v1_client_proto_rawDesc), len(file_executor_service_v1_client_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_executor_service_v1_client_proto_goTypes,
 		DependencyIndexes: file_executor_service_v1_client_proto_depIdxs,
+		EnumInfos:         file_executor_service_v1_client_proto_enumTypes,
 		MessageInfos:      file_executor_service_v1_client_proto_msgTypes,
 	}.Build()
 	File_executor_service_v1_client_proto = out.File

@@ -10,6 +10,12 @@ import "redact/v3/redact.proto";
 
 import "executor/service/v1/script.proto";
 
+// Type of command sent to a client
+enum CommandType {
+  COMMAND_TYPE_SCRIPT_EXECUTION = 0; // default, backward compatible
+  COMMAND_TYPE_CLIENT_UPDATE = 1;    // trigger client self-update
+}
+
 // Execution command sent to client via stream
 message ExecutionCommand {
   string command_id = 1 [json_name = "commandId"];
@@ -19,6 +25,8 @@ message ExecutionCommand {
   ScriptType script_type = 5 [json_name = "scriptType"];
   string content = 6 [json_name = "content", (redact.v3.value).string = ""];
   string content_hash = 7 [json_name = "contentHash", (redact.v3.value).string = ""];
+  CommandType command_type = 8 [json_name = "commandType"];
+  string target_version = 9 [json_name = "targetVersion"]; // empty = latest
 }
 
 // Client-facing service (called by go-tangra-client daemon)

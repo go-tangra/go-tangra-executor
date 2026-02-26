@@ -22,6 +22,7 @@ const _ = http.SupportPackageIsVersion1
 const OperationExecutorExecutionServiceGetExecution = "/executor.service.v1.ExecutorExecutionService/GetExecution"
 const OperationExecutorExecutionServiceGetExecutionOutput = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
 const OperationExecutorExecutionServiceListExecutions = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
+const OperationExecutorExecutionServiceTriggerClientUpdate = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
 const OperationExecutorExecutionServiceTriggerExecution = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
 
 type ExecutorExecutionServiceHTTPServer interface {
@@ -31,6 +32,8 @@ type ExecutorExecutionServiceHTTPServer interface {
 	GetExecutionOutput(context.Context, *GetExecutionOutputRequest) (*GetExecutionOutputResponse, error)
 	// ListExecutions List executions
 	ListExecutions(context.Context, *ListExecutionsRequest) (*ListExecutionsResponse, error)
+	// TriggerClientUpdate Trigger a client self-update via the command stream
+	TriggerClientUpdate(context.Context, *TriggerClientUpdateRequest) (*TriggerClientUpdateResponse, error)
 	// TriggerExecution Trigger script execution on a client (UI-push)
 	TriggerExecution(context.Context, *TriggerExecutionRequest) (*TriggerExecutionResponse, error)
 }
@@ -41,6 +44,7 @@ func RegisterExecutorExecutionServiceHTTPServer(s *http.Server, srv ExecutorExec
 	r.GET("/v1/executions/{id}", _ExecutorExecutionService_GetExecution0_HTTP_Handler(srv))
 	r.GET("/v1/executions", _ExecutorExecutionService_ListExecutions0_HTTP_Handler(srv))
 	r.GET("/v1/executions/{id}/output", _ExecutorExecutionService_GetExecutionOutput0_HTTP_Handler(srv))
+	r.POST("/v1/clients/{client_id}/update", _ExecutorExecutionService_TriggerClientUpdate0_HTTP_Handler(srv))
 }
 
 func _ExecutorExecutionService_TriggerExecution0_HTTP_Handler(srv ExecutorExecutionServiceHTTPServer) func(ctx http.Context) error {
@@ -131,6 +135,31 @@ func _ExecutorExecutionService_GetExecutionOutput0_HTTP_Handler(srv ExecutorExec
 	}
 }
 
+func _ExecutorExecutionService_TriggerClientUpdate0_HTTP_Handler(srv ExecutorExecutionServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TriggerClientUpdateRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationExecutorExecutionServiceTriggerClientUpdate)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TriggerClientUpdate(ctx, req.(*TriggerClientUpdateRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TriggerClientUpdateResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ExecutorExecutionServiceHTTPClient interface {
 	// GetExecution Get execution details
 	GetExecution(ctx context.Context, req *GetExecutionRequest, opts ...http.CallOption) (rsp *GetExecutionResponse, err error)
@@ -138,6 +167,8 @@ type ExecutorExecutionServiceHTTPClient interface {
 	GetExecutionOutput(ctx context.Context, req *GetExecutionOutputRequest, opts ...http.CallOption) (rsp *GetExecutionOutputResponse, err error)
 	// ListExecutions List executions
 	ListExecutions(ctx context.Context, req *ListExecutionsRequest, opts ...http.CallOption) (rsp *ListExecutionsResponse, err error)
+	// TriggerClientUpdate Trigger a client self-update via the command stream
+	TriggerClientUpdate(ctx context.Context, req *TriggerClientUpdateRequest, opts ...http.CallOption) (rsp *TriggerClientUpdateResponse, err error)
 	// TriggerExecution Trigger script execution on a client (UI-push)
 	TriggerExecution(ctx context.Context, req *TriggerExecutionRequest, opts ...http.CallOption) (rsp *TriggerExecutionResponse, err error)
 }
@@ -186,6 +217,20 @@ func (c *ExecutorExecutionServiceHTTPClientImpl) ListExecutions(ctx context.Cont
 	opts = append(opts, http.Operation(OperationExecutorExecutionServiceListExecutions))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// TriggerClientUpdate Trigger a client self-update via the command stream
+func (c *ExecutorExecutionServiceHTTPClientImpl) TriggerClientUpdate(ctx context.Context, in *TriggerClientUpdateRequest, opts ...http.CallOption) (*TriggerClientUpdateResponse, error) {
+	var out TriggerClientUpdateResponse
+	pattern := "/v1/clients/{client_id}/update"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationExecutorExecutionServiceTriggerClientUpdate))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
