@@ -6,6 +6,7 @@
 import { useAccessStore } from 'shell/vben/stores';
 
 const LCM_BASE_URL = '/admin/v1/modules/lcm/v1';
+const EXECUTOR_BASE_URL = '/admin/v1/modules/executor/v1';
 
 export interface MtlsCertificate {
   serialNumber?: string;
@@ -15,11 +16,33 @@ export interface MtlsCertificate {
   issuerName?: string;
   status?: string;
   certType?: string;
+  clientVersion?: string;
+  online?: boolean;
 }
 
 export interface ListMtlsCertificatesResponse {
   items?: MtlsCertificate[];
   total?: number;
+}
+
+export interface ConnectedClient {
+  clientId?: string;
+  clientVersion?: string;
+  connectedAt?: string;
+}
+
+export interface ListConnectedClientsResponse {
+  clients?: ConnectedClient[];
+}
+
+function authHeaders(): Record<string, string> {
+  const accessStore = useAccessStore();
+  const token = accessStore.accessToken;
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
 export const MtlsCertificateService = {
@@ -29,13 +52,6 @@ export const MtlsCertificateService = {
       pageSize?: number;
     },
   ): Promise<ListMtlsCertificatesResponse> => {
-    const accessStore = useAccessStore();
-    const token = accessStore.accessToken;
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    if (token) headers.Authorization = `Bearer ${token}`;
-
     const query = new URLSearchParams();
     if (params?.commonName) query.set('commonName', params.commonName);
     if (params?.pageSize) query.set('pageSize', String(params.pageSize));
@@ -43,7 +59,20 @@ export const MtlsCertificateService = {
 
     const response = await fetch(
       `${LCM_BASE_URL}/certificates${qs ? `?${qs}` : ''}`,
-      { headers },
+      { headers: authHeaders() },
+    );
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  },
+};
+
+export const ConnectedClientsService = {
+  list: async (): Promise<ListConnectedClientsResponse> => {
+    const response = await fetch(
+      `${EXECUTOR_BASE_URL}/clients/connected`,
+      { headers: authHeaders() },
     );
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);

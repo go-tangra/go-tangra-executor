@@ -21,6 +21,7 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationExecutorExecutionServiceGetExecution = "/executor.service.v1.ExecutorExecutionService/GetExecution"
 const OperationExecutorExecutionServiceGetExecutionOutput = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
+const OperationExecutorExecutionServiceListConnectedClients = "/executor.service.v1.ExecutorExecutionService/ListConnectedClients"
 const OperationExecutorExecutionServiceListExecutions = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
 const OperationExecutorExecutionServiceTriggerClientUpdate = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
 const OperationExecutorExecutionServiceTriggerExecution = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
@@ -30,6 +31,8 @@ type ExecutorExecutionServiceHTTPServer interface {
 	GetExecution(context.Context, *GetExecutionRequest) (*GetExecutionResponse, error)
 	// GetExecutionOutput Get execution output (full stdout/stderr)
 	GetExecutionOutput(context.Context, *GetExecutionOutputRequest) (*GetExecutionOutputResponse, error)
+	// ListConnectedClients List currently connected clients with their versions
+	ListConnectedClients(context.Context, *ListConnectedClientsRequest) (*ListConnectedClientsResponse, error)
 	// ListExecutions List executions
 	ListExecutions(context.Context, *ListExecutionsRequest) (*ListExecutionsResponse, error)
 	// TriggerClientUpdate Trigger a client self-update via the command stream
@@ -45,6 +48,7 @@ func RegisterExecutorExecutionServiceHTTPServer(s *http.Server, srv ExecutorExec
 	r.GET("/v1/executions", _ExecutorExecutionService_ListExecutions0_HTTP_Handler(srv))
 	r.GET("/v1/executions/{id}/output", _ExecutorExecutionService_GetExecutionOutput0_HTTP_Handler(srv))
 	r.POST("/v1/clients/{client_id}/update", _ExecutorExecutionService_TriggerClientUpdate0_HTTP_Handler(srv))
+	r.GET("/v1/clients/connected", _ExecutorExecutionService_ListConnectedClients0_HTTP_Handler(srv))
 }
 
 func _ExecutorExecutionService_TriggerExecution0_HTTP_Handler(srv ExecutorExecutionServiceHTTPServer) func(ctx http.Context) error {
@@ -160,11 +164,32 @@ func _ExecutorExecutionService_TriggerClientUpdate0_HTTP_Handler(srv ExecutorExe
 	}
 }
 
+func _ExecutorExecutionService_ListConnectedClients0_HTTP_Handler(srv ExecutorExecutionServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListConnectedClientsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationExecutorExecutionServiceListConnectedClients)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListConnectedClients(ctx, req.(*ListConnectedClientsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListConnectedClientsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ExecutorExecutionServiceHTTPClient interface {
 	// GetExecution Get execution details
 	GetExecution(ctx context.Context, req *GetExecutionRequest, opts ...http.CallOption) (rsp *GetExecutionResponse, err error)
 	// GetExecutionOutput Get execution output (full stdout/stderr)
 	GetExecutionOutput(ctx context.Context, req *GetExecutionOutputRequest, opts ...http.CallOption) (rsp *GetExecutionOutputResponse, err error)
+	// ListConnectedClients List currently connected clients with their versions
+	ListConnectedClients(ctx context.Context, req *ListConnectedClientsRequest, opts ...http.CallOption) (rsp *ListConnectedClientsResponse, err error)
 	// ListExecutions List executions
 	ListExecutions(ctx context.Context, req *ListExecutionsRequest, opts ...http.CallOption) (rsp *ListExecutionsResponse, err error)
 	// TriggerClientUpdate Trigger a client self-update via the command stream
@@ -201,6 +226,20 @@ func (c *ExecutorExecutionServiceHTTPClientImpl) GetExecutionOutput(ctx context.
 	pattern := "/v1/executions/{id}/output"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationExecutorExecutionServiceGetExecutionOutput))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListConnectedClients List currently connected clients with their versions
+func (c *ExecutorExecutionServiceHTTPClientImpl) ListConnectedClients(ctx context.Context, in *ListConnectedClientsRequest, opts ...http.CallOption) (*ListConnectedClientsResponse, error) {
+	var out ListConnectedClientsResponse
+	pattern := "/v1/clients/connected"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationExecutorExecutionServiceListConnectedClients))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

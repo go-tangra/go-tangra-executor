@@ -100,6 +100,17 @@ func (s *redactedExecutorExecutionServiceServer) TriggerClientUpdate(ctx context
 	return res, err
 }
 
+// ListConnectedClients is the redacted wrapper for the actual ExecutorExecutionServiceServer.ListConnectedClients method
+// Unary RPC
+func (s *redactedExecutorExecutionServiceServer) ListConnectedClients(ctx context.Context, in *ListConnectedClientsRequest) (*ListConnectedClientsResponse, error) {
+	res, err := s.srv.ListConnectedClients(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // Redact method implementation for ExecutionLog
 func (x *ExecutionLog) Redact() string {
 	if x == nil {
@@ -266,5 +277,37 @@ func (x *TriggerClientUpdateResponse) Redact() string {
 	// Safe field: CommandId
 
 	// Safe field: ClientOnline
+	return x.String()
+}
+
+// Redact method implementation for ListConnectedClientsRequest
+func (x *ListConnectedClientsRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+	return x.String()
+}
+
+// Redact method implementation for ConnectedClient
+func (x *ConnectedClient) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: ClientId
+
+	// Safe field: ClientVersion
+
+	// Safe field: ConnectedAt
+	return x.String()
+}
+
+// Redact method implementation for ListConnectedClientsResponse
+func (x *ListConnectedClientsResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Clients
 	return x.String()
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/go-tangra/go-tangra-executor/internal/data"
 
@@ -123,6 +124,20 @@ func (s *ExecutionService) TriggerClientUpdate(ctx context.Context, req *executo
 		CommandId:    commandID,
 		ClientOnline: clientOnline,
 	}, nil
+}
+
+// ListConnectedClients returns all currently connected clients with their versions
+func (s *ExecutionService) ListConnectedClients(_ context.Context, _ *executorV1.ListConnectedClientsRequest) (*executorV1.ListConnectedClientsResponse, error) {
+	connected := s.cmdReg.ListConnected()
+	clients := make([]*executorV1.ConnectedClient, 0, len(connected))
+	for _, c := range connected {
+		clients = append(clients, &executorV1.ConnectedClient{
+			ClientId:      c.ClientID,
+			ClientVersion: c.Version,
+			ConnectedAt:   timestamppb.New(c.ConnectedAt),
+		})
+	}
+	return &executorV1.ListConnectedClientsResponse{Clients: clients}, nil
 }
 
 // GetExecution retrieves execution details

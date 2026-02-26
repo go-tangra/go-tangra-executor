@@ -91,6 +91,7 @@ message StreamCommandsRequest {
     (google.api.field_behavior) = REQUIRED,
     (buf.validate.field).string = {min_len: 1, max_len: 255}
   ];
+  string client_version = 2 [json_name = "clientVersion"];
 }
 
 // Ack command request

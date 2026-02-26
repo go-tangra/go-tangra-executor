@@ -86,6 +86,13 @@ service ExecutorExecutionService {
       body: "*"
     };
   }
+
+  // List currently connected clients with their versions
+  rpc ListConnectedClients(ListConnectedClientsRequest) returns (ListConnectedClientsResponse) {
+    option (google.api.http) = {
+      get: "/v1/clients/connected"
+    };
+  }
 }
 
 // Trigger execution request
@@ -163,4 +170,19 @@ message TriggerClientUpdateRequest {
 message TriggerClientUpdateResponse {
   string command_id = 1 [json_name = "commandId"];
   bool client_online = 2 [json_name = "clientOnline"];
+}
+
+// List connected clients request
+message ListConnectedClientsRequest {}
+
+// A currently connected client
+message ConnectedClient {
+  string client_id = 1 [json_name = "clientId"];
+  string client_version = 2 [json_name = "clientVersion"];
+  google.protobuf.Timestamp connected_at = 3 [json_name = "connectedAt"];
+}
+
+// List connected clients response
+message ListConnectedClientsResponse {
+  repeated ConnectedClient clients = 1 [json_name = "clients"];
 }

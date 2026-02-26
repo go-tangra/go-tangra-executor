@@ -1427,3 +1427,376 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = TriggerClientUpdateResponseValidationError{}
+
+// Validate checks the field values on ListConnectedClientsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListConnectedClientsRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListConnectedClientsRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListConnectedClientsRequestMultiError, or nil if none found.
+func (m *ListConnectedClientsRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListConnectedClientsRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if len(errors) > 0 {
+		return ListConnectedClientsRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListConnectedClientsRequestMultiError is an error wrapping multiple
+// validation errors returned by ListConnectedClientsRequest.ValidateAll() if
+// the designated constraints aren't met.
+type ListConnectedClientsRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListConnectedClientsRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListConnectedClientsRequestMultiError) AllErrors() []error { return m }
+
+// ListConnectedClientsRequestValidationError is the validation error returned
+// by ListConnectedClientsRequest.Validate if the designated constraints
+// aren't met.
+type ListConnectedClientsRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListConnectedClientsRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListConnectedClientsRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListConnectedClientsRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListConnectedClientsRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListConnectedClientsRequestValidationError) ErrorName() string {
+	return "ListConnectedClientsRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListConnectedClientsRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListConnectedClientsRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListConnectedClientsRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListConnectedClientsRequestValidationError{}
+
+// Validate checks the field values on ConnectedClient with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ConnectedClient) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ConnectedClient with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ConnectedClientMultiError, or nil if none found.
+func (m *ConnectedClient) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ConnectedClient) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ClientId
+
+	// no validation rules for ClientVersion
+
+	if all {
+		switch v := interface{}(m.GetConnectedAt()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConnectedClientValidationError{
+					field:  "ConnectedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConnectedClientValidationError{
+					field:  "ConnectedAt",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetConnectedAt()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConnectedClientValidationError{
+				field:  "ConnectedAt",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	if len(errors) > 0 {
+		return ConnectedClientMultiError(errors)
+	}
+
+	return nil
+}
+
+// ConnectedClientMultiError is an error wrapping multiple validation errors
+// returned by ConnectedClient.ValidateAll() if the designated constraints
+// aren't met.
+type ConnectedClientMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ConnectedClientMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ConnectedClientMultiError) AllErrors() []error { return m }
+
+// ConnectedClientValidationError is the validation error returned by
+// ConnectedClient.Validate if the designated constraints aren't met.
+type ConnectedClientValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ConnectedClientValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ConnectedClientValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ConnectedClientValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ConnectedClientValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ConnectedClientValidationError) ErrorName() string { return "ConnectedClientValidationError" }
+
+// Error satisfies the builtin error interface
+func (e ConnectedClientValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sConnectedClient.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ConnectedClientValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ConnectedClientValidationError{}
+
+// Validate checks the field values on ListConnectedClientsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ListConnectedClientsResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ListConnectedClientsResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ListConnectedClientsResponseMultiError, or nil if none found.
+func (m *ListConnectedClientsResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ListConnectedClientsResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	for idx, item := range m.GetClients() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ListConnectedClientsResponseValidationError{
+						field:  fmt.Sprintf("Clients[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ListConnectedClientsResponseValidationError{
+						field:  fmt.Sprintf("Clients[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ListConnectedClientsResponseValidationError{
+					field:  fmt.Sprintf("Clients[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	if len(errors) > 0 {
+		return ListConnectedClientsResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ListConnectedClientsResponseMultiError is an error wrapping multiple
+// validation errors returned by ListConnectedClientsResponse.ValidateAll() if
+// the designated constraints aren't met.
+type ListConnectedClientsResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ListConnectedClientsResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ListConnectedClientsResponseMultiError) AllErrors() []error { return m }
+
+// ListConnectedClientsResponseValidationError is the validation error returned
+// by ListConnectedClientsResponse.Validate if the designated constraints
+// aren't met.
+type ListConnectedClientsResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ListConnectedClientsResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ListConnectedClientsResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ListConnectedClientsResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ListConnectedClientsResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ListConnectedClientsResponseValidationError) ErrorName() string {
+	return "ListConnectedClientsResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ListConnectedClientsResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sListConnectedClientsResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ListConnectedClientsResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ListConnectedClientsResponseValidationError{}
