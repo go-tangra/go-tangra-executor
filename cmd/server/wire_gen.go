@@ -19,7 +19,7 @@ import (
 
 // initApp initializes the Wire provider entry for the kratos application
 func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
-	certManager, err := cert.NewCertManager(context)
+	v, err := cert.NewCertManager(context)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -29,7 +29,12 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	}
 	scriptRepo := data.NewScriptRepo(context, entClient)
 	assignmentRepo := data.NewAssignmentRepo(context, entClient)
-	portalClient, cleanup2, err := data.NewPortalClient(context)
+	client, err := data.NewRegistrationClient(context)
+	if err != nil {
+		cleanup()
+		return nil, nil, err
+	}
+	portalClient, cleanup2, err := data.NewPortalClient(context, client)
 	if err != nil {
 		cleanup()
 		return nil, nil, err
@@ -43,9 +48,9 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	statisticsRepo := data.NewStatisticsRepo(context, entClient)
 	statisticsService := service.NewStatisticsService(context, statisticsRepo)
 	backupService := service.NewBackupService(context, entClient)
-	grpcServer := server.NewGRPCServer(context, certManager, scriptService, assignmentService, executionService, clientService, statisticsService, backupService)
+	grpcServer := server.NewGRPCServer(context, v, scriptService, assignmentService, executionService, clientService, statisticsService, backupService)
 	httpServer := server.NewHTTPServer(context)
-	app := newApp(context, grpcServer, httpServer)
+	app := newApp(context, grpcServer, httpServer, client)
 	return app, func() {
 		cleanup2()
 		cleanup()
