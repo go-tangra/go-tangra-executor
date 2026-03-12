@@ -103,6 +103,76 @@ func (r *StatisticsRepo) GetExecutionCountSince(ctx context.Context, tenantID ui
 	return int64(count), nil
 }
 
+// GetGlobalScriptCount returns the total number of scripts across all tenants.
+func (r *StatisticsRepo) GetGlobalScriptCount(ctx context.Context) (int64, error) {
+	count, err := r.entClient.Client().Script.Query().Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return int64(count), nil
+}
+
+// GetGlobalScriptCountByEnabled returns the count of scripts grouped by enabled status across all tenants.
+func (r *StatisticsRepo) GetGlobalScriptCountByEnabled(ctx context.Context) (map[bool]int64, error) {
+	result := make(map[bool]int64)
+	for _, enabled := range []bool{true, false} {
+		count, err := r.entClient.Client().Script.Query().
+			Where(script.EnabledEQ(enabled)).
+			Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if count > 0 {
+			result[enabled] = int64(count)
+		}
+	}
+	return result, nil
+}
+
+// GetGlobalAssignmentCount returns the total number of assignments across all tenants.
+func (r *StatisticsRepo) GetGlobalAssignmentCount(ctx context.Context) (int64, error) {
+	count, err := r.entClient.Client().ScriptAssignment.Query().Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return int64(count), nil
+}
+
+// GetGlobalExecutionCount returns the total number of executions across all tenants.
+func (r *StatisticsRepo) GetGlobalExecutionCount(ctx context.Context) (int64, error) {
+	count, err := r.entClient.Client().ExecutionLog.Query().Count(ctx)
+	if err != nil {
+		return 0, err
+	}
+	return int64(count), nil
+}
+
+// GetGlobalExecutionCountByStatus returns the count of executions grouped by status across all tenants.
+func (r *StatisticsRepo) GetGlobalExecutionCountByStatus(ctx context.Context) (map[string]int64, error) {
+	result := make(map[string]int64)
+	statuses := []executionlog.Status{
+		executionlog.StatusPENDING,
+		executionlog.StatusRUNNING,
+		executionlog.StatusCOMPLETED,
+		executionlog.StatusFAILED,
+		executionlog.StatusREJECTED_HASH_MISMATCH,
+		executionlog.StatusREJECTED_NOT_APPROVED,
+		executionlog.StatusCLIENT_OFFLINE,
+	}
+	for _, status := range statuses {
+		count, err := r.entClient.Client().ExecutionLog.Query().
+			Where(executionlog.StatusEQ(status)).
+			Count(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if count > 0 {
+			result[string(status)] = int64(count)
+		}
+	}
+	return result, nil
+}
+
 // GetRecentErrors returns the most recent failed/rejected executions
 func (r *StatisticsRepo) GetRecentErrors(ctx context.Context, tenantID uint32, limit int) ([]*ent.ExecutionLog, error) {
 	return r.entClient.Client().ExecutionLog.Query().

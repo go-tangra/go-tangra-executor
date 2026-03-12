@@ -7,9 +7,13 @@
 package main
 
 import (
+	gocontext "context"
+
 	"github.com/go-kratos/kratos/v2"
+	"github.com/go-tangra/go-tangra-common/viewer"
 	"github.com/go-tangra/go-tangra-executor/internal/cert"
 	"github.com/go-tangra/go-tangra-executor/internal/data"
+	"github.com/go-tangra/go-tangra-executor/internal/metrics"
 	"github.com/go-tangra/go-tangra-executor/internal/server"
 	"github.com/go-tangra/go-tangra-executor/internal/service"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
@@ -48,10 +52,17 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	statisticsRepo := data.NewStatisticsRepo(context, entClient)
 	statisticsService := service.NewStatisticsService(context, statisticsRepo)
 	backupService := service.NewBackupService(context, entClient)
-	grpcServer := server.NewGRPCServer(context, v, scriptService, assignmentService, executionService, clientService, statisticsService, backupService)
+	collector := metrics.NewCollector(context)
+	grpcServer := server.NewGRPCServer(context, v, collector, scriptService, assignmentService, executionService, clientService, statisticsService, backupService)
 	httpServer := server.NewHTTPServer(context)
+
+	// Seed Prometheus metrics from database
+	seedCtx := viewer.NewSystemViewerContext(gocontext.Background())
+	collector.Seed(seedCtx, statisticsRepo)
+
 	app := newApp(context, grpcServer, httpServer, client)
 	return app, func() {
+		collector.Stop(gocontext.Background())
 		cleanup2()
 		cleanup()
 	}, nil

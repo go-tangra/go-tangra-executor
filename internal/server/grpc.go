@@ -16,6 +16,7 @@ import (
 
 	executorV1 "github.com/go-tangra/go-tangra-executor/gen/go/executor/service/v1"
 	"github.com/go-tangra/go-tangra-executor/internal/cert"
+	"github.com/go-tangra/go-tangra-executor/internal/metrics"
 	"github.com/go-tangra/go-tangra-executor/internal/service"
 
 	"github.com/go-tangra/go-tangra-common/middleware/audit"
@@ -36,6 +37,7 @@ func systemViewerMiddleware() middleware.Middleware {
 func NewGRPCServer(
 	ctx *bootstrap.Context,
 	certManager *cert.CertManager,
+	collector *metrics.Collector,
 	scriptSvc *service.ScriptService,
 	assignSvc *service.AssignmentService,
 	execSvc *service.ExecutionService,
@@ -76,6 +78,7 @@ func NewGRPCServer(
 	// Add middleware
 	var ms []middleware.Middleware
 	ms = append(ms, recovery.Recovery())
+	ms = append(ms, collector.Middleware())
 	ms = append(ms, systemViewerMiddleware())
 	ms = append(ms, tracing.Server())
 	ms = append(ms, metadata.Server())
