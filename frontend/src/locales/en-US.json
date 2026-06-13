@@ -102,7 +102,12 @@
       "updateCommandSent": "Command {commandId} sent to client",
       "clientOffline": "Client is offline",
       "clientOfflineDesc": "The update command was queued but the client is not currently connected",
-      "updateFailed": "Failed to trigger client update"
+      "updateFailed": "Failed to trigger client update",
+      "connection": "Connection",
+      "updateSelected": "Update selected",
+      "selectClients": "Select at least one client first",
+      "batchUpdateTitle": "Force update on {count} client(s)",
+      "batchUpdateResult": "Update sent — {online} online, {offline} offline, {failed} failed"
     }
   }
 }

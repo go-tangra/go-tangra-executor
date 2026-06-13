@@ -49,11 +49,13 @@ export const MtlsCertificateService = {
   list: async (
     params?: {
       commonName?: string;
+      page?: number;
       pageSize?: number;
     },
   ): Promise<ListMtlsCertificatesResponse> => {
     const query = new URLSearchParams();
     if (params?.commonName) query.set('commonName', params.commonName);
+    if (params?.page) query.set('page', String(params.page));
     if (params?.pageSize) query.set('pageSize', String(params.pageSize));
     const qs = query.toString();
 

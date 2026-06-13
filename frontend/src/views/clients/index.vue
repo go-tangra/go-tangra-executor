@@ -27,6 +27,12 @@ import {
 
 const executionStore = useExecutorExecutionStore();
 
+// Upper bound on clients fetched for client-side pagination/filtering. Online
+// status comes from a separate (in-memory) executor endpoint than the paginated
+// certificate source, so the merge + status filter + paging are done here over
+// the fetched set. The agent-client population is bounded well below this.
+const CLIENT_FETCH_LIMIT = 1000;
+
 function statusToColor(status: string | undefined) {
   switch (status) {
     case 'MTLS_CERTIFICATE_STATUS_ACTIVE':
@@ -97,6 +103,19 @@ const formOptions: VbenFormProps = {
         allowClear: true,
       },
     },
+    {
+      component: 'Select',
+      fieldName: 'connection',
+      label: $t('executor.page.client.connection'),
+      componentProps: {
+        placeholder: $t('ui.placeholder.select'),
+        allowClear: true,
+        options: [
+          { label: $t('executor.page.client.online'), value: 'online' },
+          { label: $t('executor.page.client.offline'), value: 'offline' },
+        ],
+      },
+    },
   ],
 };
 
@@ -112,6 +131,11 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
   },
   rowConfig: {
     isHover: true,
+    keyField: 'serialNumber',
+  },
+  checkboxConfig: {
+    highlight: true,
+    range: true,
   },
   pagerConfig: {
     enabled: true,
@@ -125,7 +149,7 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
         const [certResp, connResp] = await Promise.all([
           MtlsCertificateService.list({
             commonName: formValues?.commonName,
-            pageSize: page.pageSize,
+            pageSize: CLIENT_FETCH_LIMIT,
           }),
           ConnectedClientsService.list().catch(() => ({ clients: [] })),
         ]);
@@ -137,7 +161,7 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
           }
         }
 
-        const items = (certResp.items ?? []).map((cert) => {
+        let items = (certResp.items ?? []).map((cert) => {
           const key = cert.commonName ?? cert.clientId ?? '';
           const version = connectedMap.get(key);
           return {
@@ -147,15 +171,27 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
           };
         });
 
+        // Online/offline filter (status is not part of the paginated source).
+        if (formValues?.connection === 'online') {
+          items = items.filter((i) => i.online);
+        } else if (formValues?.connection === 'offline') {
+          items = items.filter((i) => !i.online);
+        }
+
+        // Paginate the merged+filtered set ourselves so the pager works
+        // regardless of which source the row/status came from.
+        const total = items.length;
+        const start = (page.currentPage - 1) * page.pageSize;
         return {
-          items,
-          total: certResp.total ?? 0,
+          items: items.slice(start, start + page.pageSize),
+          total,
         };
       },
     },
   },
 
   columns: [
+    { type: 'checkbox', width: 45, fixed: 'left' },
     { title: $t('ui.table.seq'), type: 'seq', width: 50 },
     {
       title: $t('executor.page.client.clientId'),
@@ -201,12 +237,16 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
   ],
 };
 
-const [Grid] = useVbenVxeGrid({ gridOptions, formOptions });
+const [Grid, gridApi] = useVbenVxeGrid({ gridOptions, formOptions });
 
 const updateTargetVersion = ref('');
 
+function clientIdOf(row: MtlsCertificate): string {
+  return row.commonName ?? row.clientId ?? '';
+}
+
 async function handleTriggerUpdate(row: MtlsCertificate) {
-  const clientId = row.commonName ?? row.clientId ?? '';
+  const clientId = clientIdOf(row);
   if (!clientId) return;
 
   updateTargetVersion.value = '';
@@ -251,11 +291,71 @@ async function handleTriggerUpdate(row: MtlsCertificate) {
     },
   });
 }
+
+// Force a client self-update on every selected host at once. Each host gets the
+// same (optional) target version; results are tallied by online/offline/failed.
+async function handleBatchUpdate() {
+  const rows = (gridApi.grid?.getCheckboxRecords?.() ?? []) as MtlsCertificate[];
+  const clientIds = [...new Set(rows.map(clientIdOf).filter(Boolean))];
+  if (clientIds.length === 0) {
+    notification.warning({ message: $t('executor.page.client.selectClients') });
+    return;
+  }
+
+  updateTargetVersion.value = '';
+
+  Modal.confirm({
+    title: $t('executor.page.client.batchUpdateTitle', { count: clientIds.length }),
+    content: h('div', { style: 'margin-top: 12px' }, [
+      h('div', { style: 'margin-bottom: 8px; margin-top: 4px' }, $t('executor.page.client.targetVersion')),
+      h(Input, {
+        placeholder: $t('executor.page.client.targetVersionPlaceholder'),
+        allowClear: true,
+        onChange: (e: Event) => {
+          updateTargetVersion.value = (e.target as HTMLInputElement)?.value ?? '';
+        },
+      }),
+    ]),
+    async onOk() {
+      const version = updateTargetVersion.value || undefined;
+      const results = await Promise.allSettled(
+        clientIds.map((id) => executionStore.triggerClientUpdate(id, version)),
+      );
+      let online = 0;
+      let offline = 0;
+      let failed = 0;
+      for (const r of results) {
+        if (r.status === 'fulfilled') {
+          if (r.value?.clientOnline) online += 1;
+          else offline += 1;
+        } else {
+          failed += 1;
+        }
+      }
+      const note = { message: $t('executor.page.client.batchUpdateResult', { online, offline, failed }) };
+      if (failed > 0) notification.error(note);
+      else notification.success(note);
+
+      gridApi.grid?.clearCheckboxRow?.();
+      await gridApi.query();
+    },
+  });
+}
 </script>
 
 <template>
   <Page auto-content-height>
     <Grid :table-title="$t('executor.page.client.title')">
+      <template #toolbar-tools>
+        <Button
+          class="mr-2"
+          type="primary"
+          :icon="h(LucideRefreshCw)"
+          @click="handleBatchUpdate"
+        >
+          {{ $t('executor.page.client.updateSelected') }}
+        </Button>
+      </template>
       <template #commonName="{ row }">
         <Badge :status="row.online ? 'success' : 'default'" />
         <span class="font-mono text-xs ml-1">{{ row.commonName ?? row.clientId }}</span>
