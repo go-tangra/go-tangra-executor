@@ -11,6 +11,7 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/validate"
 	"github.com/go-kratos/kratos/v2/transport/grpc"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
+	commonV1 "github.com/go-tangra/go-tangra-common/gen/go/common/service/v1"
 
 	"github.com/go-tangra/go-tangra-common/viewer"
 
@@ -44,6 +45,7 @@ func NewGRPCServer(
 	clientSvc *service.ClientService,
 	statsSvc *service.StatisticsService,
 	backupSvc *service.BackupService,
+	sqlBackupSvc *service.SqlBackupService,
 ) *grpc.Server {
 	cfg := ctx.GetConfig()
 	l := ctx.NewLoggerHelper("executor/grpc")
@@ -119,6 +121,7 @@ func NewGRPCServer(
 	executorV1.RegisterRedactedExecutorClientServiceServer(srv, clientSvc, nil)
 	executorV1.RegisterRedactedExecutorStatisticsServiceServer(srv, statsSvc, nil)
 	executorV1.RegisterRedactedBackupServiceServer(srv, backupSvc, nil)
+	commonV1.RegisterBackupServiceServer(srv, sqlBackupSvc)
 
 	return srv
 }

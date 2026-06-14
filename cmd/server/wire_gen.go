@@ -7,10 +7,7 @@
 package main
 
 import (
-	gocontext "context"
-
 	"github.com/go-kratos/kratos/v2"
-	"github.com/go-tangra/go-tangra-common/viewer"
 	"github.com/go-tangra/go-tangra-executor/internal/cert"
 	"github.com/go-tangra/go-tangra-executor/internal/data"
 	"github.com/go-tangra/go-tangra-executor/internal/metrics"
@@ -23,10 +20,11 @@ import (
 
 // initApp initializes the Wire provider entry for the kratos application
 func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
-	v, err := cert.NewCertManager(context)
+	certManager, err := cert.NewCertManager(context)
 	if err != nil {
 		return nil, nil, err
 	}
+	collector := metrics.NewCollector(context)
 	entClient, cleanup, err := data.NewEntClient(context)
 	if err != nil {
 		return nil, nil, err
@@ -52,17 +50,11 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	statisticsRepo := data.NewStatisticsRepo(context, entClient)
 	statisticsService := service.NewStatisticsService(context, statisticsRepo)
 	backupService := service.NewBackupService(context, entClient)
-	collector := metrics.NewCollector(context)
-	grpcServer := server.NewGRPCServer(context, v, collector, scriptService, assignmentService, executionService, clientService, statisticsService, backupService)
+	sqlBackupService := service.NewSqlBackupService(context)
+	grpcServer := server.NewGRPCServer(context, certManager, collector, scriptService, assignmentService, executionService, clientService, statisticsService, backupService, sqlBackupService)
 	httpServer := server.NewHTTPServer(context)
-
-	// Seed Prometheus metrics from database
-	seedCtx := viewer.NewSystemViewerContext(gocontext.Background())
-	collector.Seed(seedCtx, statisticsRepo)
-
 	app := newApp(context, grpcServer, httpServer, client)
 	return app, func() {
-		collector.Stop(gocontext.Background())
 		cleanup2()
 		cleanup()
 	}, nil
