@@ -9,6 +9,30 @@ import (
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent"
 )
 
+// The ActionFunc type is an adapter to allow the use of ordinary
+// function as Action mutator.
+type ActionFunc func(context.Context, *ent.ActionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ActionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ActionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActionMutation", m)
+}
+
+// The ActionFileFunc type is an adapter to allow the use of ordinary
+// function as ActionFile mutator.
+type ActionFileFunc func(context.Context, *ent.ActionFileMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ActionFileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ActionFileMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ActionFileMutation", m)
+}
+
 // The AuditLogFunc type is an adapter to allow the use of ordinary
 // function as AuditLog mutator.
 type AuditLogFunc func(context.Context, *ent.AuditLogMutation) (ent.Value, error)

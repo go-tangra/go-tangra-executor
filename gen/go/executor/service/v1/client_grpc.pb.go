@@ -26,6 +26,7 @@ const (
 	ExecutorClientService_SubmitExecution_FullMethodName        = "/executor.service.v1.ExecutorClientService/SubmitExecution"
 	ExecutorClientService_GetLatestClientRelease_FullMethodName = "/executor.service.v1.ExecutorClientService/GetLatestClientRelease"
 	ExecutorClientService_DownloadClientBinary_FullMethodName   = "/executor.service.v1.ExecutorClientService/DownloadClientBinary"
+	ExecutorClientService_ResolveAction_FullMethodName          = "/executor.service.v1.ExecutorClientService/ResolveAction"
 )
 
 // ExecutorClientServiceClient is the client API for ExecutorClientService service.
@@ -50,6 +51,10 @@ type ExecutorClientServiceClient interface {
 	GetLatestClientRelease(ctx context.Context, in *GetLatestClientReleaseRequest, opts ...grpc.CallOption) (*GetLatestClientReleaseResponse, error)
 	// Download a cached client binary as a stream of raw byte chunks.
 	DownloadClientBinary(ctx context.Context, in *DownloadClientBinaryRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ClientBinaryChunk], error)
+	// Resolve an action package by name so go-tangra-actions can execute it on the
+	// host. Returns the action.yaml manifest plus the package files, feeding the
+	// engine's action Resolver.
+	ResolveAction(ctx context.Context, in *ResolveActionRequest, opts ...grpc.CallOption) (*ResolveActionResponse, error)
 }
 
 type executorClientServiceClient struct {
@@ -148,6 +153,16 @@ func (c *executorClientServiceClient) DownloadClientBinary(ctx context.Context, 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExecutorClientService_DownloadClientBinaryClient = grpc.ServerStreamingClient[ClientBinaryChunk]
 
+func (c *executorClientServiceClient) ResolveAction(ctx context.Context, in *ResolveActionRequest, opts ...grpc.CallOption) (*ResolveActionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ResolveActionResponse)
+	err := c.cc.Invoke(ctx, ExecutorClientService_ResolveAction_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ExecutorClientServiceServer is the server API for ExecutorClientService service.
 // All implementations must embed UnimplementedExecutorClientServiceServer
 // for forward compatibility.
@@ -170,6 +185,10 @@ type ExecutorClientServiceServer interface {
 	GetLatestClientRelease(context.Context, *GetLatestClientReleaseRequest) (*GetLatestClientReleaseResponse, error)
 	// Download a cached client binary as a stream of raw byte chunks.
 	DownloadClientBinary(*DownloadClientBinaryRequest, grpc.ServerStreamingServer[ClientBinaryChunk]) error
+	// Resolve an action package by name so go-tangra-actions can execute it on the
+	// host. Returns the action.yaml manifest plus the package files, feeding the
+	// engine's action Resolver.
+	ResolveAction(context.Context, *ResolveActionRequest) (*ResolveActionResponse, error)
 	mustEmbedUnimplementedExecutorClientServiceServer()
 }
 
@@ -200,6 +219,9 @@ func (UnimplementedExecutorClientServiceServer) GetLatestClientRelease(context.C
 }
 func (UnimplementedExecutorClientServiceServer) DownloadClientBinary(*DownloadClientBinaryRequest, grpc.ServerStreamingServer[ClientBinaryChunk]) error {
 	return status.Error(codes.Unimplemented, "method DownloadClientBinary not implemented")
+}
+func (UnimplementedExecutorClientServiceServer) ResolveAction(context.Context, *ResolveActionRequest) (*ResolveActionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ResolveAction not implemented")
 }
 func (UnimplementedExecutorClientServiceServer) mustEmbedUnimplementedExecutorClientServiceServer() {}
 func (UnimplementedExecutorClientServiceServer) testEmbeddedByValue()                               {}
@@ -334,6 +356,24 @@ func _ExecutorClientService_DownloadClientBinary_Handler(srv interface{}, stream
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type ExecutorClientService_DownloadClientBinaryServer = grpc.ServerStreamingServer[ClientBinaryChunk]
 
+func _ExecutorClientService_ResolveAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ResolveActionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExecutorClientServiceServer).ResolveAction(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExecutorClientService_ResolveAction_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExecutorClientServiceServer).ResolveAction(ctx, req.(*ResolveActionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ExecutorClientService_ServiceDesc is the grpc.ServiceDesc for ExecutorClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -360,6 +400,10 @@ var ExecutorClientService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLatestClientRelease",
 			Handler:    _ExecutorClientService_GetLatestClientRelease_Handler,
+		},
+		{
+			MethodName: "ResolveAction",
+			Handler:    _ExecutorClientService_ResolveAction_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

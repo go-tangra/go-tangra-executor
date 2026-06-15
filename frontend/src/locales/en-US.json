@@ -2,10 +2,38 @@
   "menu": {
     "executor": "Executor",
     "scripts": "Scripts",
+    "actions": "Actions",
     "executions": "Executions",
     "clients": "Clients"
   },
   "page": {
+    "action": {
+      "title": "Actions",
+      "name": "Name",
+      "description": "Description",
+      "using": "Type",
+      "manifest": "Manifest (action.yaml)",
+      "files": "Package Files",
+      "version": "Version",
+      "enabled": "Enabled",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "create": "Create Action",
+      "edit": "Edit Action",
+      "view": "View Action",
+      "delete": "Delete Action",
+      "confirmDelete": "Are you sure you want to delete this action?",
+      "createSuccess": "Action created successfully",
+      "updateSuccess": "Action updated successfully",
+      "deleteSuccess": "Action deleted successfully",
+      "namePlaceholder": "Enter action name (the uses: reference)",
+      "descriptionPlaceholder": "Enter action description",
+      "addFile": "Add File",
+      "filePathPlaceholder": "File path (e.g. index.js)",
+      "fileContentPlaceholder": "File content",
+      "passwordRequired": "Password required to update action content",
+      "passwordPlaceholder": "Enter your password to confirm"
+    },
     "script": {
       "title": "Scripts",
       "id": "Script ID",

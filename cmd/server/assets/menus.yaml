@@ -31,6 +31,18 @@ menus:
       - platform:admin
       - tenant:manager
 
+  - id: executor-actions
+    parent_id: executor
+    type: MENU
+    name: Actions
+    path: actions
+    component: app/executor/actions/index.vue
+    icon: lucide:blocks
+    order: 2
+    authority:
+      - platform:admin
+      - tenant:manager
+
   - id: executor-executions
     parent_id: executor
     type: MENU
@@ -38,7 +50,7 @@ menus:
     path: executions
     component: app/executor/executions/index.vue
     icon: lucide:play
-    order: 2
+    order: 3
     authority:
       - platform:admin
       - tenant:manager
@@ -50,7 +62,7 @@ menus:
     path: clients
     component: app/executor/clients/index.vue
     icon: lucide:monitor
-    order: 3
+    order: 4
     authority:
       - platform:admin
       - tenant:manager
@@ -141,6 +153,12 @@ permission_groups:
       - name: Manage Scripts
         code: executor.script.manage
         description: Create, update, and delete scripts
+      - name: View Actions
+        code: executor.action.view
+        description: View the action repository
+      - name: Manage Actions
+        code: executor.action.manage
+        description: Create, update, and delete actions
       - name: Manage Assignments
         code: executor.assignment.manage
         description: Assign and unassign scripts to clients
@@ -162,6 +180,8 @@ roles:
     permissions:
       - executor.script.view
       - executor.script.manage
+      - executor.action.view
+      - executor.action.manage
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
@@ -174,6 +194,8 @@ roles:
     permissions:
       - executor.script.view
       - executor.script.manage
+      - executor.action.view
+      - executor.action.manage
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
@@ -185,4 +207,5 @@ roles:
     is_system: true
     permissions:
       - executor.script.view
+      - executor.action.view
       - executor.execution.view

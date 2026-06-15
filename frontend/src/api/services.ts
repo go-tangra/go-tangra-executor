@@ -263,3 +263,86 @@ export const ExecutionService = {
       options,
     ),
 };
+
+// ==================== Action Repository Types ====================
+
+export interface ActionFile {
+  path: string;
+  content: string;
+}
+
+export interface Action {
+  id: string;
+  tenantId: number;
+  name: string;
+  description: string;
+  using: string;
+  manifest: string;
+  contentHash: string;
+  version: number;
+  enabled: boolean;
+  files: ActionFile[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateActionRequest {
+  name: string;
+  description?: string;
+  manifest: string;
+  files?: ActionFile[];
+  enabled?: boolean;
+}
+
+export interface UpdateActionRequest {
+  description?: string;
+  manifest?: string;
+  files?: ActionFile[];
+  enabled?: boolean;
+  password?: string;
+}
+
+export interface ListActionsResponse {
+  actions: Action[];
+  total: number;
+}
+
+// ==================== Action Service ====================
+
+export const ActionService = {
+  create: (data: CreateActionRequest, options?: RequestOptions) =>
+    executorApi.post<{ action: Action }>('/actions', data, options),
+
+  get: (id: string, options?: RequestOptions) =>
+    executorApi.get<{ action: Action }>(`/actions/${id}`, options),
+
+  list: (
+    params?: {
+      page?: number;
+      pageSize?: number;
+      name?: string;
+      using?: string;
+      enabled?: boolean;
+    },
+    options?: RequestOptions,
+  ) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    if (params?.name) query.set('name', params.name);
+    if (params?.using) query.set('using', params.using);
+    if (params?.enabled !== undefined)
+      query.set('enabled', String(params.enabled));
+    const qs = query.toString();
+    return executorApi.get<ListActionsResponse>(
+      `/actions${qs ? `?${qs}` : ''}`,
+      options,
+    );
+  },
+
+  update: (id: string, data: UpdateActionRequest, options?: RequestOptions) =>
+    executorApi.put<{ action: Action }>(`/actions/${id}`, data, options),
+
+  delete: (id: string, options?: RequestOptions) =>
+    executorApi.delete<void>(`/actions/${id}`, options),
+};

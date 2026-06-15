@@ -153,6 +153,252 @@ var _ interface {
 	ErrorName() string
 } = ExecutionCommandValidationError{}
 
+// Validate checks the field values on ResolveActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ResolveActionRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveActionRequest with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ResolveActionRequestMultiError, or nil if none found.
+func (m *ResolveActionRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveActionRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	if len(errors) > 0 {
+		return ResolveActionRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveActionRequestMultiError is an error wrapping multiple validation
+// errors returned by ResolveActionRequest.ValidateAll() if the designated
+// constraints aren't met.
+type ResolveActionRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveActionRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveActionRequestMultiError) AllErrors() []error { return m }
+
+// ResolveActionRequestValidationError is the validation error returned by
+// ResolveActionRequest.Validate if the designated constraints aren't met.
+type ResolveActionRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveActionRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveActionRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveActionRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveActionRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveActionRequestValidationError) ErrorName() string {
+	return "ResolveActionRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveActionRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveActionRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveActionRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveActionRequestValidationError{}
+
+// Validate checks the field values on ResolveActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ResolveActionResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ResolveActionResponse with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ResolveActionResponseMultiError, or nil if none found.
+func (m *ResolveActionResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ResolveActionResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Name
+
+	// no validation rules for Manifest
+
+	for idx, item := range m.GetFiles() {
+		_, _ = idx, item
+
+		if all {
+			switch v := interface{}(item).(type) {
+			case interface{ ValidateAll() error }:
+				if err := v.ValidateAll(); err != nil {
+					errors = append(errors, ResolveActionResponseValidationError{
+						field:  fmt.Sprintf("Files[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			case interface{ Validate() error }:
+				if err := v.Validate(); err != nil {
+					errors = append(errors, ResolveActionResponseValidationError{
+						field:  fmt.Sprintf("Files[%v]", idx),
+						reason: "embedded message failed validation",
+						cause:  err,
+					})
+				}
+			}
+		} else if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return ResolveActionResponseValidationError{
+					field:  fmt.Sprintf("Files[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return ResolveActionResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// ResolveActionResponseMultiError is an error wrapping multiple validation
+// errors returned by ResolveActionResponse.ValidateAll() if the designated
+// constraints aren't met.
+type ResolveActionResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ResolveActionResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ResolveActionResponseMultiError) AllErrors() []error { return m }
+
+// ResolveActionResponseValidationError is the validation error returned by
+// ResolveActionResponse.Validate if the designated constraints aren't met.
+type ResolveActionResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ResolveActionResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ResolveActionResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ResolveActionResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ResolveActionResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ResolveActionResponseValidationError) ErrorName() string {
+	return "ResolveActionResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ResolveActionResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sResolveActionResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ResolveActionResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ResolveActionResponseValidationError{}
+
 // Validate checks the field values on FetchScriptRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

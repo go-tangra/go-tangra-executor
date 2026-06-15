@@ -116,6 +116,17 @@ func (s *redactedExecutorClientServiceServer) DownloadClientBinary(in *DownloadC
 	return s.srv.DownloadClientBinary(in, stream)
 }
 
+// ResolveAction is the redacted wrapper for the actual ExecutorClientServiceServer.ResolveAction method
+// Unary RPC
+func (s *redactedExecutorClientServiceServer) ResolveAction(ctx context.Context, in *ResolveActionRequest) (*ResolveActionResponse, error) {
+	res, err := s.srv.ResolveAction(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // Redact method implementation for ExecutionCommand
 func (x *ExecutionCommand) Redact() string {
 	if x == nil {
@@ -141,6 +152,32 @@ func (x *ExecutionCommand) Redact() string {
 	// Safe field: CommandType
 
 	// Safe field: TargetVersion
+	return x.String()
+}
+
+// Redact method implementation for ResolveActionRequest
+func (x *ResolveActionRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Name
+	return x.String()
+}
+
+// Redact method implementation for ResolveActionResponse
+func (x *ResolveActionResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Name
+
+	// Safe field: Manifest
+
+	// Safe field: Files
+
+	// Safe field: Version
 	return x.String()
 }
 

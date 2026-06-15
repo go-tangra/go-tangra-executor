@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/action"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/actionfile"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/auditlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
@@ -76,6 +78,8 @@ var (
 func checkColumn(t, c string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
+			action.Table:           action.ValidColumn,
+			actionfile.Table:       actionfile.ValidColumn,
 			auditlog.Table:         auditlog.ValidColumn,
 			executionlog.Table:     executionlog.ValidColumn,
 			script.Table:           script.ValidColumn,

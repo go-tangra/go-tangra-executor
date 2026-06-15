@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Action is the predicate function for action builders.
+type Action func(*sql.Selector)
+
+// ActionFile is the predicate function for actionfile builders.
+type ActionFile func(*sql.Selector)
+
 // AuditLog is the predicate function for auditlog builders.
 type AuditLog func(*sql.Selector)
 

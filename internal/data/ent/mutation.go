@@ -11,6 +11,8 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/action"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/actionfile"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/auditlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/predicate"
@@ -27,11 +29,2095 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
+	TypeAction           = "Action"
+	TypeActionFile       = "ActionFile"
 	TypeAuditLog         = "AuditLog"
 	TypeExecutionLog     = "ExecutionLog"
 	TypeScript           = "Script"
 	TypeScriptAssignment = "ScriptAssignment"
 )
+
+// ActionMutation represents an operation that mutates the Action nodes in the graph.
+type ActionMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	create_by     *uint32
+	addcreate_by  *int32
+	update_by     *uint32
+	addupdate_by  *int32
+	create_time   *time.Time
+	update_time   *time.Time
+	delete_time   *time.Time
+	tenant_id     *uint32
+	addtenant_id  *int32
+	name          *string
+	version       *int
+	addversion    *int
+	description   *string
+	using         *string
+	manifest      *string
+	content_hash  *string
+	enabled       *bool
+	clearedFields map[string]struct{}
+	files         map[string]struct{}
+	removedfiles  map[string]struct{}
+	clearedfiles  bool
+	done          bool
+	oldValue      func(context.Context) (*Action, error)
+	predicates    []predicate.Action
+}
+
+var _ ent.Mutation = (*ActionMutation)(nil)
+
+// actionOption allows management of the mutation configuration using functional options.
+type actionOption func(*ActionMutation)
+
+// newActionMutation creates new mutation for the Action entity.
+func newActionMutation(c config, op Op, opts ...actionOption) *ActionMutation {
+	m := &ActionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAction,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withActionID sets the ID field of the mutation.
+func withActionID(id string) actionOption {
+	return func(m *ActionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Action
+		)
+		m.oldValue = func(ctx context.Context) (*Action, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Action.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAction sets the old Action of the mutation.
+func withAction(node *Action) actionOption {
+	return func(m *ActionMutation) {
+		m.oldValue = func(context.Context) (*Action, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ActionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ActionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Action entities.
+func (m *ActionMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ActionMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ActionMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Action.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateBy sets the "create_by" field.
+func (m *ActionMutation) SetCreateBy(u uint32) {
+	m.create_by = &u
+	m.addcreate_by = nil
+}
+
+// CreateBy returns the value of the "create_by" field in the mutation.
+func (m *ActionMutation) CreateBy() (r uint32, exists bool) {
+	v := m.create_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateBy returns the old "create_by" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldCreateBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateBy: %w", err)
+	}
+	return oldValue.CreateBy, nil
+}
+
+// AddCreateBy adds u to the "create_by" field.
+func (m *ActionMutation) AddCreateBy(u int32) {
+	if m.addcreate_by != nil {
+		*m.addcreate_by += u
+	} else {
+		m.addcreate_by = &u
+	}
+}
+
+// AddedCreateBy returns the value that was added to the "create_by" field in this mutation.
+func (m *ActionMutation) AddedCreateBy() (r int32, exists bool) {
+	v := m.addcreate_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCreateBy clears the value of the "create_by" field.
+func (m *ActionMutation) ClearCreateBy() {
+	m.create_by = nil
+	m.addcreate_by = nil
+	m.clearedFields[action.FieldCreateBy] = struct{}{}
+}
+
+// CreateByCleared returns if the "create_by" field was cleared in this mutation.
+func (m *ActionMutation) CreateByCleared() bool {
+	_, ok := m.clearedFields[action.FieldCreateBy]
+	return ok
+}
+
+// ResetCreateBy resets all changes to the "create_by" field.
+func (m *ActionMutation) ResetCreateBy() {
+	m.create_by = nil
+	m.addcreate_by = nil
+	delete(m.clearedFields, action.FieldCreateBy)
+}
+
+// SetUpdateBy sets the "update_by" field.
+func (m *ActionMutation) SetUpdateBy(u uint32) {
+	m.update_by = &u
+	m.addupdate_by = nil
+}
+
+// UpdateBy returns the value of the "update_by" field in the mutation.
+func (m *ActionMutation) UpdateBy() (r uint32, exists bool) {
+	v := m.update_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateBy returns the old "update_by" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldUpdateBy(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateBy: %w", err)
+	}
+	return oldValue.UpdateBy, nil
+}
+
+// AddUpdateBy adds u to the "update_by" field.
+func (m *ActionMutation) AddUpdateBy(u int32) {
+	if m.addupdate_by != nil {
+		*m.addupdate_by += u
+	} else {
+		m.addupdate_by = &u
+	}
+}
+
+// AddedUpdateBy returns the value that was added to the "update_by" field in this mutation.
+func (m *ActionMutation) AddedUpdateBy() (r int32, exists bool) {
+	v := m.addupdate_by
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearUpdateBy clears the value of the "update_by" field.
+func (m *ActionMutation) ClearUpdateBy() {
+	m.update_by = nil
+	m.addupdate_by = nil
+	m.clearedFields[action.FieldUpdateBy] = struct{}{}
+}
+
+// UpdateByCleared returns if the "update_by" field was cleared in this mutation.
+func (m *ActionMutation) UpdateByCleared() bool {
+	_, ok := m.clearedFields[action.FieldUpdateBy]
+	return ok
+}
+
+// ResetUpdateBy resets all changes to the "update_by" field.
+func (m *ActionMutation) ResetUpdateBy() {
+	m.update_by = nil
+	m.addupdate_by = nil
+	delete(m.clearedFields, action.FieldUpdateBy)
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *ActionMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *ActionMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *ActionMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[action.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *ActionMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[action.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *ActionMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, action.FieldCreateTime)
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *ActionMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *ActionMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (m *ActionMutation) ClearUpdateTime() {
+	m.update_time = nil
+	m.clearedFields[action.FieldUpdateTime] = struct{}{}
+}
+
+// UpdateTimeCleared returns if the "update_time" field was cleared in this mutation.
+func (m *ActionMutation) UpdateTimeCleared() bool {
+	_, ok := m.clearedFields[action.FieldUpdateTime]
+	return ok
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *ActionMutation) ResetUpdateTime() {
+	m.update_time = nil
+	delete(m.clearedFields, action.FieldUpdateTime)
+}
+
+// SetDeleteTime sets the "delete_time" field.
+func (m *ActionMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
+}
+
+// DeleteTime returns the value of the "delete_time" field in the mutation.
+func (m *ActionMutation) DeleteTime() (r time.Time, exists bool) {
+	v := m.delete_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTime returns the old "delete_time" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTime: %w", err)
+	}
+	return oldValue.DeleteTime, nil
+}
+
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (m *ActionMutation) ClearDeleteTime() {
+	m.delete_time = nil
+	m.clearedFields[action.FieldDeleteTime] = struct{}{}
+}
+
+// DeleteTimeCleared returns if the "delete_time" field was cleared in this mutation.
+func (m *ActionMutation) DeleteTimeCleared() bool {
+	_, ok := m.clearedFields[action.FieldDeleteTime]
+	return ok
+}
+
+// ResetDeleteTime resets all changes to the "delete_time" field.
+func (m *ActionMutation) ResetDeleteTime() {
+	m.delete_time = nil
+	delete(m.clearedFields, action.FieldDeleteTime)
+}
+
+// SetTenantID sets the "tenant_id" field.
+func (m *ActionMutation) SetTenantID(u uint32) {
+	m.tenant_id = &u
+	m.addtenant_id = nil
+}
+
+// TenantID returns the value of the "tenant_id" field in the mutation.
+func (m *ActionMutation) TenantID() (r uint32, exists bool) {
+	v := m.tenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTenantID returns the old "tenant_id" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldTenantID(ctx context.Context) (v *uint32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTenantID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTenantID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTenantID: %w", err)
+	}
+	return oldValue.TenantID, nil
+}
+
+// AddTenantID adds u to the "tenant_id" field.
+func (m *ActionMutation) AddTenantID(u int32) {
+	if m.addtenant_id != nil {
+		*m.addtenant_id += u
+	} else {
+		m.addtenant_id = &u
+	}
+}
+
+// AddedTenantID returns the value that was added to the "tenant_id" field in this mutation.
+func (m *ActionMutation) AddedTenantID() (r int32, exists bool) {
+	v := m.addtenant_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTenantID clears the value of the "tenant_id" field.
+func (m *ActionMutation) ClearTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	m.clearedFields[action.FieldTenantID] = struct{}{}
+}
+
+// TenantIDCleared returns if the "tenant_id" field was cleared in this mutation.
+func (m *ActionMutation) TenantIDCleared() bool {
+	_, ok := m.clearedFields[action.FieldTenantID]
+	return ok
+}
+
+// ResetTenantID resets all changes to the "tenant_id" field.
+func (m *ActionMutation) ResetTenantID() {
+	m.tenant_id = nil
+	m.addtenant_id = nil
+	delete(m.clearedFields, action.FieldTenantID)
+}
+
+// SetName sets the "name" field.
+func (m *ActionMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ActionMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ActionMutation) ResetName() {
+	m.name = nil
+}
+
+// SetVersion sets the "version" field.
+func (m *ActionMutation) SetVersion(i int) {
+	m.version = &i
+	m.addversion = nil
+}
+
+// Version returns the value of the "version" field in the mutation.
+func (m *ActionMutation) Version() (r int, exists bool) {
+	v := m.version
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVersion returns the old "version" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldVersion(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVersion is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVersion requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVersion: %w", err)
+	}
+	return oldValue.Version, nil
+}
+
+// AddVersion adds i to the "version" field.
+func (m *ActionMutation) AddVersion(i int) {
+	if m.addversion != nil {
+		*m.addversion += i
+	} else {
+		m.addversion = &i
+	}
+}
+
+// AddedVersion returns the value that was added to the "version" field in this mutation.
+func (m *ActionMutation) AddedVersion() (r int, exists bool) {
+	v := m.addversion
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetVersion resets all changes to the "version" field.
+func (m *ActionMutation) ResetVersion() {
+	m.version = nil
+	m.addversion = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *ActionMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *ActionMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *ActionMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[action.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *ActionMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[action.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *ActionMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, action.FieldDescription)
+}
+
+// SetUsing sets the "using" field.
+func (m *ActionMutation) SetUsing(s string) {
+	m.using = &s
+}
+
+// Using returns the value of the "using" field in the mutation.
+func (m *ActionMutation) Using() (r string, exists bool) {
+	v := m.using
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUsing returns the old "using" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldUsing(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUsing is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUsing requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUsing: %w", err)
+	}
+	return oldValue.Using, nil
+}
+
+// ClearUsing clears the value of the "using" field.
+func (m *ActionMutation) ClearUsing() {
+	m.using = nil
+	m.clearedFields[action.FieldUsing] = struct{}{}
+}
+
+// UsingCleared returns if the "using" field was cleared in this mutation.
+func (m *ActionMutation) UsingCleared() bool {
+	_, ok := m.clearedFields[action.FieldUsing]
+	return ok
+}
+
+// ResetUsing resets all changes to the "using" field.
+func (m *ActionMutation) ResetUsing() {
+	m.using = nil
+	delete(m.clearedFields, action.FieldUsing)
+}
+
+// SetManifest sets the "manifest" field.
+func (m *ActionMutation) SetManifest(s string) {
+	m.manifest = &s
+}
+
+// Manifest returns the value of the "manifest" field in the mutation.
+func (m *ActionMutation) Manifest() (r string, exists bool) {
+	v := m.manifest
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldManifest returns the old "manifest" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldManifest(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldManifest is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldManifest requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldManifest: %w", err)
+	}
+	return oldValue.Manifest, nil
+}
+
+// ResetManifest resets all changes to the "manifest" field.
+func (m *ActionMutation) ResetManifest() {
+	m.manifest = nil
+}
+
+// SetContentHash sets the "content_hash" field.
+func (m *ActionMutation) SetContentHash(s string) {
+	m.content_hash = &s
+}
+
+// ContentHash returns the value of the "content_hash" field in the mutation.
+func (m *ActionMutation) ContentHash() (r string, exists bool) {
+	v := m.content_hash
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContentHash returns the old "content_hash" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldContentHash(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContentHash is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContentHash requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContentHash: %w", err)
+	}
+	return oldValue.ContentHash, nil
+}
+
+// ResetContentHash resets all changes to the "content_hash" field.
+func (m *ActionMutation) ResetContentHash() {
+	m.content_hash = nil
+}
+
+// SetEnabled sets the "enabled" field.
+func (m *ActionMutation) SetEnabled(b bool) {
+	m.enabled = &b
+}
+
+// Enabled returns the value of the "enabled" field in the mutation.
+func (m *ActionMutation) Enabled() (r bool, exists bool) {
+	v := m.enabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnabled returns the old "enabled" field's value of the Action entity.
+// If the Action object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionMutation) OldEnabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnabled: %w", err)
+	}
+	return oldValue.Enabled, nil
+}
+
+// ResetEnabled resets all changes to the "enabled" field.
+func (m *ActionMutation) ResetEnabled() {
+	m.enabled = nil
+}
+
+// AddFileIDs adds the "files" edge to the ActionFile entity by ids.
+func (m *ActionMutation) AddFileIDs(ids ...string) {
+	if m.files == nil {
+		m.files = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.files[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFiles clears the "files" edge to the ActionFile entity.
+func (m *ActionMutation) ClearFiles() {
+	m.clearedfiles = true
+}
+
+// FilesCleared reports if the "files" edge to the ActionFile entity was cleared.
+func (m *ActionMutation) FilesCleared() bool {
+	return m.clearedfiles
+}
+
+// RemoveFileIDs removes the "files" edge to the ActionFile entity by IDs.
+func (m *ActionMutation) RemoveFileIDs(ids ...string) {
+	if m.removedfiles == nil {
+		m.removedfiles = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.files, ids[i])
+		m.removedfiles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFiles returns the removed IDs of the "files" edge to the ActionFile entity.
+func (m *ActionMutation) RemovedFilesIDs() (ids []string) {
+	for id := range m.removedfiles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FilesIDs returns the "files" edge IDs in the mutation.
+func (m *ActionMutation) FilesIDs() (ids []string) {
+	for id := range m.files {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFiles resets all changes to the "files" edge.
+func (m *ActionMutation) ResetFiles() {
+	m.files = nil
+	m.clearedfiles = false
+	m.removedfiles = nil
+}
+
+// Where appends a list predicates to the ActionMutation builder.
+func (m *ActionMutation) Where(ps ...predicate.Action) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ActionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ActionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Action, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ActionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ActionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Action).
+func (m *ActionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ActionMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.create_by != nil {
+		fields = append(fields, action.FieldCreateBy)
+	}
+	if m.update_by != nil {
+		fields = append(fields, action.FieldUpdateBy)
+	}
+	if m.create_time != nil {
+		fields = append(fields, action.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, action.FieldUpdateTime)
+	}
+	if m.delete_time != nil {
+		fields = append(fields, action.FieldDeleteTime)
+	}
+	if m.tenant_id != nil {
+		fields = append(fields, action.FieldTenantID)
+	}
+	if m.name != nil {
+		fields = append(fields, action.FieldName)
+	}
+	if m.version != nil {
+		fields = append(fields, action.FieldVersion)
+	}
+	if m.description != nil {
+		fields = append(fields, action.FieldDescription)
+	}
+	if m.using != nil {
+		fields = append(fields, action.FieldUsing)
+	}
+	if m.manifest != nil {
+		fields = append(fields, action.FieldManifest)
+	}
+	if m.content_hash != nil {
+		fields = append(fields, action.FieldContentHash)
+	}
+	if m.enabled != nil {
+		fields = append(fields, action.FieldEnabled)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ActionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case action.FieldCreateBy:
+		return m.CreateBy()
+	case action.FieldUpdateBy:
+		return m.UpdateBy()
+	case action.FieldCreateTime:
+		return m.CreateTime()
+	case action.FieldUpdateTime:
+		return m.UpdateTime()
+	case action.FieldDeleteTime:
+		return m.DeleteTime()
+	case action.FieldTenantID:
+		return m.TenantID()
+	case action.FieldName:
+		return m.Name()
+	case action.FieldVersion:
+		return m.Version()
+	case action.FieldDescription:
+		return m.Description()
+	case action.FieldUsing:
+		return m.Using()
+	case action.FieldManifest:
+		return m.Manifest()
+	case action.FieldContentHash:
+		return m.ContentHash()
+	case action.FieldEnabled:
+		return m.Enabled()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ActionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case action.FieldCreateBy:
+		return m.OldCreateBy(ctx)
+	case action.FieldUpdateBy:
+		return m.OldUpdateBy(ctx)
+	case action.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case action.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case action.FieldDeleteTime:
+		return m.OldDeleteTime(ctx)
+	case action.FieldTenantID:
+		return m.OldTenantID(ctx)
+	case action.FieldName:
+		return m.OldName(ctx)
+	case action.FieldVersion:
+		return m.OldVersion(ctx)
+	case action.FieldDescription:
+		return m.OldDescription(ctx)
+	case action.FieldUsing:
+		return m.OldUsing(ctx)
+	case action.FieldManifest:
+		return m.OldManifest(ctx)
+	case action.FieldContentHash:
+		return m.OldContentHash(ctx)
+	case action.FieldEnabled:
+		return m.OldEnabled(ctx)
+	}
+	return nil, fmt.Errorf("unknown Action field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case action.FieldCreateBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateBy(v)
+		return nil
+	case action.FieldUpdateBy:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateBy(v)
+		return nil
+	case action.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case action.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case action.FieldDeleteTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTime(v)
+		return nil
+	case action.FieldTenantID:
+		v, ok := value.(uint32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTenantID(v)
+		return nil
+	case action.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case action.FieldVersion:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVersion(v)
+		return nil
+	case action.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case action.FieldUsing:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUsing(v)
+		return nil
+	case action.FieldManifest:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetManifest(v)
+		return nil
+	case action.FieldContentHash:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContentHash(v)
+		return nil
+	case action.FieldEnabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnabled(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Action field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ActionMutation) AddedFields() []string {
+	var fields []string
+	if m.addcreate_by != nil {
+		fields = append(fields, action.FieldCreateBy)
+	}
+	if m.addupdate_by != nil {
+		fields = append(fields, action.FieldUpdateBy)
+	}
+	if m.addtenant_id != nil {
+		fields = append(fields, action.FieldTenantID)
+	}
+	if m.addversion != nil {
+		fields = append(fields, action.FieldVersion)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ActionMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case action.FieldCreateBy:
+		return m.AddedCreateBy()
+	case action.FieldUpdateBy:
+		return m.AddedUpdateBy()
+	case action.FieldTenantID:
+		return m.AddedTenantID()
+	case action.FieldVersion:
+		return m.AddedVersion()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case action.FieldCreateBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCreateBy(v)
+		return nil
+	case action.FieldUpdateBy:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUpdateBy(v)
+		return nil
+	case action.FieldTenantID:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTenantID(v)
+		return nil
+	case action.FieldVersion:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVersion(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Action numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ActionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(action.FieldCreateBy) {
+		fields = append(fields, action.FieldCreateBy)
+	}
+	if m.FieldCleared(action.FieldUpdateBy) {
+		fields = append(fields, action.FieldUpdateBy)
+	}
+	if m.FieldCleared(action.FieldCreateTime) {
+		fields = append(fields, action.FieldCreateTime)
+	}
+	if m.FieldCleared(action.FieldUpdateTime) {
+		fields = append(fields, action.FieldUpdateTime)
+	}
+	if m.FieldCleared(action.FieldDeleteTime) {
+		fields = append(fields, action.FieldDeleteTime)
+	}
+	if m.FieldCleared(action.FieldTenantID) {
+		fields = append(fields, action.FieldTenantID)
+	}
+	if m.FieldCleared(action.FieldDescription) {
+		fields = append(fields, action.FieldDescription)
+	}
+	if m.FieldCleared(action.FieldUsing) {
+		fields = append(fields, action.FieldUsing)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ActionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ActionMutation) ClearField(name string) error {
+	switch name {
+	case action.FieldCreateBy:
+		m.ClearCreateBy()
+		return nil
+	case action.FieldUpdateBy:
+		m.ClearUpdateBy()
+		return nil
+	case action.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	case action.FieldUpdateTime:
+		m.ClearUpdateTime()
+		return nil
+	case action.FieldDeleteTime:
+		m.ClearDeleteTime()
+		return nil
+	case action.FieldTenantID:
+		m.ClearTenantID()
+		return nil
+	case action.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case action.FieldUsing:
+		m.ClearUsing()
+		return nil
+	}
+	return fmt.Errorf("unknown Action nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ActionMutation) ResetField(name string) error {
+	switch name {
+	case action.FieldCreateBy:
+		m.ResetCreateBy()
+		return nil
+	case action.FieldUpdateBy:
+		m.ResetUpdateBy()
+		return nil
+	case action.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case action.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case action.FieldDeleteTime:
+		m.ResetDeleteTime()
+		return nil
+	case action.FieldTenantID:
+		m.ResetTenantID()
+		return nil
+	case action.FieldName:
+		m.ResetName()
+		return nil
+	case action.FieldVersion:
+		m.ResetVersion()
+		return nil
+	case action.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case action.FieldUsing:
+		m.ResetUsing()
+		return nil
+	case action.FieldManifest:
+		m.ResetManifest()
+		return nil
+	case action.FieldContentHash:
+		m.ResetContentHash()
+		return nil
+	case action.FieldEnabled:
+		m.ResetEnabled()
+		return nil
+	}
+	return fmt.Errorf("unknown Action field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ActionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.files != nil {
+		edges = append(edges, action.EdgeFiles)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ActionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case action.EdgeFiles:
+		ids := make([]ent.Value, 0, len(m.files))
+		for id := range m.files {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ActionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedfiles != nil {
+		edges = append(edges, action.EdgeFiles)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ActionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case action.EdgeFiles:
+		ids := make([]ent.Value, 0, len(m.removedfiles))
+		for id := range m.removedfiles {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ActionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedfiles {
+		edges = append(edges, action.EdgeFiles)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ActionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case action.EdgeFiles:
+		return m.clearedfiles
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ActionMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Action unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ActionMutation) ResetEdge(name string) error {
+	switch name {
+	case action.EdgeFiles:
+		m.ResetFiles()
+		return nil
+	}
+	return fmt.Errorf("unknown Action edge %s", name)
+}
+
+// ActionFileMutation represents an operation that mutates the ActionFile nodes in the graph.
+type ActionFileMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	create_time   *time.Time
+	update_time   *time.Time
+	delete_time   *time.Time
+	_path         *string
+	content       *string
+	clearedFields map[string]struct{}
+	action        *string
+	clearedaction bool
+	done          bool
+	oldValue      func(context.Context) (*ActionFile, error)
+	predicates    []predicate.ActionFile
+}
+
+var _ ent.Mutation = (*ActionFileMutation)(nil)
+
+// actionfileOption allows management of the mutation configuration using functional options.
+type actionfileOption func(*ActionFileMutation)
+
+// newActionFileMutation creates new mutation for the ActionFile entity.
+func newActionFileMutation(c config, op Op, opts ...actionfileOption) *ActionFileMutation {
+	m := &ActionFileMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeActionFile,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withActionFileID sets the ID field of the mutation.
+func withActionFileID(id string) actionfileOption {
+	return func(m *ActionFileMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ActionFile
+		)
+		m.oldValue = func(ctx context.Context) (*ActionFile, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ActionFile.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withActionFile sets the old ActionFile of the mutation.
+func withActionFile(node *ActionFile) actionfileOption {
+	return func(m *ActionFileMutation) {
+		m.oldValue = func(context.Context) (*ActionFile, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ActionFileMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ActionFileMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of ActionFile entities.
+func (m *ActionFileMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ActionFileMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ActionFileMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ActionFile.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreateTime sets the "create_time" field.
+func (m *ActionFileMutation) SetCreateTime(t time.Time) {
+	m.create_time = &t
+}
+
+// CreateTime returns the value of the "create_time" field in the mutation.
+func (m *ActionFileMutation) CreateTime() (r time.Time, exists bool) {
+	v := m.create_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreateTime returns the old "create_time" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldCreateTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreateTime: %w", err)
+	}
+	return oldValue.CreateTime, nil
+}
+
+// ClearCreateTime clears the value of the "create_time" field.
+func (m *ActionFileMutation) ClearCreateTime() {
+	m.create_time = nil
+	m.clearedFields[actionfile.FieldCreateTime] = struct{}{}
+}
+
+// CreateTimeCleared returns if the "create_time" field was cleared in this mutation.
+func (m *ActionFileMutation) CreateTimeCleared() bool {
+	_, ok := m.clearedFields[actionfile.FieldCreateTime]
+	return ok
+}
+
+// ResetCreateTime resets all changes to the "create_time" field.
+func (m *ActionFileMutation) ResetCreateTime() {
+	m.create_time = nil
+	delete(m.clearedFields, actionfile.FieldCreateTime)
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (m *ActionFileMutation) SetUpdateTime(t time.Time) {
+	m.update_time = &t
+}
+
+// UpdateTime returns the value of the "update_time" field in the mutation.
+func (m *ActionFileMutation) UpdateTime() (r time.Time, exists bool) {
+	v := m.update_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdateTime returns the old "update_time" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldUpdateTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdateTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdateTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdateTime: %w", err)
+	}
+	return oldValue.UpdateTime, nil
+}
+
+// ClearUpdateTime clears the value of the "update_time" field.
+func (m *ActionFileMutation) ClearUpdateTime() {
+	m.update_time = nil
+	m.clearedFields[actionfile.FieldUpdateTime] = struct{}{}
+}
+
+// UpdateTimeCleared returns if the "update_time" field was cleared in this mutation.
+func (m *ActionFileMutation) UpdateTimeCleared() bool {
+	_, ok := m.clearedFields[actionfile.FieldUpdateTime]
+	return ok
+}
+
+// ResetUpdateTime resets all changes to the "update_time" field.
+func (m *ActionFileMutation) ResetUpdateTime() {
+	m.update_time = nil
+	delete(m.clearedFields, actionfile.FieldUpdateTime)
+}
+
+// SetDeleteTime sets the "delete_time" field.
+func (m *ActionFileMutation) SetDeleteTime(t time.Time) {
+	m.delete_time = &t
+}
+
+// DeleteTime returns the value of the "delete_time" field in the mutation.
+func (m *ActionFileMutation) DeleteTime() (r time.Time, exists bool) {
+	v := m.delete_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeleteTime returns the old "delete_time" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldDeleteTime(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeleteTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeleteTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeleteTime: %w", err)
+	}
+	return oldValue.DeleteTime, nil
+}
+
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (m *ActionFileMutation) ClearDeleteTime() {
+	m.delete_time = nil
+	m.clearedFields[actionfile.FieldDeleteTime] = struct{}{}
+}
+
+// DeleteTimeCleared returns if the "delete_time" field was cleared in this mutation.
+func (m *ActionFileMutation) DeleteTimeCleared() bool {
+	_, ok := m.clearedFields[actionfile.FieldDeleteTime]
+	return ok
+}
+
+// ResetDeleteTime resets all changes to the "delete_time" field.
+func (m *ActionFileMutation) ResetDeleteTime() {
+	m.delete_time = nil
+	delete(m.clearedFields, actionfile.FieldDeleteTime)
+}
+
+// SetActionID sets the "action_id" field.
+func (m *ActionFileMutation) SetActionID(s string) {
+	m.action = &s
+}
+
+// ActionID returns the value of the "action_id" field in the mutation.
+func (m *ActionFileMutation) ActionID() (r string, exists bool) {
+	v := m.action
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldActionID returns the old "action_id" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldActionID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldActionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldActionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldActionID: %w", err)
+	}
+	return oldValue.ActionID, nil
+}
+
+// ResetActionID resets all changes to the "action_id" field.
+func (m *ActionFileMutation) ResetActionID() {
+	m.action = nil
+}
+
+// SetPath sets the "path" field.
+func (m *ActionFileMutation) SetPath(s string) {
+	m._path = &s
+}
+
+// Path returns the value of the "path" field in the mutation.
+func (m *ActionFileMutation) Path() (r string, exists bool) {
+	v := m._path
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPath returns the old "path" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldPath(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPath is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPath requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPath: %w", err)
+	}
+	return oldValue.Path, nil
+}
+
+// ResetPath resets all changes to the "path" field.
+func (m *ActionFileMutation) ResetPath() {
+	m._path = nil
+}
+
+// SetContent sets the "content" field.
+func (m *ActionFileMutation) SetContent(s string) {
+	m.content = &s
+}
+
+// Content returns the value of the "content" field in the mutation.
+func (m *ActionFileMutation) Content() (r string, exists bool) {
+	v := m.content
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldContent returns the old "content" field's value of the ActionFile entity.
+// If the ActionFile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ActionFileMutation) OldContent(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldContent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldContent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldContent: %w", err)
+	}
+	return oldValue.Content, nil
+}
+
+// ResetContent resets all changes to the "content" field.
+func (m *ActionFileMutation) ResetContent() {
+	m.content = nil
+}
+
+// ClearAction clears the "action" edge to the Action entity.
+func (m *ActionFileMutation) ClearAction() {
+	m.clearedaction = true
+	m.clearedFields[actionfile.FieldActionID] = struct{}{}
+}
+
+// ActionCleared reports if the "action" edge to the Action entity was cleared.
+func (m *ActionFileMutation) ActionCleared() bool {
+	return m.clearedaction
+}
+
+// ActionIDs returns the "action" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ActionID instead. It exists only for internal usage by the builders.
+func (m *ActionFileMutation) ActionIDs() (ids []string) {
+	if id := m.action; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAction resets all changes to the "action" edge.
+func (m *ActionFileMutation) ResetAction() {
+	m.action = nil
+	m.clearedaction = false
+}
+
+// Where appends a list predicates to the ActionFileMutation builder.
+func (m *ActionFileMutation) Where(ps ...predicate.ActionFile) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ActionFileMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ActionFileMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ActionFile, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ActionFileMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ActionFileMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ActionFile).
+func (m *ActionFileMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ActionFileMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.create_time != nil {
+		fields = append(fields, actionfile.FieldCreateTime)
+	}
+	if m.update_time != nil {
+		fields = append(fields, actionfile.FieldUpdateTime)
+	}
+	if m.delete_time != nil {
+		fields = append(fields, actionfile.FieldDeleteTime)
+	}
+	if m.action != nil {
+		fields = append(fields, actionfile.FieldActionID)
+	}
+	if m._path != nil {
+		fields = append(fields, actionfile.FieldPath)
+	}
+	if m.content != nil {
+		fields = append(fields, actionfile.FieldContent)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ActionFileMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case actionfile.FieldCreateTime:
+		return m.CreateTime()
+	case actionfile.FieldUpdateTime:
+		return m.UpdateTime()
+	case actionfile.FieldDeleteTime:
+		return m.DeleteTime()
+	case actionfile.FieldActionID:
+		return m.ActionID()
+	case actionfile.FieldPath:
+		return m.Path()
+	case actionfile.FieldContent:
+		return m.Content()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ActionFileMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case actionfile.FieldCreateTime:
+		return m.OldCreateTime(ctx)
+	case actionfile.FieldUpdateTime:
+		return m.OldUpdateTime(ctx)
+	case actionfile.FieldDeleteTime:
+		return m.OldDeleteTime(ctx)
+	case actionfile.FieldActionID:
+		return m.OldActionID(ctx)
+	case actionfile.FieldPath:
+		return m.OldPath(ctx)
+	case actionfile.FieldContent:
+		return m.OldContent(ctx)
+	}
+	return nil, fmt.Errorf("unknown ActionFile field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActionFileMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case actionfile.FieldCreateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreateTime(v)
+		return nil
+	case actionfile.FieldUpdateTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdateTime(v)
+		return nil
+	case actionfile.FieldDeleteTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeleteTime(v)
+		return nil
+	case actionfile.FieldActionID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetActionID(v)
+		return nil
+	case actionfile.FieldPath:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPath(v)
+		return nil
+	case actionfile.FieldContent:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetContent(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ActionFile field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ActionFileMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ActionFileMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ActionFileMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown ActionFile numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ActionFileMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(actionfile.FieldCreateTime) {
+		fields = append(fields, actionfile.FieldCreateTime)
+	}
+	if m.FieldCleared(actionfile.FieldUpdateTime) {
+		fields = append(fields, actionfile.FieldUpdateTime)
+	}
+	if m.FieldCleared(actionfile.FieldDeleteTime) {
+		fields = append(fields, actionfile.FieldDeleteTime)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ActionFileMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ActionFileMutation) ClearField(name string) error {
+	switch name {
+	case actionfile.FieldCreateTime:
+		m.ClearCreateTime()
+		return nil
+	case actionfile.FieldUpdateTime:
+		m.ClearUpdateTime()
+		return nil
+	case actionfile.FieldDeleteTime:
+		m.ClearDeleteTime()
+		return nil
+	}
+	return fmt.Errorf("unknown ActionFile nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ActionFileMutation) ResetField(name string) error {
+	switch name {
+	case actionfile.FieldCreateTime:
+		m.ResetCreateTime()
+		return nil
+	case actionfile.FieldUpdateTime:
+		m.ResetUpdateTime()
+		return nil
+	case actionfile.FieldDeleteTime:
+		m.ResetDeleteTime()
+		return nil
+	case actionfile.FieldActionID:
+		m.ResetActionID()
+		return nil
+	case actionfile.FieldPath:
+		m.ResetPath()
+		return nil
+	case actionfile.FieldContent:
+		m.ResetContent()
+		return nil
+	}
+	return fmt.Errorf("unknown ActionFile field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ActionFileMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.action != nil {
+		edges = append(edges, actionfile.EdgeAction)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ActionFileMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case actionfile.EdgeAction:
+		if id := m.action; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ActionFileMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ActionFileMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ActionFileMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedaction {
+		edges = append(edges, actionfile.EdgeAction)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ActionFileMutation) EdgeCleared(name string) bool {
+	switch name {
+	case actionfile.EdgeAction:
+		return m.clearedaction
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ActionFileMutation) ClearEdge(name string) error {
+	switch name {
+	case actionfile.EdgeAction:
+		m.ClearAction()
+		return nil
+	}
+	return fmt.Errorf("unknown ActionFile unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ActionFileMutation) ResetEdge(name string) error {
+	switch name {
+	case actionfile.EdgeAction:
+		m.ResetAction()
+		return nil
+	}
+	return fmt.Errorf("unknown ActionFile edge %s", name)
+}
 
 // AuditLogMutation represents an operation that mutates the AuditLog nodes in the graph.
 type AuditLogMutation struct {

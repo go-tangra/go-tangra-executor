@@ -181,6 +181,120 @@ func (x *ExecutionCommand) GetTargetVersion() string {
 	return ""
 }
 
+// Resolve an action package by name (the workflow `uses:` reference).
+type ResolveActionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveActionRequest) Reset() {
+	*x = ResolveActionRequest{}
+	mi := &file_executor_service_v1_client_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveActionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveActionRequest) ProtoMessage() {}
+
+func (x *ResolveActionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_executor_service_v1_client_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveActionRequest.ProtoReflect.Descriptor instead.
+func (*ResolveActionRequest) Descriptor() ([]byte, []int) {
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *ResolveActionRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+// An action package returned to the host for execution.
+type ResolveActionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Manifest      string                 `protobuf:"bytes,2,opt,name=manifest,proto3" json:"manifest,omitempty"` // the action.yaml content
+	Files         []*ActionFile          `protobuf:"bytes,3,rep,name=files,proto3" json:"files,omitempty"`       // supporting package files
+	Version       int32                  `protobuf:"varint,4,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ResolveActionResponse) Reset() {
+	*x = ResolveActionResponse{}
+	mi := &file_executor_service_v1_client_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ResolveActionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ResolveActionResponse) ProtoMessage() {}
+
+func (x *ResolveActionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_executor_service_v1_client_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ResolveActionResponse.ProtoReflect.Descriptor instead.
+func (*ResolveActionResponse) Descriptor() ([]byte, []int) {
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *ResolveActionResponse) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ResolveActionResponse) GetManifest() string {
+	if x != nil {
+		return x.Manifest
+	}
+	return ""
+}
+
+func (x *ResolveActionResponse) GetFiles() []*ActionFile {
+	if x != nil {
+		return x.Files
+	}
+	return nil
+}
+
+func (x *ResolveActionResponse) GetVersion() int32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
 // Fetch script request
 type FetchScriptRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -191,7 +305,7 @@ type FetchScriptRequest struct {
 
 func (x *FetchScriptRequest) Reset() {
 	*x = FetchScriptRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[1]
+	mi := &file_executor_service_v1_client_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -203,7 +317,7 @@ func (x *FetchScriptRequest) String() string {
 func (*FetchScriptRequest) ProtoMessage() {}
 
 func (x *FetchScriptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[1]
+	mi := &file_executor_service_v1_client_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -216,7 +330,7 @@ func (x *FetchScriptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FetchScriptRequest.ProtoReflect.Descriptor instead.
 func (*FetchScriptRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{1}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *FetchScriptRequest) GetScriptId() string {
@@ -240,7 +354,7 @@ type FetchScriptResponse struct {
 
 func (x *FetchScriptResponse) Reset() {
 	*x = FetchScriptResponse{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[2]
+	mi := &file_executor_service_v1_client_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -252,7 +366,7 @@ func (x *FetchScriptResponse) String() string {
 func (*FetchScriptResponse) ProtoMessage() {}
 
 func (x *FetchScriptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[2]
+	mi := &file_executor_service_v1_client_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +379,7 @@ func (x *FetchScriptResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FetchScriptResponse.ProtoReflect.Descriptor instead.
 func (*FetchScriptResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{2}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *FetchScriptResponse) GetScriptId() string {
@@ -321,7 +435,7 @@ type StreamCommandsRequest struct {
 
 func (x *StreamCommandsRequest) Reset() {
 	*x = StreamCommandsRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[3]
+	mi := &file_executor_service_v1_client_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -333,7 +447,7 @@ func (x *StreamCommandsRequest) String() string {
 func (*StreamCommandsRequest) ProtoMessage() {}
 
 func (x *StreamCommandsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[3]
+	mi := &file_executor_service_v1_client_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -346,7 +460,7 @@ func (x *StreamCommandsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamCommandsRequest.ProtoReflect.Descriptor instead.
 func (*StreamCommandsRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{3}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StreamCommandsRequest) GetClientId() string {
@@ -375,7 +489,7 @@ type AckCommandRequest struct {
 
 func (x *AckCommandRequest) Reset() {
 	*x = AckCommandRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[4]
+	mi := &file_executor_service_v1_client_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -387,7 +501,7 @@ func (x *AckCommandRequest) String() string {
 func (*AckCommandRequest) ProtoMessage() {}
 
 func (x *AckCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[4]
+	mi := &file_executor_service_v1_client_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +514,7 @@ func (x *AckCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AckCommandRequest.ProtoReflect.Descriptor instead.
 func (*AckCommandRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{4}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *AckCommandRequest) GetCommandId() string {
@@ -433,7 +547,7 @@ type AckCommandResponse struct {
 
 func (x *AckCommandResponse) Reset() {
 	*x = AckCommandResponse{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[5]
+	mi := &file_executor_service_v1_client_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -445,7 +559,7 @@ func (x *AckCommandResponse) String() string {
 func (*AckCommandResponse) ProtoMessage() {}
 
 func (x *AckCommandResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[5]
+	mi := &file_executor_service_v1_client_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -458,7 +572,7 @@ func (x *AckCommandResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AckCommandResponse.ProtoReflect.Descriptor instead.
 func (*AckCommandResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{5}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *AckCommandResponse) GetAcknowledged() bool {
@@ -482,7 +596,7 @@ type ReportResultRequest struct {
 
 func (x *ReportResultRequest) Reset() {
 	*x = ReportResultRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[6]
+	mi := &file_executor_service_v1_client_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -494,7 +608,7 @@ func (x *ReportResultRequest) String() string {
 func (*ReportResultRequest) ProtoMessage() {}
 
 func (x *ReportResultRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[6]
+	mi := &file_executor_service_v1_client_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -507,7 +621,7 @@ func (x *ReportResultRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportResultRequest.ProtoReflect.Descriptor instead.
 func (*ReportResultRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{6}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ReportResultRequest) GetExecutionId() string {
@@ -554,7 +668,7 @@ type ReportResultResponse struct {
 
 func (x *ReportResultResponse) Reset() {
 	*x = ReportResultResponse{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[7]
+	mi := &file_executor_service_v1_client_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -566,7 +680,7 @@ func (x *ReportResultResponse) String() string {
 func (*ReportResultResponse) ProtoMessage() {}
 
 func (x *ReportResultResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[7]
+	mi := &file_executor_service_v1_client_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -579,7 +693,7 @@ func (x *ReportResultResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReportResultResponse.ProtoReflect.Descriptor instead.
 func (*ReportResultResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{7}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ReportResultResponse) GetRecorded() bool {
@@ -603,7 +717,7 @@ type SubmitExecutionRequest struct {
 
 func (x *SubmitExecutionRequest) Reset() {
 	*x = SubmitExecutionRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[8]
+	mi := &file_executor_service_v1_client_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -615,7 +729,7 @@ func (x *SubmitExecutionRequest) String() string {
 func (*SubmitExecutionRequest) ProtoMessage() {}
 
 func (x *SubmitExecutionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[8]
+	mi := &file_executor_service_v1_client_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -628,7 +742,7 @@ func (x *SubmitExecutionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitExecutionRequest.ProtoReflect.Descriptor instead.
 func (*SubmitExecutionRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{8}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *SubmitExecutionRequest) GetScriptId() string {
@@ -676,7 +790,7 @@ type SubmitExecutionResponse struct {
 
 func (x *SubmitExecutionResponse) Reset() {
 	*x = SubmitExecutionResponse{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[9]
+	mi := &file_executor_service_v1_client_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -688,7 +802,7 @@ func (x *SubmitExecutionResponse) String() string {
 func (*SubmitExecutionResponse) ProtoMessage() {}
 
 func (x *SubmitExecutionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[9]
+	mi := &file_executor_service_v1_client_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -701,7 +815,7 @@ func (x *SubmitExecutionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitExecutionResponse.ProtoReflect.Descriptor instead.
 func (*SubmitExecutionResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{9}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SubmitExecutionResponse) GetExecutionId() string {
@@ -729,7 +843,7 @@ type GetLatestClientReleaseRequest struct {
 
 func (x *GetLatestClientReleaseRequest) Reset() {
 	*x = GetLatestClientReleaseRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[10]
+	mi := &file_executor_service_v1_client_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -741,7 +855,7 @@ func (x *GetLatestClientReleaseRequest) String() string {
 func (*GetLatestClientReleaseRequest) ProtoMessage() {}
 
 func (x *GetLatestClientReleaseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[10]
+	mi := &file_executor_service_v1_client_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -754,7 +868,7 @@ func (x *GetLatestClientReleaseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestClientReleaseRequest.ProtoReflect.Descriptor instead.
 func (*GetLatestClientReleaseRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{10}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetLatestClientReleaseRequest) GetOs() string {
@@ -786,7 +900,7 @@ type GetLatestClientReleaseResponse struct {
 
 func (x *GetLatestClientReleaseResponse) Reset() {
 	*x = GetLatestClientReleaseResponse{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[11]
+	mi := &file_executor_service_v1_client_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -798,7 +912,7 @@ func (x *GetLatestClientReleaseResponse) String() string {
 func (*GetLatestClientReleaseResponse) ProtoMessage() {}
 
 func (x *GetLatestClientReleaseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[11]
+	mi := &file_executor_service_v1_client_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -811,7 +925,7 @@ func (x *GetLatestClientReleaseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLatestClientReleaseResponse.ProtoReflect.Descriptor instead.
 func (*GetLatestClientReleaseResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{11}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetLatestClientReleaseResponse) GetAvailable() bool {
@@ -867,7 +981,7 @@ type DownloadClientBinaryRequest struct {
 
 func (x *DownloadClientBinaryRequest) Reset() {
 	*x = DownloadClientBinaryRequest{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[12]
+	mi := &file_executor_service_v1_client_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -879,7 +993,7 @@ func (x *DownloadClientBinaryRequest) String() string {
 func (*DownloadClientBinaryRequest) ProtoMessage() {}
 
 func (x *DownloadClientBinaryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[12]
+	mi := &file_executor_service_v1_client_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -892,7 +1006,7 @@ func (x *DownloadClientBinaryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadClientBinaryRequest.ProtoReflect.Descriptor instead.
 func (*DownloadClientBinaryRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{12}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DownloadClientBinaryRequest) GetBinaryName() string {
@@ -919,7 +1033,7 @@ type ClientBinaryChunk struct {
 
 func (x *ClientBinaryChunk) Reset() {
 	*x = ClientBinaryChunk{}
-	mi := &file_executor_service_v1_client_proto_msgTypes[13]
+	mi := &file_executor_service_v1_client_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -931,7 +1045,7 @@ func (x *ClientBinaryChunk) String() string {
 func (*ClientBinaryChunk) ProtoMessage() {}
 
 func (x *ClientBinaryChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_client_proto_msgTypes[13]
+	mi := &file_executor_service_v1_client_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -944,7 +1058,7 @@ func (x *ClientBinaryChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClientBinaryChunk.ProtoReflect.Descriptor instead.
 func (*ClientBinaryChunk) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{13}
+	return file_executor_service_v1_client_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ClientBinaryChunk) GetData() []byte {
@@ -958,7 +1072,7 @@ var File_executor_service_v1_client_proto protoreflect.FileDescriptor
 
 const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\n" +
-	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\x1a executor/service/v1/script.proto\"\x8d\x03\n" +
+	" executor/service/v1/client.proto\x12\x13executor.service.v1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16redact/v3/redact.proto\x1a executor/service/v1/script.proto\x1a executor/service/v1/action.proto\"\x8d\x03\n" +
 	"\x10ExecutionCommand\x12\x1d\n" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tR\tcommandId\x12!\n" +
@@ -971,7 +1085,14 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\acontent\x18\x06 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
 	"\fcontent_hash\x18\a \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12C\n" +
 	"\fcommand_type\x18\b \x01(\x0e2 .executor.service.v1.CommandTypeR\vcommandType\x12%\n" +
-	"\x0etarget_version\x18\t \x01(\tR\rtargetVersion\"?\n" +
+	"\x0etarget_version\x18\t \x01(\tR\rtargetVersion\"9\n" +
+	"\x14ResolveActionRequest\x12!\n" +
+	"\x04name\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\x04name\"\x98\x01\n" +
+	"\x15ResolveActionResponse\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
+	"\bmanifest\x18\x02 \x01(\tR\bmanifest\x125\n" +
+	"\x05files\x18\x03 \x03(\v2\x1f.executor.service.v1.ActionFileR\x05files\x12\x18\n" +
+	"\aversion\x18\x04 \x01(\x05R\aversion\"?\n" +
 	"\x12FetchScriptRequest\x12)\n" +
 	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\"\xfc\x01\n" +
 	"\x13FetchScriptResponse\x12\x1b\n" +
@@ -1033,7 +1154,7 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\x04data\x18\x01 \x01(\fR\x04data*P\n" +
 	"\vCommandType\x12!\n" +
 	"\x1dCOMMAND_TYPE_SCRIPT_EXECUTION\x10\x00\x12\x1e\n" +
-	"\x1aCOMMAND_TYPE_CLIENT_UPDATE\x10\x012\xc7\a\n" +
+	"\x1aCOMMAND_TYPE_CLIENT_UPDATE\x10\x012\xb1\b\n" +
 	"\x15ExecutorClientService\x12\x88\x01\n" +
 	"\vFetchScript\x12'.executor.service.v1.FetchScriptRequest\x1a(.executor.service.v1.FetchScriptResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/v1/client/scripts/{script_id}\x12g\n" +
 	"\x0eStreamCommands\x12*.executor.service.v1.StreamCommandsRequest\x1a%.executor.service.v1.ExecutionCommand\"\x000\x01\x12\x8e\x01\n" +
@@ -1042,7 +1163,8 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"\fReportResult\x12(.executor.service.v1.ReportResultRequest\x1a).executor.service.v1.ReportResultResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/v1/client/executions/{execution_id}/result\x12\x8e\x01\n" +
 	"\x0fSubmitExecution\x12+.executor.service.v1.SubmitExecutionRequest\x1a,.executor.service.v1.SubmitExecutionResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/v1/client/executions\x12\x83\x01\n" +
 	"\x16GetLatestClientRelease\x122.executor.service.v1.GetLatestClientReleaseRequest\x1a3.executor.service.v1.GetLatestClientReleaseResponse\"\x00\x12t\n" +
-	"\x14DownloadClientBinary\x120.executor.service.v1.DownloadClientBinaryRequest\x1a&.executor.service.v1.ClientBinaryChunk\"\x000\x01B\xe3\x01\n" +
+	"\x14DownloadClientBinary\x120.executor.service.v1.DownloadClientBinaryRequest\x1a&.executor.service.v1.ClientBinaryChunk\"\x000\x01\x12h\n" +
+	"\rResolveAction\x12).executor.service.v1.ResolveActionRequest\x1a*.executor.service.v1.ResolveActionResponse\"\x00B\xe3\x01\n" +
 	"\x17com.executor.service.v1B\vClientProtoP\x01ZMgithub.com/go-tangra/go-tangra-executor/gen/go/executor/service/v1;executorpb\xa2\x02\x03ESX\xaa\x02\x13Executor.Service.V1\xca\x02\x13Executor\\Service\\V1\xe2\x02\x1fExecutor\\Service\\V1\\GPBMetadata\xea\x02\x15Executor::Service::V1b\x06proto3"
 
 var (
@@ -1058,48 +1180,54 @@ func file_executor_service_v1_client_proto_rawDescGZIP() []byte {
 }
 
 var file_executor_service_v1_client_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_executor_service_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_executor_service_v1_client_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_executor_service_v1_client_proto_goTypes = []any{
 	(CommandType)(0),                       // 0: executor.service.v1.CommandType
 	(*ExecutionCommand)(nil),               // 1: executor.service.v1.ExecutionCommand
-	(*FetchScriptRequest)(nil),             // 2: executor.service.v1.FetchScriptRequest
-	(*FetchScriptResponse)(nil),            // 3: executor.service.v1.FetchScriptResponse
-	(*StreamCommandsRequest)(nil),          // 4: executor.service.v1.StreamCommandsRequest
-	(*AckCommandRequest)(nil),              // 5: executor.service.v1.AckCommandRequest
-	(*AckCommandResponse)(nil),             // 6: executor.service.v1.AckCommandResponse
-	(*ReportResultRequest)(nil),            // 7: executor.service.v1.ReportResultRequest
-	(*ReportResultResponse)(nil),           // 8: executor.service.v1.ReportResultResponse
-	(*SubmitExecutionRequest)(nil),         // 9: executor.service.v1.SubmitExecutionRequest
-	(*SubmitExecutionResponse)(nil),        // 10: executor.service.v1.SubmitExecutionResponse
-	(*GetLatestClientReleaseRequest)(nil),  // 11: executor.service.v1.GetLatestClientReleaseRequest
-	(*GetLatestClientReleaseResponse)(nil), // 12: executor.service.v1.GetLatestClientReleaseResponse
-	(*DownloadClientBinaryRequest)(nil),    // 13: executor.service.v1.DownloadClientBinaryRequest
-	(*ClientBinaryChunk)(nil),              // 14: executor.service.v1.ClientBinaryChunk
-	(ScriptType)(0),                        // 15: executor.service.v1.ScriptType
+	(*ResolveActionRequest)(nil),           // 2: executor.service.v1.ResolveActionRequest
+	(*ResolveActionResponse)(nil),          // 3: executor.service.v1.ResolveActionResponse
+	(*FetchScriptRequest)(nil),             // 4: executor.service.v1.FetchScriptRequest
+	(*FetchScriptResponse)(nil),            // 5: executor.service.v1.FetchScriptResponse
+	(*StreamCommandsRequest)(nil),          // 6: executor.service.v1.StreamCommandsRequest
+	(*AckCommandRequest)(nil),              // 7: executor.service.v1.AckCommandRequest
+	(*AckCommandResponse)(nil),             // 8: executor.service.v1.AckCommandResponse
+	(*ReportResultRequest)(nil),            // 9: executor.service.v1.ReportResultRequest
+	(*ReportResultResponse)(nil),           // 10: executor.service.v1.ReportResultResponse
+	(*SubmitExecutionRequest)(nil),         // 11: executor.service.v1.SubmitExecutionRequest
+	(*SubmitExecutionResponse)(nil),        // 12: executor.service.v1.SubmitExecutionResponse
+	(*GetLatestClientReleaseRequest)(nil),  // 13: executor.service.v1.GetLatestClientReleaseRequest
+	(*GetLatestClientReleaseResponse)(nil), // 14: executor.service.v1.GetLatestClientReleaseResponse
+	(*DownloadClientBinaryRequest)(nil),    // 15: executor.service.v1.DownloadClientBinaryRequest
+	(*ClientBinaryChunk)(nil),              // 16: executor.service.v1.ClientBinaryChunk
+	(ScriptType)(0),                        // 17: executor.service.v1.ScriptType
+	(*ActionFile)(nil),                     // 18: executor.service.v1.ActionFile
 }
 var file_executor_service_v1_client_proto_depIdxs = []int32{
-	15, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
+	17, // 0: executor.service.v1.ExecutionCommand.script_type:type_name -> executor.service.v1.ScriptType
 	0,  // 1: executor.service.v1.ExecutionCommand.command_type:type_name -> executor.service.v1.CommandType
-	15, // 2: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
-	2,  // 3: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
-	4,  // 4: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
-	5,  // 5: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
-	7,  // 6: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
-	9,  // 7: executor.service.v1.ExecutorClientService.SubmitExecution:input_type -> executor.service.v1.SubmitExecutionRequest
-	11, // 8: executor.service.v1.ExecutorClientService.GetLatestClientRelease:input_type -> executor.service.v1.GetLatestClientReleaseRequest
-	13, // 9: executor.service.v1.ExecutorClientService.DownloadClientBinary:input_type -> executor.service.v1.DownloadClientBinaryRequest
-	3,  // 10: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
-	1,  // 11: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
-	6,  // 12: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
-	8,  // 13: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
-	10, // 14: executor.service.v1.ExecutorClientService.SubmitExecution:output_type -> executor.service.v1.SubmitExecutionResponse
-	12, // 15: executor.service.v1.ExecutorClientService.GetLatestClientRelease:output_type -> executor.service.v1.GetLatestClientReleaseResponse
-	14, // 16: executor.service.v1.ExecutorClientService.DownloadClientBinary:output_type -> executor.service.v1.ClientBinaryChunk
-	10, // [10:17] is the sub-list for method output_type
-	3,  // [3:10] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	18, // 2: executor.service.v1.ResolveActionResponse.files:type_name -> executor.service.v1.ActionFile
+	17, // 3: executor.service.v1.FetchScriptResponse.script_type:type_name -> executor.service.v1.ScriptType
+	4,  // 4: executor.service.v1.ExecutorClientService.FetchScript:input_type -> executor.service.v1.FetchScriptRequest
+	6,  // 5: executor.service.v1.ExecutorClientService.StreamCommands:input_type -> executor.service.v1.StreamCommandsRequest
+	7,  // 6: executor.service.v1.ExecutorClientService.AckCommand:input_type -> executor.service.v1.AckCommandRequest
+	9,  // 7: executor.service.v1.ExecutorClientService.ReportResult:input_type -> executor.service.v1.ReportResultRequest
+	11, // 8: executor.service.v1.ExecutorClientService.SubmitExecution:input_type -> executor.service.v1.SubmitExecutionRequest
+	13, // 9: executor.service.v1.ExecutorClientService.GetLatestClientRelease:input_type -> executor.service.v1.GetLatestClientReleaseRequest
+	15, // 10: executor.service.v1.ExecutorClientService.DownloadClientBinary:input_type -> executor.service.v1.DownloadClientBinaryRequest
+	2,  // 11: executor.service.v1.ExecutorClientService.ResolveAction:input_type -> executor.service.v1.ResolveActionRequest
+	5,  // 12: executor.service.v1.ExecutorClientService.FetchScript:output_type -> executor.service.v1.FetchScriptResponse
+	1,  // 13: executor.service.v1.ExecutorClientService.StreamCommands:output_type -> executor.service.v1.ExecutionCommand
+	8,  // 14: executor.service.v1.ExecutorClientService.AckCommand:output_type -> executor.service.v1.AckCommandResponse
+	10, // 15: executor.service.v1.ExecutorClientService.ReportResult:output_type -> executor.service.v1.ReportResultResponse
+	12, // 16: executor.service.v1.ExecutorClientService.SubmitExecution:output_type -> executor.service.v1.SubmitExecutionResponse
+	14, // 17: executor.service.v1.ExecutorClientService.GetLatestClientRelease:output_type -> executor.service.v1.GetLatestClientReleaseResponse
+	16, // 18: executor.service.v1.ExecutorClientService.DownloadClientBinary:output_type -> executor.service.v1.ClientBinaryChunk
+	3,  // 19: executor.service.v1.ExecutorClientService.ResolveAction:output_type -> executor.service.v1.ResolveActionResponse
+	12, // [12:20] is the sub-list for method output_type
+	4,  // [4:12] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_executor_service_v1_client_proto_init() }
@@ -1108,14 +1236,15 @@ func file_executor_service_v1_client_proto_init() {
 		return
 	}
 	file_executor_service_v1_script_proto_init()
-	file_executor_service_v1_client_proto_msgTypes[4].OneofWrappers = []any{}
+	file_executor_service_v1_action_proto_init()
+	file_executor_service_v1_client_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_executor_service_v1_client_proto_rawDesc), len(file_executor_service_v1_client_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

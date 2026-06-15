@@ -42,17 +42,19 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 		return nil, nil, err
 	}
 	scriptService := service.NewScriptService(context, scriptRepo, assignmentRepo, portalClient)
+	actionRepo := data.NewActionRepo(context, entClient)
+	actionService := service.NewActionService(context, actionRepo, portalClient)
 	assignmentService := service.NewAssignmentService(context, assignmentRepo, scriptRepo)
 	executionLogRepo := data.NewExecutionLogRepo(context, entClient)
 	commandRegistry := service.NewCommandRegistry()
 	executionService := service.NewExecutionService(context, scriptRepo, assignmentRepo, executionLogRepo, commandRegistry)
 	clientReleaseService := service.NewClientReleaseService(context)
-	clientService := service.NewClientService(context, scriptRepo, assignmentRepo, executionLogRepo, commandRegistry, clientReleaseService)
+	clientService := service.NewClientService(context, scriptRepo, assignmentRepo, executionLogRepo, commandRegistry, clientReleaseService, actionRepo)
 	statisticsRepo := data.NewStatisticsRepo(context, entClient)
 	statisticsService := service.NewStatisticsService(context, statisticsRepo)
 	backupService := service.NewBackupService(context, entClient)
 	sqlBackupService := service.NewSqlBackupService(context)
-	grpcServer := server.NewGRPCServer(context, certManager, collector, scriptService, assignmentService, executionService, clientService, statisticsService, backupService, sqlBackupService)
+	grpcServer := server.NewGRPCServer(context, certManager, collector, scriptService, actionService, assignmentService, executionService, clientService, statisticsService, backupService, sqlBackupService)
 	httpServer := server.NewHTTPServer(context)
 	app := newApp(context, grpcServer, httpServer, client, clientReleaseService)
 	return app, func() {

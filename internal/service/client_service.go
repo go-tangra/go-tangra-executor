@@ -25,6 +25,7 @@ type ClientService struct {
 	execRepo   *data.ExecutionLogRepo
 	cmdReg     *CommandRegistry
 	releaseSvc *ClientReleaseService
+	actionRepo *data.ActionRepo
 }
 
 // NewClientService creates a new ClientService
@@ -35,6 +36,7 @@ func NewClientService(
 	execRepo *data.ExecutionLogRepo,
 	cmdReg *CommandRegistry,
 	releaseSvc *ClientReleaseService,
+	actionRepo *data.ActionRepo,
 ) *ClientService {
 	return &ClientService{
 		log:        ctx.NewLoggerHelper("executor/service/client"),
@@ -43,6 +45,7 @@ func NewClientService(
 		execRepo:   execRepo,
 		cmdReg:     cmdReg,
 		releaseSvc: releaseSvc,
+		actionRepo: actionRepo,
 	}
 }
 
@@ -309,4 +312,26 @@ func (s *ClientService) DownloadClientBinary(req *executorV1.DownloadClientBinar
 			return rErr
 		}
 	}
+}
+
+// ResolveAction returns an action package (manifest + files) by name so the
+// go-tangra-actions engine can execute it on the host. Resolves within the
+// caller's tenant scope.
+func (s *ClientService) ResolveAction(ctx context.Context, req *executorV1.ResolveActionRequest) (*executorV1.ResolveActionResponse, error) {
+	tenantID := getTenantIDFromContext(ctx)
+
+	entity, err := s.actionRepo.GetByName(ctx, tenantID, req.GetName())
+	if err != nil {
+		return nil, err
+	}
+	if entity == nil || !entity.Enabled {
+		return nil, executorV1.ErrorNotFound("action %q not found", req.GetName())
+	}
+
+	return &executorV1.ResolveActionResponse{
+		Name:     entity.Name,
+		Manifest: entity.Manifest,
+		Files:    s.actionRepo.ActionFilesToProto(entity.Edges.Files),
+		Version:  int32(entity.Version),
+	}, nil
 }

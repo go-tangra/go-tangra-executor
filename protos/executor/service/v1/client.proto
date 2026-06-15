@@ -9,6 +9,7 @@ import "google/protobuf/timestamp.proto";
 import "redact/v3/redact.proto";
 
 import "executor/service/v1/script.proto";
+import "executor/service/v1/action.proto";
 
 // Type of command sent to a client
 enum CommandType {
@@ -72,6 +73,28 @@ service ExecutorClientService {
 
   // Download a cached client binary as a stream of raw byte chunks.
   rpc DownloadClientBinary(DownloadClientBinaryRequest) returns (stream ClientBinaryChunk) {}
+
+  // Resolve an action package by name so go-tangra-actions can execute it on the
+  // host. Returns the action.yaml manifest plus the package files, feeding the
+  // engine's action Resolver.
+  rpc ResolveAction(ResolveActionRequest) returns (ResolveActionResponse) {}
+}
+
+// Resolve an action package by name (the workflow `uses:` reference).
+message ResolveActionRequest {
+  string name = 1 [
+    json_name = "name",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+}
+
+// An action package returned to the host for execution.
+message ResolveActionResponse {
+  string name = 1 [json_name = "name"];
+  string manifest = 2 [json_name = "manifest"];   // the action.yaml content
+  repeated ActionFile files = 3 [json_name = "files"]; // supporting package files
+  int32 version = 4 [json_name = "version"];
 }
 
 // Fetch script request

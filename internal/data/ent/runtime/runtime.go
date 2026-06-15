@@ -5,6 +5,8 @@ package runtime
 import (
 	"context"
 
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/action"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/actionfile"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/auditlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/schema"
@@ -19,6 +21,122 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	actionMixin := schema.Action{}.Mixin()
+	action.Policy = privacy.NewPolicies(actionMixin[3], schema.Action{})
+	action.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := action.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	actionMixinFields3 := actionMixin[3].Fields()
+	_ = actionMixinFields3
+	actionFields := schema.Action{}.Fields()
+	_ = actionFields
+	// actionDescTenantID is the schema descriptor for tenant_id field.
+	actionDescTenantID := actionMixinFields3[0].Descriptor()
+	// action.DefaultTenantID holds the default value on creation for the tenant_id field.
+	action.DefaultTenantID = actionDescTenantID.Default.(uint32)
+	// actionDescName is the schema descriptor for name field.
+	actionDescName := actionFields[1].Descriptor()
+	// action.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	action.NameValidator = func() func(string) error {
+		validators := actionDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// actionDescVersion is the schema descriptor for version field.
+	actionDescVersion := actionFields[2].Descriptor()
+	// action.DefaultVersion holds the default value on creation for the version field.
+	action.DefaultVersion = actionDescVersion.Default.(int)
+	// actionDescDescription is the schema descriptor for description field.
+	actionDescDescription := actionFields[3].Descriptor()
+	// action.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	action.DescriptionValidator = actionDescDescription.Validators[0].(func(string) error)
+	// actionDescUsing is the schema descriptor for using field.
+	actionDescUsing := actionFields[4].Descriptor()
+	// action.UsingValidator is a validator for the "using" field. It is called by the builders before save.
+	action.UsingValidator = actionDescUsing.Validators[0].(func(string) error)
+	// actionDescContentHash is the schema descriptor for content_hash field.
+	actionDescContentHash := actionFields[6].Descriptor()
+	// action.ContentHashValidator is a validator for the "content_hash" field. It is called by the builders before save.
+	action.ContentHashValidator = func() func(string) error {
+		validators := actionDescContentHash.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content_hash string) error {
+			for _, fn := range fns {
+				if err := fn(content_hash); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// actionDescEnabled is the schema descriptor for enabled field.
+	actionDescEnabled := actionFields[7].Descriptor()
+	// action.DefaultEnabled holds the default value on creation for the enabled field.
+	action.DefaultEnabled = actionDescEnabled.Default.(bool)
+	// actionDescID is the schema descriptor for id field.
+	actionDescID := actionFields[0].Descriptor()
+	// action.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	action.IDValidator = actionDescID.Validators[0].(func(string) error)
+	actionfileFields := schema.ActionFile{}.Fields()
+	_ = actionfileFields
+	// actionfileDescActionID is the schema descriptor for action_id field.
+	actionfileDescActionID := actionfileFields[1].Descriptor()
+	// actionfile.ActionIDValidator is a validator for the "action_id" field. It is called by the builders before save.
+	actionfile.ActionIDValidator = func() func(string) error {
+		validators := actionfileDescActionID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(action string) error {
+			for _, fn := range fns {
+				if err := fn(action); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// actionfileDescPath is the schema descriptor for path field.
+	actionfileDescPath := actionfileFields[2].Descriptor()
+	// actionfile.PathValidator is a validator for the "path" field. It is called by the builders before save.
+	actionfile.PathValidator = func() func(string) error {
+		validators := actionfileDescPath.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(_path string) error {
+			for _, fn := range fns {
+				if err := fn(_path); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// actionfileDescID is the schema descriptor for id field.
+	actionfileDescID := actionfileFields[0].Descriptor()
+	// actionfile.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	actionfile.IDValidator = actionfileDescID.Validators[0].(func(string) error)
 	auditlogMixin := schema.AuditLog{}.Mixin()
 	auditlog.Policy = privacy.NewPolicies(auditlogMixin[2], schema.AuditLog{})
 	auditlog.Hooks[0] = func(next ent.Mutator) ent.Mutator {
@@ -296,6 +414,6 @@ func init() {
 }
 
 const (
-	Version = "v0.14.5"                                         // Version of ent codegen.
-	Sum     = "h1:Rj2WOYJtCkWyFo6a+5wB3EfBRP0rnx1fMk6gGA0UUe4=" // Sum of ent codegen.
+	Version = "v0.14.6"                                         // Version of ent codegen.
+	Sum     = "h1:/f2696BpwuWAEEG6PVGWflg6+Inrpq4pRWuNlWz/Skk=" // Sum of ent codegen.
 )

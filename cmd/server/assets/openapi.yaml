@@ -1,352 +1,1296 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
 openapi: 3.0.3
 info:
-  title: Executor Service API
-  description: Remote script execution management with hash verification and audit logging
-  version: 1.0.0
-
+    title: ""
+    version: 0.0.1
 paths:
-  /v1/scripts:
-    post:
-      summary: Create a new script
-      operationId: CreateScript
-      tags: [Scripts]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateScriptRequest'
-      responses:
-        '200':
-          description: Script created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateScriptResponse'
-    get:
-      summary: List scripts
-      operationId: ListScripts
-      tags: [Scripts]
-      parameters:
-        - name: page
-          in: query
-          schema: { type: integer }
-        - name: pageSize
-          in: query
-          schema: { type: integer }
-        - name: scriptType
-          in: query
-          schema: { type: string, enum: [BASH, JAVASCRIPT, LUA] }
-        - name: name
-          in: query
-          schema: { type: string }
-        - name: enabled
-          in: query
-          schema: { type: boolean }
-      responses:
-        '200':
-          description: List of scripts
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListScriptsResponse'
-
-  /v1/scripts/{id}:
-    get:
-      summary: Get a script by ID
-      operationId: GetScript
-      tags: [Scripts]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Script details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GetScriptResponse'
-    put:
-      summary: Update a script
-      operationId: UpdateScript
-      tags: [Scripts]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateScriptRequest'
-      responses:
-        '200':
-          description: Script updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UpdateScriptResponse'
-    delete:
-      summary: Delete a script
-      operationId: DeleteScript
-      tags: [Scripts]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Script deleted
-
-  /v1/scripts/{scriptId}/assignments:
-    post:
-      summary: Assign script to client
-      operationId: AssignScript
-      tags: [Assignments]
-      parameters:
-        - name: scriptId
-          in: path
-          required: true
-          schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                clientId: { type: string }
-      responses:
-        '200':
-          description: Assignment created
-    get:
-      summary: List assignments for a script
-      operationId: ListAssignments
-      tags: [Assignments]
-      parameters:
-        - name: scriptId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: List of assignments
-
-  /v1/scripts/{scriptId}/assignments/{clientId}:
-    delete:
-      summary: Unassign script from client
-      operationId: UnassignScript
-      tags: [Assignments]
-      parameters:
-        - name: scriptId
-          in: path
-          required: true
-          schema: { type: string }
-        - name: clientId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Assignment deleted
-
-  /v1/clients/{clientId}/scripts:
-    get:
-      summary: List scripts assigned to a client
-      operationId: ListClientScripts
-      tags: [Assignments]
-      parameters:
-        - name: clientId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: List of assigned scripts
-
-  /v1/scripts/{scriptId}/execute:
-    post:
-      summary: Trigger script execution on a client
-      operationId: TriggerExecution
-      tags: [Executions]
-      parameters:
-        - name: scriptId
-          in: path
-          required: true
-          schema: { type: string }
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                clientId: { type: string }
-      responses:
-        '200':
-          description: Execution triggered
-
-  /v1/executions:
-    get:
-      summary: List executions
-      operationId: ListExecutions
-      tags: [Executions]
-      parameters:
-        - name: page
-          in: query
-          schema: { type: integer }
-        - name: pageSize
-          in: query
-          schema: { type: integer }
-        - name: scriptId
-          in: query
-          schema: { type: string }
-        - name: clientId
-          in: query
-          schema: { type: string }
-        - name: status
-          in: query
-          schema: { type: string }
-      responses:
-        '200':
-          description: List of executions
-
-  /v1/executions/{id}:
-    get:
-      summary: Get execution details
-      operationId: GetExecution
-      tags: [Executions]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Execution details
-
-  /v1/executions/{id}/output:
-    get:
-      summary: Get execution output
-      operationId: GetExecutionOutput
-      tags: [Executions]
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Execution output
-
-  /v1/client/scripts/{scriptId}:
-    get:
-      summary: Fetch script for execution (client-facing)
-      operationId: FetchScript
-      tags: [Client]
-      parameters:
-        - name: scriptId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Script content and hash
-
-  /v1/client/commands/{commandId}/ack:
-    post:
-      summary: Acknowledge a command
-      operationId: AckCommand
-      tags: [Client]
-      parameters:
-        - name: commandId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Command acknowledged
-
-  /v1/client/executions/{executionId}/result:
-    post:
-      summary: Report execution result
-      operationId: ReportResult
-      tags: [Client]
-      parameters:
-        - name: executionId
-          in: path
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Result recorded
-
+    /v1/actions:
+        get:
+            tags:
+                - ExecutorActionService
+            description: List actions
+            operationId: ExecutorActionService_ListActions
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: using
+                  in: query
+                  schema:
+                    type: string
+                - name: enabled
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListActionsResponse'
+        post:
+            tags:
+                - ExecutorActionService
+            description: Create a new action package
+            operationId: ExecutorActionService_CreateAction
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateActionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateActionResponse'
+    /v1/actions/{id}:
+        get:
+            tags:
+                - ExecutorActionService
+            description: Get an action by ID
+            operationId: ExecutorActionService_GetAction
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetActionResponse'
+        put:
+            tags:
+                - ExecutorActionService
+            description: Update an action package
+            operationId: ExecutorActionService_UpdateAction
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateActionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateActionResponse'
+        delete:
+            tags:
+                - ExecutorActionService
+            description: Delete an action
+            operationId: ExecutorActionService_DeleteAction
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/backup/export:
+        get:
+            tags:
+                - BackupService
+            operationId: BackupService_ExportBackup
+            parameters:
+                - name: tenantId
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ExportBackupResponse'
+    /v1/backup/import:
+        post:
+            tags:
+                - BackupService
+            operationId: BackupService_ImportBackup
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ImportBackupRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ImportBackupResponse'
+    /v1/client/actions/{ref}:
+        get:
+            tags:
+                - ExecutorClientService
+            description: |-
+                Resolve an action package by reference (name or name@version). Returns the
+                 manifest + package files so the client can build an engine.Resolver result.
+            operationId: ExecutorClientService_FetchAction
+            parameters:
+                - name: ref
+                  in: path
+                  description: 'Action reference: "name" (latest enabled version) or "name@version".'
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FetchActionResponse'
+    /v1/client/commands/{commandId}/ack:
+        post:
+            tags:
+                - ExecutorClientService
+            description: Acknowledge a command (accepted or rejected)
+            operationId: ExecutorClientService_AckCommand
+            parameters:
+                - name: commandId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AckCommandRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AckCommandResponse'
+    /v1/client/executions:
+        post:
+            tags:
+                - ExecutorClientService
+            description: Submit a complete execution log (client-pull scenario)
+            operationId: ExecutorClientService_SubmitExecution
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/SubmitExecutionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/SubmitExecutionResponse'
+    /v1/client/executions/{executionId}/result:
+        post:
+            tags:
+                - ExecutorClientService
+            description: Report execution result
+            operationId: ExecutorClientService_ReportResult
+            parameters:
+                - name: executionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ReportResultRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ReportResultResponse'
+    /v1/client/scripts/{scriptId}:
+        get:
+            tags:
+                - ExecutorClientService
+            description: Fetch a script (validates mTLS CN assignment)
+            operationId: ExecutorClientService_FetchScript
+            parameters:
+                - name: scriptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/FetchScriptResponse'
+    /v1/clients/connected:
+        get:
+            tags:
+                - ExecutorExecutionService
+            description: List currently connected clients with their versions
+            operationId: ExecutorExecutionService_ListConnectedClients
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListConnectedClientsResponse'
+    /v1/clients/{clientId}/scripts:
+        get:
+            tags:
+                - ExecutorAssignmentService
+            description: List scripts assigned to a client
+            operationId: ExecutorAssignmentService_ListClientScripts
+            parameters:
+                - name: clientId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListClientScriptsResponse'
+    /v1/clients/{clientId}/update:
+        post:
+            tags:
+                - ExecutorExecutionService
+            description: Trigger a client self-update via the command stream
+            operationId: ExecutorExecutionService_TriggerClientUpdate
+            parameters:
+                - name: clientId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TriggerClientUpdateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TriggerClientUpdateResponse'
+    /v1/executions:
+        get:
+            tags:
+                - ExecutorExecutionService
+            description: List executions
+            operationId: ExecutorExecutionService_ListExecutions
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: scriptId
+                  in: query
+                  schema:
+                    type: string
+                - name: clientId
+                  in: query
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    enum:
+                        - EXECUTION_STATUS_UNSPECIFIED
+                        - EXECUTION_STATUS_PENDING
+                        - EXECUTION_STATUS_RUNNING
+                        - EXECUTION_STATUS_COMPLETED
+                        - EXECUTION_STATUS_FAILED
+                        - EXECUTION_STATUS_REJECTED_HASH_MISMATCH
+                        - EXECUTION_STATUS_REJECTED_NOT_APPROVED
+                        - EXECUTION_STATUS_CLIENT_OFFLINE
+                    type: string
+                    format: enum
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListExecutionsResponse'
+    /v1/executions/{id}:
+        get:
+            tags:
+                - ExecutorExecutionService
+            description: Get execution details
+            operationId: ExecutorExecutionService_GetExecution
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetExecutionResponse'
+    /v1/executions/{id}/output:
+        get:
+            tags:
+                - ExecutorExecutionService
+            description: Get execution output (full stdout/stderr)
+            operationId: ExecutorExecutionService_GetExecutionOutput
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetExecutionOutputResponse'
+    /v1/scripts:
+        get:
+            tags:
+                - ExecutorScriptService
+            description: List scripts
+            operationId: ExecutorScriptService_ListScripts
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: uint32
+                - name: scriptType
+                  in: query
+                  schema:
+                    enum:
+                        - SCRIPT_TYPE_UNSPECIFIED
+                        - SCRIPT_TYPE_BASH
+                        - SCRIPT_TYPE_JAVASCRIPT
+                        - SCRIPT_TYPE_LUA
+                    type: string
+                    format: enum
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+                - name: enabled
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListScriptsResponse'
+        post:
+            tags:
+                - ExecutorScriptService
+            description: Create a new script
+            operationId: ExecutorScriptService_CreateScript
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateScriptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateScriptResponse'
+    /v1/scripts/{id}:
+        get:
+            tags:
+                - ExecutorScriptService
+            description: Get a script by ID
+            operationId: ExecutorScriptService_GetScript
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetScriptResponse'
+        put:
+            tags:
+                - ExecutorScriptService
+            description: Update a script (password required when content changes)
+            operationId: ExecutorScriptService_UpdateScript
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateScriptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UpdateScriptResponse'
+        delete:
+            tags:
+                - ExecutorScriptService
+            description: Delete a script
+            operationId: ExecutorScriptService_DeleteScript
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/scripts/{scriptId}/assignments:
+        get:
+            tags:
+                - ExecutorAssignmentService
+            description: List assignments for a script
+            operationId: ExecutorAssignmentService_ListAssignments
+            parameters:
+                - name: scriptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ListAssignmentsResponse'
+        post:
+            tags:
+                - ExecutorAssignmentService
+            description: Assign a script to a client
+            operationId: ExecutorAssignmentService_AssignScript
+            parameters:
+                - name: scriptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/AssignScriptRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/AssignScriptResponse'
+    /v1/scripts/{scriptId}/assignments/{clientId}:
+        delete:
+            tags:
+                - ExecutorAssignmentService
+            description: Unassign a script from a client
+            operationId: ExecutorAssignmentService_UnassignScript
+            parameters:
+                - name: scriptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: clientId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content: {}
+    /v1/scripts/{scriptId}/execute:
+        post:
+            tags:
+                - ExecutorExecutionService
+            description: Trigger script execution on a client (UI-push)
+            operationId: ExecutorExecutionService_TriggerExecution
+            parameters:
+                - name: scriptId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/TriggerExecutionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/TriggerExecutionResponse'
+    /v1/statistics:
+        get:
+            tags:
+                - ExecutorStatisticsService
+            description: GetStatistics returns comprehensive statistics about the Executor system
+            operationId: ExecutorStatisticsService_GetStatistics
+            parameters:
+                - name: tenantId
+                  in: query
+                  description: Filter by specific tenant ID (optional, admin only)
+                  schema:
+                    type: integer
+                    format: uint32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/GetStatisticsResponse'
 components:
-  schemas:
-    CreateScriptRequest:
-      type: object
-      required: [name, scriptType, content]
-      properties:
-        name: { type: string }
-        description: { type: string }
-        scriptType: { type: string, enum: [BASH, JAVASCRIPT, LUA] }
-        content: { type: string }
-        enabled: { type: boolean }
-
-    CreateScriptResponse:
-      type: object
-      properties:
-        script:
-          $ref: '#/components/schemas/Script'
-
-    GetScriptResponse:
-      type: object
-      properties:
-        script:
-          $ref: '#/components/schemas/Script'
-
-    ListScriptsResponse:
-      type: object
-      properties:
-        scripts:
-          type: array
-          items:
-            $ref: '#/components/schemas/Script'
-        total: { type: integer }
-
-    UpdateScriptRequest:
-      type: object
-      properties:
-        name: { type: string }
-        description: { type: string }
-        content: { type: string }
-        enabled: { type: boolean }
-        password: { type: string }
-
-    UpdateScriptResponse:
-      type: object
-      properties:
-        script:
-          $ref: '#/components/schemas/Script'
-
-    Script:
-      type: object
-      properties:
-        id: { type: string }
-        tenantId: { type: integer }
-        name: { type: string }
-        description: { type: string }
-        scriptType: { type: string }
-        content: { type: string }
-        contentHash: { type: string }
-        version: { type: integer }
-        enabled: { type: boolean }
-        createdBy: { type: integer }
-        updatedBy: { type: integer }
-        createTime: { type: string, format: date-time }
-        updateTime: { type: string, format: date-time }
+    schemas:
+        AckCommandRequest:
+            required:
+                - commandId
+            type: object
+            properties:
+                commandId:
+                    type: string
+                accepted:
+                    type: boolean
+                rejectionReason:
+                    type: string
+            description: Ack command request
+        AckCommandResponse:
+            type: object
+            properties:
+                acknowledged:
+                    type: boolean
+        Action:
+            type: object
+            properties:
+                id:
+                    type: string
+                tenantId:
+                    type: integer
+                    format: uint32
+                name:
+                    type: string
+                version:
+                    type: string
+                description:
+                    type: string
+                using:
+                    type: string
+                    description: Runner kind derived from the manifest's runs.using (composite/javascript/lua).
+                manifest:
+                    type: string
+                    description: The action.yaml manifest body.
+                contentHash:
+                    type: string
+                    description: SHA256 hex digest over the assembled package (manifest + sorted files).
+                enabled:
+                    type: boolean
+                createdBy:
+                    type: integer
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    format: uint32
+                createTime:
+                    type: string
+                    format: date-time
+                updateTime:
+                    type: string
+                    format: date-time
+                files:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ActionFile'
+            description: |-
+                Action is a reusable, versioned go-tangra-actions package: an action.yaml
+                 manifest plus any supporting files. Served to clients which resolve external
+                 actions referenced by workflows (uses: name[@version]).
+        ActionFile:
+            type: object
+            properties:
+                path:
+                    type: string
+                content:
+                    type: string
+            description: A file belonging to an action package (e.g. index.js next to action.yaml).
+        AssignScriptRequest:
+            required:
+                - scriptId
+                - clientId
+            type: object
+            properties:
+                scriptId:
+                    type: string
+                clientId:
+                    type: string
+            description: Assign script request
+        AssignScriptResponse:
+            type: object
+            properties:
+                assignment:
+                    $ref: '#/components/schemas/ScriptAssignment'
+        ConnectedClient:
+            type: object
+            properties:
+                clientId:
+                    type: string
+                clientVersion:
+                    type: string
+                connectedAt:
+                    type: string
+                    format: date-time
+            description: A currently connected client
+        CreateActionRequest:
+            required:
+                - name
+                - version
+                - manifest
+            type: object
+            properties:
+                name:
+                    type: string
+                version:
+                    type: string
+                description:
+                    type: string
+                manifest:
+                    type: string
+                enabled:
+                    type: boolean
+                files:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ActionFile'
+            description: Create action request
+        CreateActionResponse:
+            type: object
+            properties:
+                action:
+                    $ref: '#/components/schemas/Action'
+        CreateScriptRequest:
+            required:
+                - name
+                - scriptType
+                - content
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                scriptType:
+                    enum:
+                        - SCRIPT_TYPE_UNSPECIFIED
+                        - SCRIPT_TYPE_BASH
+                        - SCRIPT_TYPE_JAVASCRIPT
+                        - SCRIPT_TYPE_LUA
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                enabled:
+                    type: boolean
+            description: Create script request
+        CreateScriptResponse:
+            type: object
+            properties:
+                script:
+                    $ref: '#/components/schemas/Script'
+        EntityImportResult:
+            type: object
+            properties:
+                entityType:
+                    type: string
+                total:
+                    type: string
+                created:
+                    type: string
+                updated:
+                    type: string
+                skipped:
+                    type: string
+                failed:
+                    type: string
+        ExecutionLog:
+            type: object
+            properties:
+                id:
+                    type: string
+                tenantId:
+                    type: integer
+                    format: uint32
+                scriptId:
+                    type: string
+                scriptName:
+                    type: string
+                clientId:
+                    type: string
+                scriptHash:
+                    type: string
+                triggerType:
+                    enum:
+                        - TRIGGER_TYPE_UNSPECIFIED
+                        - TRIGGER_TYPE_CLIENT_PULL
+                        - TRIGGER_TYPE_UI_PUSH
+                    type: string
+                    format: enum
+                status:
+                    enum:
+                        - EXECUTION_STATUS_UNSPECIFIED
+                        - EXECUTION_STATUS_PENDING
+                        - EXECUTION_STATUS_RUNNING
+                        - EXECUTION_STATUS_COMPLETED
+                        - EXECUTION_STATUS_FAILED
+                        - EXECUTION_STATUS_REJECTED_HASH_MISMATCH
+                        - EXECUTION_STATUS_REJECTED_NOT_APPROVED
+                        - EXECUTION_STATUS_CLIENT_OFFLINE
+                    type: string
+                    format: enum
+                exitCode:
+                    type: integer
+                    format: int32
+                output:
+                    type: string
+                errorOutput:
+                    type: string
+                rejectionReason:
+                    type: string
+                startedAt:
+                    type: string
+                    format: date-time
+                completedAt:
+                    type: string
+                    format: date-time
+                durationMs:
+                    type: string
+                createdBy:
+                    type: integer
+                    format: uint32
+                createTime:
+                    type: string
+                    format: date-time
+            description: Execution log entity
+        ExportBackupResponse:
+            type: object
+            properties:
+                data:
+                    type: string
+                    format: bytes
+                module:
+                    type: string
+                version:
+                    type: string
+                exportedAt:
+                    type: string
+                    format: date-time
+                tenantId:
+                    type: integer
+                    format: uint32
+                entityCounts:
+                    type: object
+                    additionalProperties:
+                        type: string
+        FetchActionResponse:
+            type: object
+            properties:
+                name:
+                    type: string
+                version:
+                    type: string
+                manifest:
+                    type: string
+                contentHash:
+                    type: string
+                files:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ActionFile'
+        FetchScriptResponse:
+            type: object
+            properties:
+                scriptId:
+                    type: string
+                scriptName:
+                    type: string
+                scriptType:
+                    enum:
+                        - SCRIPT_TYPE_UNSPECIFIED
+                        - SCRIPT_TYPE_BASH
+                        - SCRIPT_TYPE_JAVASCRIPT
+                        - SCRIPT_TYPE_LUA
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                contentHash:
+                    type: string
+                version:
+                    type: integer
+                    format: int32
+        GetActionResponse:
+            type: object
+            properties:
+                action:
+                    $ref: '#/components/schemas/Action'
+        GetExecutionOutputResponse:
+            type: object
+            properties:
+                output:
+                    type: string
+                errorOutput:
+                    type: string
+                exitCode:
+                    type: integer
+                    format: int32
+        GetExecutionResponse:
+            type: object
+            properties:
+                execution:
+                    $ref: '#/components/schemas/ExecutionLog'
+        GetScriptResponse:
+            type: object
+            properties:
+                script:
+                    $ref: '#/components/schemas/Script'
+        GetStatisticsResponse:
+            type: object
+            properties:
+                totalScripts:
+                    type: string
+                    description: Scripts
+                enabledScripts:
+                    type: string
+                disabledScripts:
+                    type: string
+                totalAssignments:
+                    type: string
+                    description: Assignments
+                totalExecutions:
+                    type: string
+                    description: Executions
+                completedExecutions:
+                    type: string
+                failedExecutions:
+                    type: string
+                pendingExecutions:
+                    type: string
+                runningExecutions:
+                    type: string
+                rejectedExecutions:
+                    type: string
+                successRate:
+                    type: number
+                    description: Rates
+                    format: double
+                executionsLast24h:
+                    type: string
+                    description: Time-based
+                executionsLast7d:
+                    type: string
+                recentErrors:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/RecentError'
+                    description: Recent errors
+            description: GetStatisticsResponse is the response message for GetStatistics
+        ImportBackupRequest:
+            type: object
+            properties:
+                data:
+                    type: string
+                    format: bytes
+                mode:
+                    enum:
+                        - RESTORE_MODE_SKIP
+                        - RESTORE_MODE_OVERWRITE
+                    type: string
+                    format: enum
+        ImportBackupResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/EntityImportResult'
+                warnings:
+                    type: array
+                    items:
+                        type: string
+        ListActionsResponse:
+            type: object
+            properties:
+                actions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Action'
+                total:
+                    type: integer
+                    format: uint32
+        ListAssignmentsResponse:
+            type: object
+            properties:
+                assignments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ScriptAssignment'
+        ListClientScriptsResponse:
+            type: object
+            properties:
+                assignments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ScriptAssignment'
+        ListConnectedClientsResponse:
+            type: object
+            properties:
+                clients:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ConnectedClient'
+            description: List connected clients response
+        ListExecutionsResponse:
+            type: object
+            properties:
+                executions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ExecutionLog'
+                total:
+                    type: integer
+                    format: uint32
+        ListScriptsResponse:
+            type: object
+            properties:
+                scripts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Script'
+                total:
+                    type: integer
+                    format: uint32
+        RecentError:
+            type: object
+            properties:
+                executionId:
+                    type: string
+                scriptName:
+                    type: string
+                clientId:
+                    type: string
+                errorOutput:
+                    type: string
+                status:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+            description: RecentError represents a recent execution failure
+        ReportResultRequest:
+            required:
+                - executionId
+            type: object
+            properties:
+                executionId:
+                    type: string
+                exitCode:
+                    type: integer
+                    format: int32
+                output:
+                    type: string
+                errorOutput:
+                    type: string
+                durationMs:
+                    type: string
+            description: Report result request
+        ReportResultResponse:
+            type: object
+            properties:
+                recorded:
+                    type: boolean
+        Script:
+            type: object
+            properties:
+                id:
+                    type: string
+                tenantId:
+                    type: integer
+                    format: uint32
+                name:
+                    type: string
+                description:
+                    type: string
+                scriptType:
+                    enum:
+                        - SCRIPT_TYPE_UNSPECIFIED
+                        - SCRIPT_TYPE_BASH
+                        - SCRIPT_TYPE_JAVASCRIPT
+                        - SCRIPT_TYPE_LUA
+                    type: string
+                    format: enum
+                content:
+                    type: string
+                contentHash:
+                    type: string
+                version:
+                    type: integer
+                    format: int32
+                enabled:
+                    type: boolean
+                createdBy:
+                    type: integer
+                    format: uint32
+                updatedBy:
+                    type: integer
+                    format: uint32
+                createTime:
+                    type: string
+                    format: date-time
+                updateTime:
+                    type: string
+                    format: date-time
+            description: Script entity
+        ScriptAssignment:
+            type: object
+            properties:
+                id:
+                    type: string
+                tenantId:
+                    type: integer
+                    format: uint32
+                scriptId:
+                    type: string
+                clientId:
+                    type: string
+                createdBy:
+                    type: integer
+                    format: uint32
+                createTime:
+                    type: string
+                    format: date-time
+                script:
+                    allOf:
+                        - $ref: '#/components/schemas/Script'
+                    description: Optionally populated when listing
+            description: Script assignment entity
+        SubmitExecutionRequest:
+            required:
+                - scriptId
+            type: object
+            properties:
+                scriptId:
+                    type: string
+                exitCode:
+                    type: integer
+                    format: int32
+                output:
+                    type: string
+                errorOutput:
+                    type: string
+                durationMs:
+                    type: string
+            description: 'Submit execution request (client-pull: creates log + stores result in one shot)'
+        SubmitExecutionResponse:
+            type: object
+            properties:
+                executionId:
+                    type: string
+                recorded:
+                    type: boolean
+        TriggerClientUpdateRequest:
+            required:
+                - clientId
+            type: object
+            properties:
+                clientId:
+                    type: string
+                targetVersion:
+                    type: string
+            description: Trigger client update request
+        TriggerClientUpdateResponse:
+            type: object
+            properties:
+                commandId:
+                    type: string
+                clientOnline:
+                    type: boolean
+        TriggerExecutionRequest:
+            required:
+                - scriptId
+                - clientId
+            type: object
+            properties:
+                scriptId:
+                    type: string
+                clientId:
+                    type: string
+            description: Trigger execution request
+        TriggerExecutionResponse:
+            type: object
+            properties:
+                execution:
+                    $ref: '#/components/schemas/ExecutionLog'
+        UpdateActionRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                version:
+                    type: string
+                description:
+                    type: string
+                manifest:
+                    type: string
+                enabled:
+                    type: boolean
+                files:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/ActionFile'
+                    description: When set, replaces the action's file set wholesale.
+                replaceFiles:
+                    type: boolean
+                    description: Whether files were provided (distinguishes "clear all files" from "leave unchanged").
+                password:
+                    type: string
+                    description: Password required when the package content (manifest or files) changes.
+            description: Update action request
+        UpdateActionResponse:
+            type: object
+            properties:
+                action:
+                    $ref: '#/components/schemas/Action'
+        UpdateScriptRequest:
+            required:
+                - id
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                content:
+                    type: string
+                enabled:
+                    type: boolean
+                password:
+                    type: string
+                    description: Password required when content changes
+            description: Update script request
+        UpdateScriptResponse:
+            type: object
+            properties:
+                script:
+                    $ref: '#/components/schemas/Script'
+tags:
+    - name: BackupService
+    - name: ExecutorActionService
+      description: Action registry service
+    - name: ExecutorAssignmentService
+      description: Assignment management service
+    - name: ExecutorClientService
+      description: Client-facing service (called by go-tangra-client daemon)
+    - name: ExecutorExecutionService
+      description: Execution management service (UI/admin facing)
+    - name: ExecutorScriptService
+      description: Script management service
+    - name: ExecutorStatisticsService
+      description: Executor Statistics Service provides aggregated statistics about the execution system

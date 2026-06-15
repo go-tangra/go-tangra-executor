@@ -49,6 +49,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/inflect v0.21.5 // indirect
 	github.com/go-playground/form/v4 v4.3.0 // indirect
+	github.com/go-tangra/go-tangra-actions v0.1.0 // indirect
 	github.com/google/gnostic v0.7.1 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect

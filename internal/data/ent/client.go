@@ -14,6 +14,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/action"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/actionfile"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/auditlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
@@ -25,6 +28,10 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// Action is the client for interacting with the Action builders.
+	Action *ActionClient
+	// ActionFile is the client for interacting with the ActionFile builders.
+	ActionFile *ActionFileClient
 	// AuditLog is the client for interacting with the AuditLog builders.
 	AuditLog *AuditLogClient
 	// ExecutionLog is the client for interacting with the ExecutionLog builders.
@@ -44,6 +51,8 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.Action = NewActionClient(c.config)
+	c.ActionFile = NewActionFileClient(c.config)
 	c.AuditLog = NewAuditLogClient(c.config)
 	c.ExecutionLog = NewExecutionLogClient(c.config)
 	c.Script = NewScriptClient(c.config)
@@ -140,6 +149,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		Action:           NewActionClient(cfg),
+		ActionFile:       NewActionFileClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		ExecutionLog:     NewExecutionLogClient(cfg),
 		Script:           NewScriptClient(cfg),
@@ -163,6 +174,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:              ctx,
 		config:           cfg,
+		Action:           NewActionClient(cfg),
+		ActionFile:       NewActionFileClient(cfg),
 		AuditLog:         NewAuditLogClient(cfg),
 		ExecutionLog:     NewExecutionLogClient(cfg),
 		Script:           NewScriptClient(cfg),
@@ -173,7 +186,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AuditLog.
+//		Action.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -195,24 +208,32 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AuditLog.Use(hooks...)
-	c.ExecutionLog.Use(hooks...)
-	c.Script.Use(hooks...)
-	c.ScriptAssignment.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.Action, c.ActionFile, c.AuditLog, c.ExecutionLog, c.Script,
+		c.ScriptAssignment,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AuditLog.Intercept(interceptors...)
-	c.ExecutionLog.Intercept(interceptors...)
-	c.Script.Intercept(interceptors...)
-	c.ScriptAssignment.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.Action, c.ActionFile, c.AuditLog, c.ExecutionLog, c.Script,
+		c.ScriptAssignment,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *ActionMutation:
+		return c.Action.mutate(ctx, m)
+	case *ActionFileMutation:
+		return c.ActionFile.mutate(ctx, m)
 	case *AuditLogMutation:
 		return c.AuditLog.mutate(ctx, m)
 	case *ExecutionLogMutation:
@@ -223,6 +244,305 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ScriptAssignment.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// ActionClient is a client for the Action schema.
+type ActionClient struct {
+	config
+}
+
+// NewActionClient returns a client for the Action from the given config.
+func NewActionClient(c config) *ActionClient {
+	return &ActionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `action.Hooks(f(g(h())))`.
+func (c *ActionClient) Use(hooks ...Hook) {
+	c.hooks.Action = append(c.hooks.Action, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `action.Intercept(f(g(h())))`.
+func (c *ActionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Action = append(c.inters.Action, interceptors...)
+}
+
+// Create returns a builder for creating a Action entity.
+func (c *ActionClient) Create() *ActionCreate {
+	mutation := newActionMutation(c.config, OpCreate)
+	return &ActionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Action entities.
+func (c *ActionClient) CreateBulk(builders ...*ActionCreate) *ActionCreateBulk {
+	return &ActionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ActionClient) MapCreateBulk(slice any, setFunc func(*ActionCreate, int)) *ActionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ActionCreateBulk{err: fmt.Errorf("calling to ActionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ActionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ActionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Action.
+func (c *ActionClient) Update() *ActionUpdate {
+	mutation := newActionMutation(c.config, OpUpdate)
+	return &ActionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ActionClient) UpdateOne(_m *Action) *ActionUpdateOne {
+	mutation := newActionMutation(c.config, OpUpdateOne, withAction(_m))
+	return &ActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ActionClient) UpdateOneID(id string) *ActionUpdateOne {
+	mutation := newActionMutation(c.config, OpUpdateOne, withActionID(id))
+	return &ActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Action.
+func (c *ActionClient) Delete() *ActionDelete {
+	mutation := newActionMutation(c.config, OpDelete)
+	return &ActionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ActionClient) DeleteOne(_m *Action) *ActionDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ActionClient) DeleteOneID(id string) *ActionDeleteOne {
+	builder := c.Delete().Where(action.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ActionDeleteOne{builder}
+}
+
+// Query returns a query builder for Action.
+func (c *ActionClient) Query() *ActionQuery {
+	return &ActionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAction},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Action entity by its id.
+func (c *ActionClient) Get(ctx context.Context, id string) (*Action, error) {
+	return c.Query().Where(action.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ActionClient) GetX(ctx context.Context, id string) *Action {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryFiles queries the files edge of a Action.
+func (c *ActionClient) QueryFiles(_m *Action) *ActionFileQuery {
+	query := (&ActionFileClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(action.Table, action.FieldID, id),
+			sqlgraph.To(actionfile.Table, actionfile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, action.FilesTable, action.FilesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ActionClient) Hooks() []Hook {
+	hooks := c.hooks.Action
+	return append(hooks[:len(hooks):len(hooks)], action.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *ActionClient) Interceptors() []Interceptor {
+	return c.inters.Action
+}
+
+func (c *ActionClient) mutate(ctx context.Context, m *ActionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ActionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ActionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ActionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ActionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Action mutation op: %q", m.Op())
+	}
+}
+
+// ActionFileClient is a client for the ActionFile schema.
+type ActionFileClient struct {
+	config
+}
+
+// NewActionFileClient returns a client for the ActionFile from the given config.
+func NewActionFileClient(c config) *ActionFileClient {
+	return &ActionFileClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `actionfile.Hooks(f(g(h())))`.
+func (c *ActionFileClient) Use(hooks ...Hook) {
+	c.hooks.ActionFile = append(c.hooks.ActionFile, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `actionfile.Intercept(f(g(h())))`.
+func (c *ActionFileClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ActionFile = append(c.inters.ActionFile, interceptors...)
+}
+
+// Create returns a builder for creating a ActionFile entity.
+func (c *ActionFileClient) Create() *ActionFileCreate {
+	mutation := newActionFileMutation(c.config, OpCreate)
+	return &ActionFileCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ActionFile entities.
+func (c *ActionFileClient) CreateBulk(builders ...*ActionFileCreate) *ActionFileCreateBulk {
+	return &ActionFileCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ActionFileClient) MapCreateBulk(slice any, setFunc func(*ActionFileCreate, int)) *ActionFileCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ActionFileCreateBulk{err: fmt.Errorf("calling to ActionFileClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ActionFileCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ActionFileCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ActionFile.
+func (c *ActionFileClient) Update() *ActionFileUpdate {
+	mutation := newActionFileMutation(c.config, OpUpdate)
+	return &ActionFileUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ActionFileClient) UpdateOne(_m *ActionFile) *ActionFileUpdateOne {
+	mutation := newActionFileMutation(c.config, OpUpdateOne, withActionFile(_m))
+	return &ActionFileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ActionFileClient) UpdateOneID(id string) *ActionFileUpdateOne {
+	mutation := newActionFileMutation(c.config, OpUpdateOne, withActionFileID(id))
+	return &ActionFileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ActionFile.
+func (c *ActionFileClient) Delete() *ActionFileDelete {
+	mutation := newActionFileMutation(c.config, OpDelete)
+	return &ActionFileDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ActionFileClient) DeleteOne(_m *ActionFile) *ActionFileDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ActionFileClient) DeleteOneID(id string) *ActionFileDeleteOne {
+	builder := c.Delete().Where(actionfile.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ActionFileDeleteOne{builder}
+}
+
+// Query returns a query builder for ActionFile.
+func (c *ActionFileClient) Query() *ActionFileQuery {
+	return &ActionFileQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeActionFile},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ActionFile entity by its id.
+func (c *ActionFileClient) Get(ctx context.Context, id string) (*ActionFile, error) {
+	return c.Query().Where(actionfile.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ActionFileClient) GetX(ctx context.Context, id string) *ActionFile {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAction queries the action edge of a ActionFile.
+func (c *ActionFileClient) QueryAction(_m *ActionFile) *ActionQuery {
+	query := (&ActionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(actionfile.Table, actionfile.FieldID, id),
+			sqlgraph.To(action.Table, action.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, actionfile.ActionTable, actionfile.ActionColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ActionFileClient) Hooks() []Hook {
+	return c.hooks.ActionFile
+}
+
+// Interceptors returns the client interceptors.
+func (c *ActionFileClient) Interceptors() []Interceptor {
+	return c.inters.ActionFile
+}
+
+func (c *ActionFileClient) mutate(ctx context.Context, m *ActionFileMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ActionFileCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ActionFileUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ActionFileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ActionFileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ActionFile mutation op: %q", m.Op())
 	}
 }
 
@@ -765,9 +1085,10 @@ func (c *ScriptAssignmentClient) mutate(ctx context.Context, m *ScriptAssignment
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AuditLog, ExecutionLog, Script, ScriptAssignment []ent.Hook
+		Action, ActionFile, AuditLog, ExecutionLog, Script, ScriptAssignment []ent.Hook
 	}
 	inters struct {
-		AuditLog, ExecutionLog, Script, ScriptAssignment []ent.Interceptor
+		Action, ActionFile, AuditLog, ExecutionLog, Script,
+		ScriptAssignment []ent.Interceptor
 	}
 )

@@ -40,6 +40,7 @@ func NewGRPCServer(
 	certManager *cert.CertManager,
 	collector *metrics.Collector,
 	scriptSvc *service.ScriptService,
+	actionSvc *service.ActionService,
 	assignSvc *service.AssignmentService,
 	execSvc *service.ExecutionService,
 	clientSvc *service.ClientService,
@@ -116,6 +117,7 @@ func NewGRPCServer(
 
 	// Register services with redacted wrappers to prevent sensitive data from leaking in logs
 	executorV1.RegisterRedactedExecutorScriptServiceServer(srv, scriptSvc, nil)
+	executorV1.RegisterRedactedExecutorActionServiceServer(srv, actionSvc, nil)
 	executorV1.RegisterRedactedExecutorAssignmentServiceServer(srv, assignSvc, nil)
 	executorV1.RegisterRedactedExecutorExecutionServiceServer(srv, execSvc, nil)
 	executorV1.RegisterRedactedExecutorClientServiceServer(srv, clientSvc, nil)

@@ -25,6 +25,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/scripts/index.vue'),
       },
       {
+        path: 'actions',
+        name: 'ExecutorActions',
+        meta: {
+          icon: 'lucide:blocks',
+          title: 'executor.menu.actions',
+          authority: ['platform:admin', 'tenant:manager'],
+        },
+        component: () => import('./views/actions/index.vue'),
+      },
+      {
         path: 'executions',
         name: 'ExecutorExecutions',
         meta: {
