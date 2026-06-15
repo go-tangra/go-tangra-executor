@@ -97,6 +97,25 @@ func (s *redactedExecutorClientServiceServer) SubmitExecution(ctx context.Contex
 	return res, err
 }
 
+// GetLatestClientRelease is the redacted wrapper for the actual ExecutorClientServiceServer.GetLatestClientRelease method
+// Unary RPC
+func (s *redactedExecutorClientServiceServer) GetLatestClientRelease(ctx context.Context, in *GetLatestClientReleaseRequest) (*GetLatestClientReleaseResponse, error) {
+	res, err := s.srv.GetLatestClientRelease(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
+// DownloadClientBinary is the redacted wrapper for the actual ExecutorClientServiceServer.DownloadClientBinary method
+// Server streaming
+func (s *redactedExecutorClientServiceServer) DownloadClientBinary(in *DownloadClientBinaryRequest, stream grpc.ServerStreamingServer[ClientBinaryChunk]) error {
+	// Note: Redaction for server streaming is not fully implemented
+	// Streaming methods pass through without redaction
+	return s.srv.DownloadClientBinary(in, stream)
+}
+
 // Redact method implementation for ExecutionCommand
 func (x *ExecutionCommand) Redact() string {
 	if x == nil {
@@ -252,5 +271,59 @@ func (x *SubmitExecutionResponse) Redact() string {
 	// Safe field: ExecutionId
 
 	// Safe field: Recorded
+	return x.String()
+}
+
+// Redact method implementation for GetLatestClientReleaseRequest
+func (x *GetLatestClientReleaseRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Os
+
+	// Safe field: Arch
+	return x.String()
+}
+
+// Redact method implementation for GetLatestClientReleaseResponse
+func (x *GetLatestClientReleaseResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Available
+
+	// Safe field: Version
+
+	// Safe field: BinaryName
+
+	// Safe field: Sha256
+
+	// Safe field: Size
+
+	// Safe field: ReleaseUrl
+	return x.String()
+}
+
+// Redact method implementation for DownloadClientBinaryRequest
+func (x *DownloadClientBinaryRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: BinaryName
+
+	// Safe field: Version
+	return x.String()
+}
+
+// Redact method implementation for ClientBinaryChunk
+func (x *ClientBinaryChunk) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Data
 	return x.String()
 }

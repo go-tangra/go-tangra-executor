@@ -13,6 +13,7 @@ import (
 	"github.com/go-tangra/go-tangra-common/registration"
 	"github.com/go-tangra/go-tangra-common/service"
 	"github.com/go-tangra/go-tangra-executor/cmd/server/assets"
+	executorService "github.com/go-tangra/go-tangra-executor/internal/service"
 )
 
 var (
@@ -23,13 +24,23 @@ var (
 )
 
 var globalRegHelper *registration.RegistrationHelper
+var globalReleaseService *executorService.ClientReleaseService
 
 func newApp(
 	ctx *bootstrap.Context,
 	gs *grpc.Server,
 	hs *kratosHttp.Server,
 	regClient *registration.Client,
+	releaseService *executorService.ClientReleaseService,
 ) *kratos.App {
+	// Start the client release poller and keep a reference for shutdown.
+	globalReleaseService = releaseService
+	if releaseService != nil {
+		if err := releaseService.Start(); err != nil {
+			ctx.NewLoggerHelper("executor/main").Warnf("Failed to start client release poller: %v", err)
+		}
+	}
+
 	if regClient != nil {
 		// Populate the full registration config on the pre-created client
 		regClient.SetConfig(&registration.Config{
@@ -63,6 +74,9 @@ func runApp() error {
 	defer func() {
 		if globalRegHelper != nil {
 			globalRegHelper.Stop()
+		}
+		if globalReleaseService != nil {
+			_ = globalReleaseService.Stop()
 		}
 	}()
 

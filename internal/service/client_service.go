@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"io"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/tx7do/kratos-bootstrap/bootstrap"
@@ -23,6 +24,7 @@ type ClientService struct {
 	assignRepo *data.AssignmentRepo
 	execRepo   *data.ExecutionLogRepo
 	cmdReg     *CommandRegistry
+	releaseSvc *ClientReleaseService
 }
 
 // NewClientService creates a new ClientService
@@ -32,6 +34,7 @@ func NewClientService(
 	assignRepo *data.AssignmentRepo,
 	execRepo *data.ExecutionLogRepo,
 	cmdReg *CommandRegistry,
+	releaseSvc *ClientReleaseService,
 ) *ClientService {
 	return &ClientService{
 		log:        ctx.NewLoggerHelper("executor/service/client"),
@@ -39,6 +42,7 @@ func NewClientService(
 		assignRepo: assignRepo,
 		execRepo:   execRepo,
 		cmdReg:     cmdReg,
+		releaseSvc: releaseSvc,
 	}
 }
 
@@ -237,4 +241,72 @@ func (s *ClientService) ReportResult(ctx context.Context, req *executorV1.Report
 	}
 
 	return &executorV1.ReportResultResponse{Recorded: true}, nil
+}
+
+// downloadChunkSize is the size of each ClientBinaryChunk sent over the stream.
+// Kept well under the default gRPC 4MiB message limit.
+const downloadChunkSize = 256 * 1024
+
+// GetLatestClientRelease returns metadata about the latest client binary the
+// executor has cached for the requested platform.
+func (s *ClientService) GetLatestClientRelease(_ context.Context, req *executorV1.GetLatestClientReleaseRequest) (*executorV1.GetLatestClientReleaseResponse, error) {
+	if s.releaseSvc == nil {
+		return &executorV1.GetLatestClientReleaseResponse{Available: false}, nil
+	}
+
+	snapshot := s.releaseSvc.Latest()
+	if snapshot == nil {
+		return &executorV1.GetLatestClientReleaseResponse{Available: false}, nil
+	}
+
+	binaryName := BinaryNameFor(req.GetOs(), req.GetArch())
+	asset, ok := snapshot.asset(binaryName)
+	if !ok {
+		// We have a release cached, but not a binary for this platform.
+		return &executorV1.GetLatestClientReleaseResponse{
+			Available:  false,
+			Version:    snapshot.Version,
+			ReleaseUrl: snapshot.ReleaseURL,
+		}, nil
+	}
+
+	return &executorV1.GetLatestClientReleaseResponse{
+		Available:  true,
+		Version:    snapshot.Version,
+		BinaryName: asset.Name,
+		Sha256:     asset.SHA256,
+		Size:       asset.Size,
+		ReleaseUrl: snapshot.ReleaseURL,
+	}, nil
+}
+
+// DownloadClientBinary streams a cached client binary to the caller in chunks.
+func (s *ClientService) DownloadClientBinary(req *executorV1.DownloadClientBinaryRequest, stream executorV1.ExecutorClientService_DownloadClientBinaryServer) error {
+	if s.releaseSvc == nil {
+		return executorV1.ErrorScriptNotFound("client release cache is not available")
+	}
+
+	reader, asset, err := s.releaseSvc.OpenAsset(req.GetBinaryName())
+	if err != nil {
+		return executorV1.ErrorScriptNotFound("binary not cached: %v", err)
+	}
+	defer reader.Close()
+
+	s.log.Infof("Streaming client binary %q (%d bytes) to client", asset.Name, asset.Size)
+
+	buf := make([]byte, downloadChunkSize)
+	for {
+		n, rErr := reader.Read(buf)
+		if n > 0 {
+			if sErr := stream.Send(&executorV1.ClientBinaryChunk{Data: buf[:n]}); sErr != nil {
+				return sErr
+			}
+		}
+		if rErr == io.EOF {
+			return nil
+		}
+		if rErr != nil {
+			return rErr
+		}
+	}
 }

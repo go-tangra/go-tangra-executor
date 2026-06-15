@@ -64,6 +64,14 @@ service ExecutorClientService {
       body: "*"
     };
   }
+
+  // Get metadata about the latest client release the executor has cached for a
+  // given platform. Lets clients check for updates via the executor instead of
+  // hitting GitHub directly (avoids GitHub rate limits across a fleet).
+  rpc GetLatestClientRelease(GetLatestClientReleaseRequest) returns (GetLatestClientReleaseResponse) {}
+
+  // Download a cached client binary as a stream of raw byte chunks.
+  rpc DownloadClientBinary(DownloadClientBinaryRequest) returns (stream ClientBinaryChunk) {}
 }
 
 // Fetch script request
@@ -149,4 +157,35 @@ message SubmitExecutionRequest {
 message SubmitExecutionResponse {
   string execution_id = 1 [json_name = "executionId"];
   bool recorded = 2 [json_name = "recorded"];
+}
+
+// Request the latest cached client release for a platform.
+message GetLatestClientReleaseRequest {
+  string os = 1 [json_name = "os"];     // runtime.GOOS, e.g. "linux"
+  string arch = 2 [json_name = "arch"]; // runtime.GOARCH, e.g. "amd64"
+}
+
+// Metadata describing the latest client release cached by the executor.
+message GetLatestClientReleaseResponse {
+  bool available = 1 [json_name = "available"];        // executor has a binary cached for this platform
+  string version = 2 [json_name = "version"];          // semantic version, no "v" prefix
+  string binary_name = 3 [json_name = "binaryName"];   // asset name for the requested platform
+  string sha256 = 4 [json_name = "sha256"];            // hex-encoded SHA-256 of the binary
+  int64 size = 5 [json_name = "size"];                 // binary size in bytes
+  string release_url = 6 [json_name = "releaseUrl"];   // upstream release page URL
+}
+
+// Request to download a specific cached client binary.
+message DownloadClientBinaryRequest {
+  string binary_name = 1 [
+    json_name = "binaryName",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+  string version = 2 [json_name = "version"]; // optional; echoed for validation/logging
+}
+
+// A chunk of binary data streamed from the executor.
+message ClientBinaryChunk {
+  bytes data = 1 [json_name = "data"];
 }

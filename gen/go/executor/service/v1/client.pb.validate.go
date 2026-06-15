@@ -1124,3 +1124,436 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = SubmitExecutionResponseValidationError{}
+
+// Validate checks the field values on GetLatestClientReleaseRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetLatestClientReleaseRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetLatestClientReleaseRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetLatestClientReleaseRequestMultiError, or nil if none found.
+func (m *GetLatestClientReleaseRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetLatestClientReleaseRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Os
+
+	// no validation rules for Arch
+
+	if len(errors) > 0 {
+		return GetLatestClientReleaseRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetLatestClientReleaseRequestMultiError is an error wrapping multiple
+// validation errors returned by GetLatestClientReleaseRequest.ValidateAll()
+// if the designated constraints aren't met.
+type GetLatestClientReleaseRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetLatestClientReleaseRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetLatestClientReleaseRequestMultiError) AllErrors() []error { return m }
+
+// GetLatestClientReleaseRequestValidationError is the validation error
+// returned by GetLatestClientReleaseRequest.Validate if the designated
+// constraints aren't met.
+type GetLatestClientReleaseRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetLatestClientReleaseRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetLatestClientReleaseRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetLatestClientReleaseRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetLatestClientReleaseRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetLatestClientReleaseRequestValidationError) ErrorName() string {
+	return "GetLatestClientReleaseRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetLatestClientReleaseRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetLatestClientReleaseRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetLatestClientReleaseRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetLatestClientReleaseRequestValidationError{}
+
+// Validate checks the field values on GetLatestClientReleaseResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetLatestClientReleaseResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetLatestClientReleaseResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetLatestClientReleaseResponseMultiError, or nil if none found.
+func (m *GetLatestClientReleaseResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetLatestClientReleaseResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Available
+
+	// no validation rules for Version
+
+	// no validation rules for BinaryName
+
+	// no validation rules for Sha256
+
+	// no validation rules for Size
+
+	// no validation rules for ReleaseUrl
+
+	if len(errors) > 0 {
+		return GetLatestClientReleaseResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetLatestClientReleaseResponseMultiError is an error wrapping multiple
+// validation errors returned by GetLatestClientReleaseResponse.ValidateAll()
+// if the designated constraints aren't met.
+type GetLatestClientReleaseResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetLatestClientReleaseResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetLatestClientReleaseResponseMultiError) AllErrors() []error { return m }
+
+// GetLatestClientReleaseResponseValidationError is the validation error
+// returned by GetLatestClientReleaseResponse.Validate if the designated
+// constraints aren't met.
+type GetLatestClientReleaseResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetLatestClientReleaseResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetLatestClientReleaseResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetLatestClientReleaseResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetLatestClientReleaseResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetLatestClientReleaseResponseValidationError) ErrorName() string {
+	return "GetLatestClientReleaseResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetLatestClientReleaseResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetLatestClientReleaseResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetLatestClientReleaseResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetLatestClientReleaseResponseValidationError{}
+
+// Validate checks the field values on DownloadClientBinaryRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *DownloadClientBinaryRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on DownloadClientBinaryRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// DownloadClientBinaryRequestMultiError, or nil if none found.
+func (m *DownloadClientBinaryRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *DownloadClientBinaryRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for BinaryName
+
+	// no validation rules for Version
+
+	if len(errors) > 0 {
+		return DownloadClientBinaryRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// DownloadClientBinaryRequestMultiError is an error wrapping multiple
+// validation errors returned by DownloadClientBinaryRequest.ValidateAll() if
+// the designated constraints aren't met.
+type DownloadClientBinaryRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m DownloadClientBinaryRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m DownloadClientBinaryRequestMultiError) AllErrors() []error { return m }
+
+// DownloadClientBinaryRequestValidationError is the validation error returned
+// by DownloadClientBinaryRequest.Validate if the designated constraints
+// aren't met.
+type DownloadClientBinaryRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e DownloadClientBinaryRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e DownloadClientBinaryRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e DownloadClientBinaryRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e DownloadClientBinaryRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e DownloadClientBinaryRequestValidationError) ErrorName() string {
+	return "DownloadClientBinaryRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e DownloadClientBinaryRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sDownloadClientBinaryRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = DownloadClientBinaryRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = DownloadClientBinaryRequestValidationError{}
+
+// Validate checks the field values on ClientBinaryChunk with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *ClientBinaryChunk) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ClientBinaryChunk with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ClientBinaryChunkMultiError, or nil if none found.
+func (m *ClientBinaryChunk) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ClientBinaryChunk) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Data
+
+	if len(errors) > 0 {
+		return ClientBinaryChunkMultiError(errors)
+	}
+
+	return nil
+}
+
+// ClientBinaryChunkMultiError is an error wrapping multiple validation errors
+// returned by ClientBinaryChunk.ValidateAll() if the designated constraints
+// aren't met.
+type ClientBinaryChunkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ClientBinaryChunkMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ClientBinaryChunkMultiError) AllErrors() []error { return m }
+
+// ClientBinaryChunkValidationError is the validation error returned by
+// ClientBinaryChunk.Validate if the designated constraints aren't met.
+type ClientBinaryChunkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ClientBinaryChunkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ClientBinaryChunkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ClientBinaryChunkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ClientBinaryChunkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ClientBinaryChunkValidationError) ErrorName() string {
+	return "ClientBinaryChunkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ClientBinaryChunkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sClientBinaryChunk.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ClientBinaryChunkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ClientBinaryChunkValidationError{}
