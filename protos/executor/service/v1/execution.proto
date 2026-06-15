@@ -58,6 +58,15 @@ service ExecutorExecutionService {
     };
   }
 
+  // Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+  // live via ExecutorClientService.StreamExecutionOutput.
+  rpc TriggerWorkflowExecution(TriggerWorkflowExecutionRequest) returns (TriggerExecutionResponse) {
+    option (google.api.http) = {
+      post: "/v1/clients/{client_id}/run-workflow"
+      body: "*"
+    };
+  }
+
   // Get execution details
   rpc GetExecution(GetExecutionRequest) returns (GetExecutionResponse) {
     option (google.api.http) = {
@@ -112,6 +121,22 @@ message TriggerExecutionRequest {
 
 message TriggerExecutionResponse {
   ExecutionLog execution = 1 [json_name = "execution"];
+}
+
+// Run a workflow on a client
+message TriggerWorkflowExecutionRequest {
+  string client_id = 1 [
+    json_name = "clientId",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+  string name = 2 [json_name = "name"]; // display label for the execution
+  string workflow = 3 [
+    json_name = "workflow",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ]; // workflow YAML
+  map<string, string> inputs = 4 [json_name = "inputs"];
 }
 
 // Get execution request

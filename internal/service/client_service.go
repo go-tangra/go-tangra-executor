@@ -335,3 +335,40 @@ func (s *ClientService) ResolveAction(ctx context.Context, req *executorV1.Resol
 		Version:  int32(entity.Version),
 	}, nil
 }
+
+// StreamExecutionOutput receives live workflow output chunks from a client and
+// appends them to the execution log, so logs are captured as they are produced.
+func (s *ClientService) StreamExecutionOutput(stream executorV1.ExecutorClientService_StreamExecutionOutputServer) error {
+	ctx := stream.Context()
+	var (
+		execID string
+		chunks int64
+	)
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			return stream.SendAndClose(&executorV1.StreamExecutionOutputResponse{Recorded: true, Chunks: chunks})
+		}
+		if err != nil {
+			return err
+		}
+		if chunk.GetExecutionId() == "" {
+			continue
+		}
+		// Mark the execution running on the first chunk.
+		if execID == "" {
+			execID = chunk.GetExecutionId()
+			if sErr := s.execRepo.SetStartedAt(ctx, execID); sErr != nil {
+				s.log.Warnf("failed to mark execution %s running: %v", execID, sErr)
+			}
+		}
+		if len(chunk.GetData()) == 0 {
+			continue
+		}
+		if aErr := s.execRepo.AppendOutput(ctx, chunk.GetExecutionId(), string(chunk.GetData())); aErr != nil {
+			s.log.Errorf("append output for execution %s failed: %v", chunk.GetExecutionId(), aErr)
+			return aErr
+		}
+		chunks++
+	}
+}

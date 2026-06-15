@@ -127,6 +127,14 @@ func (s *redactedExecutorClientServiceServer) ResolveAction(ctx context.Context,
 	return res, err
 }
 
+// StreamExecutionOutput is the redacted wrapper for the actual ExecutorClientServiceServer.StreamExecutionOutput method
+// Client streaming
+func (s *redactedExecutorClientServiceServer) StreamExecutionOutput(stream grpc.ClientStreamingServer[ExecutionOutputChunk, StreamExecutionOutputResponse]) error {
+	// Note: Redaction for client streaming is not fully implemented
+	// Streaming methods pass through without redaction
+	return s.srv.StreamExecutionOutput(stream)
+}
+
 // Redact method implementation for ExecutionCommand
 func (x *ExecutionCommand) Redact() string {
 	if x == nil {
@@ -152,6 +160,40 @@ func (x *ExecutionCommand) Redact() string {
 	// Safe field: CommandType
 
 	// Safe field: TargetVersion
+
+	// Safe field: Workflow
+
+	// Safe field: Inputs
+	return x.String()
+}
+
+// Redact method implementation for ExecutionOutputChunk
+func (x *ExecutionOutputChunk) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: ExecutionId
+
+	// Safe field: Stream
+
+	// Safe field: Data
+
+	// Safe field: Job
+
+	// Safe field: Step
+	return x.String()
+}
+
+// Redact method implementation for StreamExecutionOutputResponse
+func (x *StreamExecutionOutputResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Recorded
+
+	// Safe field: Chunks
 	return x.String()
 }
 

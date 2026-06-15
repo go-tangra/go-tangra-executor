@@ -19,12 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ExecutorExecutionService_TriggerExecution_FullMethodName     = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
-	ExecutorExecutionService_GetExecution_FullMethodName         = "/executor.service.v1.ExecutorExecutionService/GetExecution"
-	ExecutorExecutionService_ListExecutions_FullMethodName       = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
-	ExecutorExecutionService_GetExecutionOutput_FullMethodName   = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
-	ExecutorExecutionService_TriggerClientUpdate_FullMethodName  = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
-	ExecutorExecutionService_ListConnectedClients_FullMethodName = "/executor.service.v1.ExecutorExecutionService/ListConnectedClients"
+	ExecutorExecutionService_TriggerExecution_FullMethodName         = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
+	ExecutorExecutionService_TriggerWorkflowExecution_FullMethodName = "/executor.service.v1.ExecutorExecutionService/TriggerWorkflowExecution"
+	ExecutorExecutionService_GetExecution_FullMethodName             = "/executor.service.v1.ExecutorExecutionService/GetExecution"
+	ExecutorExecutionService_ListExecutions_FullMethodName           = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
+	ExecutorExecutionService_GetExecutionOutput_FullMethodName       = "/executor.service.v1.ExecutorExecutionService/GetExecutionOutput"
+	ExecutorExecutionService_TriggerClientUpdate_FullMethodName      = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
+	ExecutorExecutionService_ListConnectedClients_FullMethodName     = "/executor.service.v1.ExecutorExecutionService/ListConnectedClients"
 )
 
 // ExecutorExecutionServiceClient is the client API for ExecutorExecutionService service.
@@ -35,6 +36,9 @@ const (
 type ExecutorExecutionServiceClient interface {
 	// Trigger script execution on a client (UI-push)
 	TriggerExecution(ctx context.Context, in *TriggerExecutionRequest, opts ...grpc.CallOption) (*TriggerExecutionResponse, error)
+	// Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+	// live via ExecutorClientService.StreamExecutionOutput.
+	TriggerWorkflowExecution(ctx context.Context, in *TriggerWorkflowExecutionRequest, opts ...grpc.CallOption) (*TriggerExecutionResponse, error)
 	// Get execution details
 	GetExecution(ctx context.Context, in *GetExecutionRequest, opts ...grpc.CallOption) (*GetExecutionResponse, error)
 	// List executions
@@ -59,6 +63,16 @@ func (c *executorExecutionServiceClient) TriggerExecution(ctx context.Context, i
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(TriggerExecutionResponse)
 	err := c.cc.Invoke(ctx, ExecutorExecutionService_TriggerExecution_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *executorExecutionServiceClient) TriggerWorkflowExecution(ctx context.Context, in *TriggerWorkflowExecutionRequest, opts ...grpc.CallOption) (*TriggerExecutionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TriggerExecutionResponse)
+	err := c.cc.Invoke(ctx, ExecutorExecutionService_TriggerWorkflowExecution_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -123,6 +137,9 @@ func (c *executorExecutionServiceClient) ListConnectedClients(ctx context.Contex
 type ExecutorExecutionServiceServer interface {
 	// Trigger script execution on a client (UI-push)
 	TriggerExecution(context.Context, *TriggerExecutionRequest) (*TriggerExecutionResponse, error)
+	// Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+	// live via ExecutorClientService.StreamExecutionOutput.
+	TriggerWorkflowExecution(context.Context, *TriggerWorkflowExecutionRequest) (*TriggerExecutionResponse, error)
 	// Get execution details
 	GetExecution(context.Context, *GetExecutionRequest) (*GetExecutionResponse, error)
 	// List executions
@@ -145,6 +162,9 @@ type UnimplementedExecutorExecutionServiceServer struct{}
 
 func (UnimplementedExecutorExecutionServiceServer) TriggerExecution(context.Context, *TriggerExecutionRequest) (*TriggerExecutionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method TriggerExecution not implemented")
+}
+func (UnimplementedExecutorExecutionServiceServer) TriggerWorkflowExecution(context.Context, *TriggerWorkflowExecutionRequest) (*TriggerExecutionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method TriggerWorkflowExecution not implemented")
 }
 func (UnimplementedExecutorExecutionServiceServer) GetExecution(context.Context, *GetExecutionRequest) (*GetExecutionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetExecution not implemented")
@@ -197,6 +217,24 @@ func _ExecutorExecutionService_TriggerExecution_Handler(srv interface{}, ctx con
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ExecutorExecutionServiceServer).TriggerExecution(ctx, req.(*TriggerExecutionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ExecutorExecutionService_TriggerWorkflowExecution_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TriggerWorkflowExecutionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExecutorExecutionServiceServer).TriggerWorkflowExecution(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ExecutorExecutionService_TriggerWorkflowExecution_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExecutorExecutionServiceServer).TriggerWorkflowExecution(ctx, req.(*TriggerWorkflowExecutionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -301,6 +339,10 @@ var ExecutorExecutionService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TriggerExecution",
 			Handler:    _ExecutorExecutionService_TriggerExecution_Handler,
+		},
+		{
+			MethodName: "TriggerWorkflowExecution",
+			Handler:    _ExecutorExecutionService_TriggerWorkflowExecution_Handler,
 		},
 		{
 			MethodName: "GetExecution",

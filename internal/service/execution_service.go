@@ -105,6 +105,51 @@ func (s *ExecutionService) TriggerExecution(ctx context.Context, req *executorV1
 	}, nil
 }
 
+// TriggerWorkflowExecution runs a go-tangra-actions workflow on a client (UI-push).
+// Output streams back live via ExecutorClientService.StreamExecutionOutput.
+func (s *ExecutionService) TriggerWorkflowExecution(ctx context.Context, req *executorV1.TriggerWorkflowExecutionRequest) (*executorV1.TriggerExecutionResponse, error) {
+	tenantID := getTenantIDFromContext(ctx)
+	createdBy := getUserIDAsUint32(ctx)
+
+	name := req.GetName()
+	if name == "" {
+		name = "workflow"
+	}
+
+	// Workflows have no script row; use stable non-empty placeholders for the
+	// NotEmpty columns and carry the human label in script_name.
+	execLog, err := s.execRepo.Create(ctx, tenantID, "workflow", name, req.ClientId, "workflow", "UI_PUSH", "PENDING", createdBy)
+	if err != nil {
+		return nil, err
+	}
+
+	commandID := uuid.New().String()
+	cmd := &executorV1.ExecutionCommand{
+		CommandId:   commandID,
+		ExecutionId: execLog.ID,
+		ScriptName:  name,
+		CommandType: executorV1.CommandType_COMMAND_TYPE_ACTION_EXECUTION,
+		Workflow:    req.GetWorkflow(),
+		Inputs:      req.GetInputs(),
+	}
+
+	if sendErr := s.cmdReg.Send(req.ClientId, cmd); sendErr != nil {
+		s.log.Warnf("Client %s not connected: %v", req.ClientId, sendErr)
+		if updateErr := s.execRepo.UpdateStatus(ctx, execLog.ID, "CLIENT_OFFLINE"); updateErr != nil {
+			s.log.Errorf("failed to update execution %s status to CLIENT_OFFLINE: %v", execLog.ID, updateErr)
+		}
+		if updated, fetchErr := s.execRepo.GetByID(ctx, execLog.ID); fetchErr != nil {
+			s.log.Errorf("failed to re-fetch execution %s: %v", execLog.ID, fetchErr)
+		} else {
+			execLog = updated
+		}
+	}
+
+	return &executorV1.TriggerExecutionResponse{
+		Execution: s.execRepo.ToProto(execLog),
+	}, nil
+}
+
 // TriggerClientUpdate sends a self-update command to a connected client
 func (s *ExecutionService) TriggerClientUpdate(ctx context.Context, req *executorV1.TriggerClientUpdateRequest) (*executorV1.TriggerClientUpdateResponse, error) {
 	commandID := uuid.New().String()

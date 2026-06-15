@@ -27,6 +27,7 @@ const (
 	ExecutorClientService_GetLatestClientRelease_FullMethodName = "/executor.service.v1.ExecutorClientService/GetLatestClientRelease"
 	ExecutorClientService_DownloadClientBinary_FullMethodName   = "/executor.service.v1.ExecutorClientService/DownloadClientBinary"
 	ExecutorClientService_ResolveAction_FullMethodName          = "/executor.service.v1.ExecutorClientService/ResolveAction"
+	ExecutorClientService_StreamExecutionOutput_FullMethodName  = "/executor.service.v1.ExecutorClientService/StreamExecutionOutput"
 )
 
 // ExecutorClientServiceClient is the client API for ExecutorClientService service.
@@ -55,6 +56,10 @@ type ExecutorClientServiceClient interface {
 	// host. Returns the action.yaml manifest plus the package files, feeding the
 	// engine's action Resolver.
 	ResolveAction(ctx context.Context, in *ResolveActionRequest, opts ...grpc.CallOption) (*ResolveActionResponse, error)
+	// Stream live execution output (logs) from a running workflow back to the
+	// executor as it is produced, GitHub-Actions style. Client-streaming: the
+	// client sends many chunks and the executor appends them to the execution log.
+	StreamExecutionOutput(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ExecutionOutputChunk, StreamExecutionOutputResponse], error)
 }
 
 type executorClientServiceClient struct {
@@ -163,6 +168,19 @@ func (c *executorClientServiceClient) ResolveAction(ctx context.Context, in *Res
 	return out, nil
 }
 
+func (c *executorClientServiceClient) StreamExecutionOutput(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[ExecutionOutputChunk, StreamExecutionOutputResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &ExecutorClientService_ServiceDesc.Streams[2], ExecutorClientService_StreamExecutionOutput_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[ExecutionOutputChunk, StreamExecutionOutputResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExecutorClientService_StreamExecutionOutputClient = grpc.ClientStreamingClient[ExecutionOutputChunk, StreamExecutionOutputResponse]
+
 // ExecutorClientServiceServer is the server API for ExecutorClientService service.
 // All implementations must embed UnimplementedExecutorClientServiceServer
 // for forward compatibility.
@@ -189,6 +207,10 @@ type ExecutorClientServiceServer interface {
 	// host. Returns the action.yaml manifest plus the package files, feeding the
 	// engine's action Resolver.
 	ResolveAction(context.Context, *ResolveActionRequest) (*ResolveActionResponse, error)
+	// Stream live execution output (logs) from a running workflow back to the
+	// executor as it is produced, GitHub-Actions style. Client-streaming: the
+	// client sends many chunks and the executor appends them to the execution log.
+	StreamExecutionOutput(grpc.ClientStreamingServer[ExecutionOutputChunk, StreamExecutionOutputResponse]) error
 	mustEmbedUnimplementedExecutorClientServiceServer()
 }
 
@@ -222,6 +244,9 @@ func (UnimplementedExecutorClientServiceServer) DownloadClientBinary(*DownloadCl
 }
 func (UnimplementedExecutorClientServiceServer) ResolveAction(context.Context, *ResolveActionRequest) (*ResolveActionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ResolveAction not implemented")
+}
+func (UnimplementedExecutorClientServiceServer) StreamExecutionOutput(grpc.ClientStreamingServer[ExecutionOutputChunk, StreamExecutionOutputResponse]) error {
+	return status.Error(codes.Unimplemented, "method StreamExecutionOutput not implemented")
 }
 func (UnimplementedExecutorClientServiceServer) mustEmbedUnimplementedExecutorClientServiceServer() {}
 func (UnimplementedExecutorClientServiceServer) testEmbeddedByValue()                               {}
@@ -374,6 +399,13 @@ func _ExecutorClientService_ResolveAction_Handler(srv interface{}, ctx context.C
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ExecutorClientService_StreamExecutionOutput_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(ExecutorClientServiceServer).StreamExecutionOutput(&grpc.GenericServerStream[ExecutionOutputChunk, StreamExecutionOutputResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type ExecutorClientService_StreamExecutionOutputServer = grpc.ClientStreamingServer[ExecutionOutputChunk, StreamExecutionOutputResponse]
+
 // ExecutorClientService_ServiceDesc is the grpc.ServiceDesc for ExecutorClientService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -416,6 +448,11 @@ var ExecutorClientService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "DownloadClientBinary",
 			Handler:       _ExecutorClientService_DownloadClientBinary_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "StreamExecutionOutput",
+			Handler:       _ExecutorClientService_StreamExecutionOutput_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "executor/service/v1/client.proto",

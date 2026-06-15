@@ -56,6 +56,17 @@ func (s *redactedExecutorExecutionServiceServer) TriggerExecution(ctx context.Co
 	return res, err
 }
 
+// TriggerWorkflowExecution is the redacted wrapper for the actual ExecutorExecutionServiceServer.TriggerWorkflowExecution method
+// Unary RPC
+func (s *redactedExecutorExecutionServiceServer) TriggerWorkflowExecution(ctx context.Context, in *TriggerWorkflowExecutionRequest) (*TriggerExecutionResponse, error) {
+	res, err := s.srv.TriggerWorkflowExecution(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // GetExecution is the redacted wrapper for the actual ExecutorExecutionServiceServer.GetExecution method
 // Unary RPC
 func (s *redactedExecutorExecutionServiceServer) GetExecution(ctx context.Context, in *GetExecutionRequest) (*GetExecutionResponse, error) {
@@ -177,6 +188,22 @@ func (x *TriggerExecutionResponse) Redact() string {
 	}
 
 	// Safe field: Execution
+	return x.String()
+}
+
+// Redact method implementation for TriggerWorkflowExecutionRequest
+func (x *TriggerWorkflowExecutionRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: ClientId
+
+	// Safe field: Name
+
+	// Safe field: Workflow
+
+	// Safe field: Inputs
 	return x.String()
 }
 

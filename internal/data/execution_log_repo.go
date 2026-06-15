@@ -110,15 +110,44 @@ func (r *ExecutionLogRepo) UpdateResult(ctx context.Context, id string, exitCode
 	builder := r.entClient.Client().ExecutionLog.UpdateOneID(id).
 		SetStatus(executionlog.Status(status)).
 		SetExitCode(exitCode).
-		SetOutput(output).
-		SetErrorOutput(errorOutput).
 		SetDurationMs(durationMs).
 		SetCompletedAt(now)
+
+	// Preserve already-streamed output: only overwrite when the caller actually
+	// provides output (script executions send the full output here; workflow
+	// executions stream it live and send empty output at completion).
+	if output != "" {
+		builder = builder.SetOutput(output)
+	}
+	if errorOutput != "" {
+		builder = builder.SetErrorOutput(errorOutput)
+	}
 
 	_, err := builder.Save(ctx)
 	if err != nil {
 		r.log.Errorf("update execution log result failed: %s", err.Error())
 		return executorV1.ErrorInternalServerError("update execution log result failed")
+	}
+	return nil
+}
+
+// AppendOutput appends a chunk of live output to an execution's output log.
+// A single execution is streamed by exactly one client, so the read-modify-write
+// here has a single writer and is safe.
+func (r *ExecutionLogRepo) AppendOutput(ctx context.Context, id, data string) error {
+	entity, err := r.GetByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	if entity == nil {
+		return executorV1.ErrorExecutionNotFound("execution not found")
+	}
+	_, err = r.entClient.Client().ExecutionLog.UpdateOneID(id).
+		SetOutput(entity.Output + data).
+		Save(ctx)
+	if err != nil {
+		r.log.Errorf("append execution output failed: %s", err.Error())
+		return executorV1.ErrorInternalServerError("append execution output failed")
 	}
 	return nil
 }

@@ -15,6 +15,7 @@ import "executor/service/v1/action.proto";
 enum CommandType {
   COMMAND_TYPE_SCRIPT_EXECUTION = 0; // default, backward compatible
   COMMAND_TYPE_CLIENT_UPDATE = 1;    // trigger client self-update
+  COMMAND_TYPE_ACTION_EXECUTION = 2; // run a go-tangra-actions workflow
 }
 
 // Execution command sent to client via stream
@@ -28,6 +29,10 @@ message ExecutionCommand {
   string content_hash = 7 [json_name = "contentHash", (redact.v3.value).string = ""];
   CommandType command_type = 8 [json_name = "commandType"];
   string target_version = 9 [json_name = "targetVersion"]; // empty = latest
+
+  // For COMMAND_TYPE_ACTION_EXECUTION: the workflow YAML to run and its inputs.
+  string workflow = 10 [json_name = "workflow"];
+  map<string, string> inputs = 11 [json_name = "inputs"];
 }
 
 // Client-facing service (called by go-tangra-client daemon)
@@ -78,6 +83,28 @@ service ExecutorClientService {
   // host. Returns the action.yaml manifest plus the package files, feeding the
   // engine's action Resolver.
   rpc ResolveAction(ResolveActionRequest) returns (ResolveActionResponse) {}
+
+  // Stream live execution output (logs) from a running workflow back to the
+  // executor as it is produced, GitHub-Actions style. Client-streaming: the
+  // client sends many chunks and the executor appends them to the execution log.
+  rpc StreamExecutionOutput(stream ExecutionOutputChunk) returns (StreamExecutionOutputResponse) {}
+}
+
+// A chunk of live execution output streamed from a client.
+message ExecutionOutputChunk {
+  string execution_id = 1 [
+    json_name = "executionId",
+    (buf.validate.field).string = {min_len: 1, max_len: 36}
+  ];
+  string stream = 2 [json_name = "stream"]; // "stdout" | "stderr"
+  bytes data = 3 [json_name = "data"];
+  string job = 4 [json_name = "job"];
+  string step = 5 [json_name = "step"];
+}
+
+message StreamExecutionOutputResponse {
+  bool recorded = 1 [json_name = "recorded"];
+  int64 chunks = 2 [json_name = "chunks"];
 }
 
 // Resolve an action package by name (the workflow `uses:` reference).

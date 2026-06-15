@@ -75,6 +75,10 @@ func (m *ExecutionCommand) validate(all bool) error {
 
 	// no validation rules for TargetVersion
 
+	// no validation rules for Workflow
+
+	// no validation rules for Inputs
+
 	if len(errors) > 0 {
 		return ExecutionCommandMultiError(errors)
 	}
@@ -152,6 +156,225 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ExecutionCommandValidationError{}
+
+// Validate checks the field values on ExecutionOutputChunk with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *ExecutionOutputChunk) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on ExecutionOutputChunk with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// ExecutionOutputChunkMultiError, or nil if none found.
+func (m *ExecutionOutputChunk) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *ExecutionOutputChunk) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ExecutionId
+
+	// no validation rules for Stream
+
+	// no validation rules for Data
+
+	// no validation rules for Job
+
+	// no validation rules for Step
+
+	if len(errors) > 0 {
+		return ExecutionOutputChunkMultiError(errors)
+	}
+
+	return nil
+}
+
+// ExecutionOutputChunkMultiError is an error wrapping multiple validation
+// errors returned by ExecutionOutputChunk.ValidateAll() if the designated
+// constraints aren't met.
+type ExecutionOutputChunkMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m ExecutionOutputChunkMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m ExecutionOutputChunkMultiError) AllErrors() []error { return m }
+
+// ExecutionOutputChunkValidationError is the validation error returned by
+// ExecutionOutputChunk.Validate if the designated constraints aren't met.
+type ExecutionOutputChunkValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ExecutionOutputChunkValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ExecutionOutputChunkValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ExecutionOutputChunkValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ExecutionOutputChunkValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ExecutionOutputChunkValidationError) ErrorName() string {
+	return "ExecutionOutputChunkValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ExecutionOutputChunkValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sExecutionOutputChunk.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ExecutionOutputChunkValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ExecutionOutputChunkValidationError{}
+
+// Validate checks the field values on StreamExecutionOutputResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *StreamExecutionOutputResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on StreamExecutionOutputResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// StreamExecutionOutputResponseMultiError, or nil if none found.
+func (m *StreamExecutionOutputResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *StreamExecutionOutputResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Recorded
+
+	// no validation rules for Chunks
+
+	if len(errors) > 0 {
+		return StreamExecutionOutputResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// StreamExecutionOutputResponseMultiError is an error wrapping multiple
+// validation errors returned by StreamExecutionOutputResponse.ValidateAll()
+// if the designated constraints aren't met.
+type StreamExecutionOutputResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m StreamExecutionOutputResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m StreamExecutionOutputResponseMultiError) AllErrors() []error { return m }
+
+// StreamExecutionOutputResponseValidationError is the validation error
+// returned by StreamExecutionOutputResponse.Validate if the designated
+// constraints aren't met.
+type StreamExecutionOutputResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e StreamExecutionOutputResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e StreamExecutionOutputResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e StreamExecutionOutputResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e StreamExecutionOutputResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e StreamExecutionOutputResponseValidationError) ErrorName() string {
+	return "StreamExecutionOutputResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e StreamExecutionOutputResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sStreamExecutionOutputResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = StreamExecutionOutputResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = StreamExecutionOutputResponseValidationError{}
 
 // Validate checks the field values on ResolveActionRequest with the rules
 // defined in the proto definition for this message. If any rules are

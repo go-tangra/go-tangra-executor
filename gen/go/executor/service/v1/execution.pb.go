@@ -410,6 +410,75 @@ func (x *TriggerExecutionResponse) GetExecution() *ExecutionLog {
 	return nil
 }
 
+// Run a workflow on a client
+type TriggerWorkflowExecutionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ClientId      string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`         // display label for the execution
+	Workflow      string                 `protobuf:"bytes,3,opt,name=workflow,proto3" json:"workflow,omitempty"` // workflow YAML
+	Inputs        map[string]string      `protobuf:"bytes,4,rep,name=inputs,proto3" json:"inputs,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *TriggerWorkflowExecutionRequest) Reset() {
+	*x = TriggerWorkflowExecutionRequest{}
+	mi := &file_executor_service_v1_execution_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TriggerWorkflowExecutionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TriggerWorkflowExecutionRequest) ProtoMessage() {}
+
+func (x *TriggerWorkflowExecutionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_executor_service_v1_execution_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TriggerWorkflowExecutionRequest.ProtoReflect.Descriptor instead.
+func (*TriggerWorkflowExecutionRequest) Descriptor() ([]byte, []int) {
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *TriggerWorkflowExecutionRequest) GetClientId() string {
+	if x != nil {
+		return x.ClientId
+	}
+	return ""
+}
+
+func (x *TriggerWorkflowExecutionRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *TriggerWorkflowExecutionRequest) GetWorkflow() string {
+	if x != nil {
+		return x.Workflow
+	}
+	return ""
+}
+
+func (x *TriggerWorkflowExecutionRequest) GetInputs() map[string]string {
+	if x != nil {
+		return x.Inputs
+	}
+	return nil
+}
+
 // Get execution request
 type GetExecutionRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -420,7 +489,7 @@ type GetExecutionRequest struct {
 
 func (x *GetExecutionRequest) Reset() {
 	*x = GetExecutionRequest{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[3]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -432,7 +501,7 @@ func (x *GetExecutionRequest) String() string {
 func (*GetExecutionRequest) ProtoMessage() {}
 
 func (x *GetExecutionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[3]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -445,7 +514,7 @@ func (x *GetExecutionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExecutionRequest.ProtoReflect.Descriptor instead.
 func (*GetExecutionRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{3}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetExecutionRequest) GetId() string {
@@ -464,7 +533,7 @@ type GetExecutionResponse struct {
 
 func (x *GetExecutionResponse) Reset() {
 	*x = GetExecutionResponse{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[4]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +545,7 @@ func (x *GetExecutionResponse) String() string {
 func (*GetExecutionResponse) ProtoMessage() {}
 
 func (x *GetExecutionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[4]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +558,7 @@ func (x *GetExecutionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExecutionResponse.ProtoReflect.Descriptor instead.
 func (*GetExecutionResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{4}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetExecutionResponse) GetExecution() *ExecutionLog {
@@ -513,7 +582,7 @@ type ListExecutionsRequest struct {
 
 func (x *ListExecutionsRequest) Reset() {
 	*x = ListExecutionsRequest{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[5]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -525,7 +594,7 @@ func (x *ListExecutionsRequest) String() string {
 func (*ListExecutionsRequest) ProtoMessage() {}
 
 func (x *ListExecutionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[5]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -538,7 +607,7 @@ func (x *ListExecutionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExecutionsRequest.ProtoReflect.Descriptor instead.
 func (*ListExecutionsRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{5}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ListExecutionsRequest) GetPage() uint32 {
@@ -586,7 +655,7 @@ type ListExecutionsResponse struct {
 
 func (x *ListExecutionsResponse) Reset() {
 	*x = ListExecutionsResponse{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[6]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -598,7 +667,7 @@ func (x *ListExecutionsResponse) String() string {
 func (*ListExecutionsResponse) ProtoMessage() {}
 
 func (x *ListExecutionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[6]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -611,7 +680,7 @@ func (x *ListExecutionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListExecutionsResponse.ProtoReflect.Descriptor instead.
 func (*ListExecutionsResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{6}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListExecutionsResponse) GetExecutions() []*ExecutionLog {
@@ -638,7 +707,7 @@ type GetExecutionOutputRequest struct {
 
 func (x *GetExecutionOutputRequest) Reset() {
 	*x = GetExecutionOutputRequest{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[7]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -650,7 +719,7 @@ func (x *GetExecutionOutputRequest) String() string {
 func (*GetExecutionOutputRequest) ProtoMessage() {}
 
 func (x *GetExecutionOutputRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[7]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -663,7 +732,7 @@ func (x *GetExecutionOutputRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExecutionOutputRequest.ProtoReflect.Descriptor instead.
 func (*GetExecutionOutputRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{7}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetExecutionOutputRequest) GetId() string {
@@ -684,7 +753,7 @@ type GetExecutionOutputResponse struct {
 
 func (x *GetExecutionOutputResponse) Reset() {
 	*x = GetExecutionOutputResponse{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[8]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -696,7 +765,7 @@ func (x *GetExecutionOutputResponse) String() string {
 func (*GetExecutionOutputResponse) ProtoMessage() {}
 
 func (x *GetExecutionOutputResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[8]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -709,7 +778,7 @@ func (x *GetExecutionOutputResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetExecutionOutputResponse.ProtoReflect.Descriptor instead.
 func (*GetExecutionOutputResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{8}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetExecutionOutputResponse) GetOutput() string {
@@ -744,7 +813,7 @@ type TriggerClientUpdateRequest struct {
 
 func (x *TriggerClientUpdateRequest) Reset() {
 	*x = TriggerClientUpdateRequest{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[9]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -756,7 +825,7 @@ func (x *TriggerClientUpdateRequest) String() string {
 func (*TriggerClientUpdateRequest) ProtoMessage() {}
 
 func (x *TriggerClientUpdateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[9]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -769,7 +838,7 @@ func (x *TriggerClientUpdateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TriggerClientUpdateRequest.ProtoReflect.Descriptor instead.
 func (*TriggerClientUpdateRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{9}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *TriggerClientUpdateRequest) GetClientId() string {
@@ -796,7 +865,7 @@ type TriggerClientUpdateResponse struct {
 
 func (x *TriggerClientUpdateResponse) Reset() {
 	*x = TriggerClientUpdateResponse{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[10]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -808,7 +877,7 @@ func (x *TriggerClientUpdateResponse) String() string {
 func (*TriggerClientUpdateResponse) ProtoMessage() {}
 
 func (x *TriggerClientUpdateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[10]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -821,7 +890,7 @@ func (x *TriggerClientUpdateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TriggerClientUpdateResponse.ProtoReflect.Descriptor instead.
 func (*TriggerClientUpdateResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{10}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *TriggerClientUpdateResponse) GetCommandId() string {
@@ -847,7 +916,7 @@ type ListConnectedClientsRequest struct {
 
 func (x *ListConnectedClientsRequest) Reset() {
 	*x = ListConnectedClientsRequest{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[11]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -859,7 +928,7 @@ func (x *ListConnectedClientsRequest) String() string {
 func (*ListConnectedClientsRequest) ProtoMessage() {}
 
 func (x *ListConnectedClientsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[11]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -872,7 +941,7 @@ func (x *ListConnectedClientsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConnectedClientsRequest.ProtoReflect.Descriptor instead.
 func (*ListConnectedClientsRequest) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{11}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{12}
 }
 
 // A currently connected client
@@ -887,7 +956,7 @@ type ConnectedClient struct {
 
 func (x *ConnectedClient) Reset() {
 	*x = ConnectedClient{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[12]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -899,7 +968,7 @@ func (x *ConnectedClient) String() string {
 func (*ConnectedClient) ProtoMessage() {}
 
 func (x *ConnectedClient) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[12]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -912,7 +981,7 @@ func (x *ConnectedClient) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConnectedClient.ProtoReflect.Descriptor instead.
 func (*ConnectedClient) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{12}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ConnectedClient) GetClientId() string {
@@ -946,7 +1015,7 @@ type ListConnectedClientsResponse struct {
 
 func (x *ListConnectedClientsResponse) Reset() {
 	*x = ListConnectedClientsResponse{}
-	mi := &file_executor_service_v1_execution_proto_msgTypes[13]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -958,7 +1027,7 @@ func (x *ListConnectedClientsResponse) String() string {
 func (*ListConnectedClientsResponse) ProtoMessage() {}
 
 func (x *ListConnectedClientsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_executor_service_v1_execution_proto_msgTypes[13]
+	mi := &file_executor_service_v1_execution_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -971,7 +1040,7 @@ func (x *ListConnectedClientsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConnectedClientsResponse.ProtoReflect.Descriptor instead.
 func (*ListConnectedClientsResponse) Descriptor() ([]byte, []int) {
-	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{13}
+	return file_executor_service_v1_execution_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListConnectedClientsResponse) GetClients() []*ConnectedClient {
@@ -1024,7 +1093,16 @@ const file_executor_service_v1_execution_proto_rawDesc = "" +
 	"\tscript_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\bscriptId\x12*\n" +
 	"\tclient_id\x18\x02 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\bclientId\"[\n" +
 	"\x18TriggerExecutionResponse\x12?\n" +
-	"\texecution\x18\x01 \x01(\v2!.executor.service.v1.ExecutionLogR\texecution\"3\n" +
+	"\texecution\x18\x01 \x01(\v2!.executor.service.v1.ExecutionLogR\texecution\"\x9e\x02\n" +
+	"\x1fTriggerWorkflowExecutionRequest\x12*\n" +
+	"\tclient_id\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\bclientId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12&\n" +
+	"\bworkflow\x18\x03 \x01(\tB\n" +
+	"\xe0A\x02\xbaH\x04r\x02\x10\x01R\bworkflow\x12X\n" +
+	"\x06inputs\x18\x04 \x03(\v2@.executor.service.v1.TriggerWorkflowExecutionRequest.InputsEntryR\x06inputs\x1a9\n" +
+	"\vInputsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"3\n" +
 	"\x13GetExecutionRequest\x12\x1c\n" +
 	"\x02id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\x02id\"W\n" +
 	"\x14GetExecutionResponse\x12?\n" +
@@ -1082,9 +1160,10 @@ const file_executor_service_v1_execution_proto_rawDesc = "" +
 	"\x17EXECUTION_STATUS_FAILED\x10\x04\x12+\n" +
 	"'EXECUTION_STATUS_REJECTED_HASH_MISMATCH\x10\x05\x12*\n" +
 	"&EXECUTION_STATUS_REJECTED_NOT_APPROVED\x10\x06\x12#\n" +
-	"\x1fEXECUTION_STATUS_CLIENT_OFFLINE\x10\a2\x9e\a\n" +
+	"\x1fEXECUTION_STATUS_CLIENT_OFFLINE\x10\a2\xd1\b\n" +
 	"\x18ExecutorExecutionService\x12\x9b\x01\n" +
-	"\x10TriggerExecution\x12,.executor.service.v1.TriggerExecutionRequest\x1a-.executor.service.v1.TriggerExecutionResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/scripts/{script_id}/execute\x12\x80\x01\n" +
+	"\x10TriggerExecution\x12,.executor.service.v1.TriggerExecutionRequest\x1a-.executor.service.v1.TriggerExecutionResponse\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/v1/scripts/{script_id}/execute\x12\xb0\x01\n" +
+	"\x18TriggerWorkflowExecution\x124.executor.service.v1.TriggerWorkflowExecutionRequest\x1a-.executor.service.v1.TriggerExecutionResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/v1/clients/{client_id}/run-workflow\x12\x80\x01\n" +
 	"\fGetExecution\x12(.executor.service.v1.GetExecutionRequest\x1a).executor.service.v1.GetExecutionResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/executions/{id}\x12\x81\x01\n" +
 	"\x0eListExecutions\x12*.executor.service.v1.ListExecutionsRequest\x1a+.executor.service.v1.ListExecutionsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/v1/executions\x12\x99\x01\n" +
 	"\x12GetExecutionOutput\x12..executor.service.v1.GetExecutionOutputRequest\x1a/.executor.service.v1.GetExecutionOutputResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1/executions/{id}/output\x12\xa3\x01\n" +
@@ -1105,55 +1184,60 @@ func file_executor_service_v1_execution_proto_rawDescGZIP() []byte {
 }
 
 var file_executor_service_v1_execution_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_executor_service_v1_execution_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_executor_service_v1_execution_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
 var file_executor_service_v1_execution_proto_goTypes = []any{
-	(TriggerType)(0),                     // 0: executor.service.v1.TriggerType
-	(ExecutionStatus)(0),                 // 1: executor.service.v1.ExecutionStatus
-	(*ExecutionLog)(nil),                 // 2: executor.service.v1.ExecutionLog
-	(*TriggerExecutionRequest)(nil),      // 3: executor.service.v1.TriggerExecutionRequest
-	(*TriggerExecutionResponse)(nil),     // 4: executor.service.v1.TriggerExecutionResponse
-	(*GetExecutionRequest)(nil),          // 5: executor.service.v1.GetExecutionRequest
-	(*GetExecutionResponse)(nil),         // 6: executor.service.v1.GetExecutionResponse
-	(*ListExecutionsRequest)(nil),        // 7: executor.service.v1.ListExecutionsRequest
-	(*ListExecutionsResponse)(nil),       // 8: executor.service.v1.ListExecutionsResponse
-	(*GetExecutionOutputRequest)(nil),    // 9: executor.service.v1.GetExecutionOutputRequest
-	(*GetExecutionOutputResponse)(nil),   // 10: executor.service.v1.GetExecutionOutputResponse
-	(*TriggerClientUpdateRequest)(nil),   // 11: executor.service.v1.TriggerClientUpdateRequest
-	(*TriggerClientUpdateResponse)(nil),  // 12: executor.service.v1.TriggerClientUpdateResponse
-	(*ListConnectedClientsRequest)(nil),  // 13: executor.service.v1.ListConnectedClientsRequest
-	(*ConnectedClient)(nil),              // 14: executor.service.v1.ConnectedClient
-	(*ListConnectedClientsResponse)(nil), // 15: executor.service.v1.ListConnectedClientsResponse
-	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
+	(TriggerType)(0),                        // 0: executor.service.v1.TriggerType
+	(ExecutionStatus)(0),                    // 1: executor.service.v1.ExecutionStatus
+	(*ExecutionLog)(nil),                    // 2: executor.service.v1.ExecutionLog
+	(*TriggerExecutionRequest)(nil),         // 3: executor.service.v1.TriggerExecutionRequest
+	(*TriggerExecutionResponse)(nil),        // 4: executor.service.v1.TriggerExecutionResponse
+	(*TriggerWorkflowExecutionRequest)(nil), // 5: executor.service.v1.TriggerWorkflowExecutionRequest
+	(*GetExecutionRequest)(nil),             // 6: executor.service.v1.GetExecutionRequest
+	(*GetExecutionResponse)(nil),            // 7: executor.service.v1.GetExecutionResponse
+	(*ListExecutionsRequest)(nil),           // 8: executor.service.v1.ListExecutionsRequest
+	(*ListExecutionsResponse)(nil),          // 9: executor.service.v1.ListExecutionsResponse
+	(*GetExecutionOutputRequest)(nil),       // 10: executor.service.v1.GetExecutionOutputRequest
+	(*GetExecutionOutputResponse)(nil),      // 11: executor.service.v1.GetExecutionOutputResponse
+	(*TriggerClientUpdateRequest)(nil),      // 12: executor.service.v1.TriggerClientUpdateRequest
+	(*TriggerClientUpdateResponse)(nil),     // 13: executor.service.v1.TriggerClientUpdateResponse
+	(*ListConnectedClientsRequest)(nil),     // 14: executor.service.v1.ListConnectedClientsRequest
+	(*ConnectedClient)(nil),                 // 15: executor.service.v1.ConnectedClient
+	(*ListConnectedClientsResponse)(nil),    // 16: executor.service.v1.ListConnectedClientsResponse
+	nil,                                     // 17: executor.service.v1.TriggerWorkflowExecutionRequest.InputsEntry
+	(*timestamppb.Timestamp)(nil),           // 18: google.protobuf.Timestamp
 }
 var file_executor_service_v1_execution_proto_depIdxs = []int32{
 	0,  // 0: executor.service.v1.ExecutionLog.trigger_type:type_name -> executor.service.v1.TriggerType
 	1,  // 1: executor.service.v1.ExecutionLog.status:type_name -> executor.service.v1.ExecutionStatus
-	16, // 2: executor.service.v1.ExecutionLog.started_at:type_name -> google.protobuf.Timestamp
-	16, // 3: executor.service.v1.ExecutionLog.completed_at:type_name -> google.protobuf.Timestamp
-	16, // 4: executor.service.v1.ExecutionLog.create_time:type_name -> google.protobuf.Timestamp
+	18, // 2: executor.service.v1.ExecutionLog.started_at:type_name -> google.protobuf.Timestamp
+	18, // 3: executor.service.v1.ExecutionLog.completed_at:type_name -> google.protobuf.Timestamp
+	18, // 4: executor.service.v1.ExecutionLog.create_time:type_name -> google.protobuf.Timestamp
 	2,  // 5: executor.service.v1.TriggerExecutionResponse.execution:type_name -> executor.service.v1.ExecutionLog
-	2,  // 6: executor.service.v1.GetExecutionResponse.execution:type_name -> executor.service.v1.ExecutionLog
-	1,  // 7: executor.service.v1.ListExecutionsRequest.status:type_name -> executor.service.v1.ExecutionStatus
-	2,  // 8: executor.service.v1.ListExecutionsResponse.executions:type_name -> executor.service.v1.ExecutionLog
-	16, // 9: executor.service.v1.ConnectedClient.connected_at:type_name -> google.protobuf.Timestamp
-	14, // 10: executor.service.v1.ListConnectedClientsResponse.clients:type_name -> executor.service.v1.ConnectedClient
-	3,  // 11: executor.service.v1.ExecutorExecutionService.TriggerExecution:input_type -> executor.service.v1.TriggerExecutionRequest
-	5,  // 12: executor.service.v1.ExecutorExecutionService.GetExecution:input_type -> executor.service.v1.GetExecutionRequest
-	7,  // 13: executor.service.v1.ExecutorExecutionService.ListExecutions:input_type -> executor.service.v1.ListExecutionsRequest
-	9,  // 14: executor.service.v1.ExecutorExecutionService.GetExecutionOutput:input_type -> executor.service.v1.GetExecutionOutputRequest
-	11, // 15: executor.service.v1.ExecutorExecutionService.TriggerClientUpdate:input_type -> executor.service.v1.TriggerClientUpdateRequest
-	13, // 16: executor.service.v1.ExecutorExecutionService.ListConnectedClients:input_type -> executor.service.v1.ListConnectedClientsRequest
-	4,  // 17: executor.service.v1.ExecutorExecutionService.TriggerExecution:output_type -> executor.service.v1.TriggerExecutionResponse
-	6,  // 18: executor.service.v1.ExecutorExecutionService.GetExecution:output_type -> executor.service.v1.GetExecutionResponse
-	8,  // 19: executor.service.v1.ExecutorExecutionService.ListExecutions:output_type -> executor.service.v1.ListExecutionsResponse
-	10, // 20: executor.service.v1.ExecutorExecutionService.GetExecutionOutput:output_type -> executor.service.v1.GetExecutionOutputResponse
-	12, // 21: executor.service.v1.ExecutorExecutionService.TriggerClientUpdate:output_type -> executor.service.v1.TriggerClientUpdateResponse
-	15, // 22: executor.service.v1.ExecutorExecutionService.ListConnectedClients:output_type -> executor.service.v1.ListConnectedClientsResponse
-	17, // [17:23] is the sub-list for method output_type
-	11, // [11:17] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	17, // 6: executor.service.v1.TriggerWorkflowExecutionRequest.inputs:type_name -> executor.service.v1.TriggerWorkflowExecutionRequest.InputsEntry
+	2,  // 7: executor.service.v1.GetExecutionResponse.execution:type_name -> executor.service.v1.ExecutionLog
+	1,  // 8: executor.service.v1.ListExecutionsRequest.status:type_name -> executor.service.v1.ExecutionStatus
+	2,  // 9: executor.service.v1.ListExecutionsResponse.executions:type_name -> executor.service.v1.ExecutionLog
+	18, // 10: executor.service.v1.ConnectedClient.connected_at:type_name -> google.protobuf.Timestamp
+	15, // 11: executor.service.v1.ListConnectedClientsResponse.clients:type_name -> executor.service.v1.ConnectedClient
+	3,  // 12: executor.service.v1.ExecutorExecutionService.TriggerExecution:input_type -> executor.service.v1.TriggerExecutionRequest
+	5,  // 13: executor.service.v1.ExecutorExecutionService.TriggerWorkflowExecution:input_type -> executor.service.v1.TriggerWorkflowExecutionRequest
+	6,  // 14: executor.service.v1.ExecutorExecutionService.GetExecution:input_type -> executor.service.v1.GetExecutionRequest
+	8,  // 15: executor.service.v1.ExecutorExecutionService.ListExecutions:input_type -> executor.service.v1.ListExecutionsRequest
+	10, // 16: executor.service.v1.ExecutorExecutionService.GetExecutionOutput:input_type -> executor.service.v1.GetExecutionOutputRequest
+	12, // 17: executor.service.v1.ExecutorExecutionService.TriggerClientUpdate:input_type -> executor.service.v1.TriggerClientUpdateRequest
+	14, // 18: executor.service.v1.ExecutorExecutionService.ListConnectedClients:input_type -> executor.service.v1.ListConnectedClientsRequest
+	4,  // 19: executor.service.v1.ExecutorExecutionService.TriggerExecution:output_type -> executor.service.v1.TriggerExecutionResponse
+	4,  // 20: executor.service.v1.ExecutorExecutionService.TriggerWorkflowExecution:output_type -> executor.service.v1.TriggerExecutionResponse
+	7,  // 21: executor.service.v1.ExecutorExecutionService.GetExecution:output_type -> executor.service.v1.GetExecutionResponse
+	9,  // 22: executor.service.v1.ExecutorExecutionService.ListExecutions:output_type -> executor.service.v1.ListExecutionsResponse
+	11, // 23: executor.service.v1.ExecutorExecutionService.GetExecutionOutput:output_type -> executor.service.v1.GetExecutionOutputResponse
+	13, // 24: executor.service.v1.ExecutorExecutionService.TriggerClientUpdate:output_type -> executor.service.v1.TriggerClientUpdateResponse
+	16, // 25: executor.service.v1.ExecutorExecutionService.ListConnectedClients:output_type -> executor.service.v1.ListConnectedClientsResponse
+	19, // [19:26] is the sub-list for method output_type
+	12, // [12:19] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_executor_service_v1_execution_proto_init() }
@@ -1162,15 +1246,15 @@ func file_executor_service_v1_execution_proto_init() {
 		return
 	}
 	file_executor_service_v1_execution_proto_msgTypes[0].OneofWrappers = []any{}
-	file_executor_service_v1_execution_proto_msgTypes[5].OneofWrappers = []any{}
-	file_executor_service_v1_execution_proto_msgTypes[8].OneofWrappers = []any{}
+	file_executor_service_v1_execution_proto_msgTypes[6].OneofWrappers = []any{}
+	file_executor_service_v1_execution_proto_msgTypes[9].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_executor_service_v1_execution_proto_rawDesc), len(file_executor_service_v1_execution_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   14,
+			NumMessages:   16,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

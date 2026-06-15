@@ -25,6 +25,7 @@ const OperationExecutorExecutionServiceListConnectedClients = "/executor.service
 const OperationExecutorExecutionServiceListExecutions = "/executor.service.v1.ExecutorExecutionService/ListExecutions"
 const OperationExecutorExecutionServiceTriggerClientUpdate = "/executor.service.v1.ExecutorExecutionService/TriggerClientUpdate"
 const OperationExecutorExecutionServiceTriggerExecution = "/executor.service.v1.ExecutorExecutionService/TriggerExecution"
+const OperationExecutorExecutionServiceTriggerWorkflowExecution = "/executor.service.v1.ExecutorExecutionService/TriggerWorkflowExecution"
 
 type ExecutorExecutionServiceHTTPServer interface {
 	// GetExecution Get execution details
@@ -39,11 +40,15 @@ type ExecutorExecutionServiceHTTPServer interface {
 	TriggerClientUpdate(context.Context, *TriggerClientUpdateRequest) (*TriggerClientUpdateResponse, error)
 	// TriggerExecution Trigger script execution on a client (UI-push)
 	TriggerExecution(context.Context, *TriggerExecutionRequest) (*TriggerExecutionResponse, error)
+	// TriggerWorkflowExecution Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+	// live via ExecutorClientService.StreamExecutionOutput.
+	TriggerWorkflowExecution(context.Context, *TriggerWorkflowExecutionRequest) (*TriggerExecutionResponse, error)
 }
 
 func RegisterExecutorExecutionServiceHTTPServer(s *http.Server, srv ExecutorExecutionServiceHTTPServer) {
 	r := s.Route("/")
 	r.POST("/v1/scripts/{script_id}/execute", _ExecutorExecutionService_TriggerExecution0_HTTP_Handler(srv))
+	r.POST("/v1/clients/{client_id}/run-workflow", _ExecutorExecutionService_TriggerWorkflowExecution0_HTTP_Handler(srv))
 	r.GET("/v1/executions/{id}", _ExecutorExecutionService_GetExecution0_HTTP_Handler(srv))
 	r.GET("/v1/executions", _ExecutorExecutionService_ListExecutions0_HTTP_Handler(srv))
 	r.GET("/v1/executions/{id}/output", _ExecutorExecutionService_GetExecutionOutput0_HTTP_Handler(srv))
@@ -66,6 +71,31 @@ func _ExecutorExecutionService_TriggerExecution0_HTTP_Handler(srv ExecutorExecut
 		http.SetOperation(ctx, OperationExecutorExecutionServiceTriggerExecution)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.TriggerExecution(ctx, req.(*TriggerExecutionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*TriggerExecutionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ExecutorExecutionService_TriggerWorkflowExecution0_HTTP_Handler(srv ExecutorExecutionServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in TriggerWorkflowExecutionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationExecutorExecutionServiceTriggerWorkflowExecution)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.TriggerWorkflowExecution(ctx, req.(*TriggerWorkflowExecutionRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -196,6 +226,9 @@ type ExecutorExecutionServiceHTTPClient interface {
 	TriggerClientUpdate(ctx context.Context, req *TriggerClientUpdateRequest, opts ...http.CallOption) (rsp *TriggerClientUpdateResponse, err error)
 	// TriggerExecution Trigger script execution on a client (UI-push)
 	TriggerExecution(ctx context.Context, req *TriggerExecutionRequest, opts ...http.CallOption) (rsp *TriggerExecutionResponse, err error)
+	// TriggerWorkflowExecution Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+	// live via ExecutorClientService.StreamExecutionOutput.
+	TriggerWorkflowExecution(ctx context.Context, req *TriggerWorkflowExecutionRequest, opts ...http.CallOption) (rsp *TriggerExecutionResponse, err error)
 }
 
 type ExecutorExecutionServiceHTTPClientImpl struct {
@@ -282,6 +315,21 @@ func (c *ExecutorExecutionServiceHTTPClientImpl) TriggerExecution(ctx context.Co
 	pattern := "/v1/scripts/{script_id}/execute"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationExecutorExecutionServiceTriggerExecution))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// TriggerWorkflowExecution Run a go-tangra-actions workflow on a client (UI-push). Output streams back
+// live via ExecutorClientService.StreamExecutionOutput.
+func (c *ExecutorExecutionServiceHTTPClientImpl) TriggerWorkflowExecution(ctx context.Context, in *TriggerWorkflowExecutionRequest, opts ...http.CallOption) (*TriggerExecutionResponse, error) {
+	var out TriggerExecutionResponse
+	pattern := "/v1/clients/{client_id}/run-workflow"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationExecutorExecutionServiceTriggerWorkflowExecution))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
