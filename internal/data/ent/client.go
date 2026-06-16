@@ -21,6 +21,7 @@ import (
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/scriptassignment"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/workflow"
 )
 
 // Client is the client that holds all ent builders.
@@ -40,6 +41,8 @@ type Client struct {
 	Script *ScriptClient
 	// ScriptAssignment is the client for interacting with the ScriptAssignment builders.
 	ScriptAssignment *ScriptAssignmentClient
+	// Workflow is the client for interacting with the Workflow builders.
+	Workflow *WorkflowClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -57,6 +60,7 @@ func (c *Client) init() {
 	c.ExecutionLog = NewExecutionLogClient(c.config)
 	c.Script = NewScriptClient(c.config)
 	c.ScriptAssignment = NewScriptAssignmentClient(c.config)
+	c.Workflow = NewWorkflowClient(c.config)
 }
 
 type (
@@ -155,6 +159,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ExecutionLog:     NewExecutionLogClient(cfg),
 		Script:           NewScriptClient(cfg),
 		ScriptAssignment: NewScriptAssignmentClient(cfg),
+		Workflow:         NewWorkflowClient(cfg),
 	}, nil
 }
 
@@ -180,6 +185,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ExecutionLog:     NewExecutionLogClient(cfg),
 		Script:           NewScriptClient(cfg),
 		ScriptAssignment: NewScriptAssignmentClient(cfg),
+		Workflow:         NewWorkflowClient(cfg),
 	}, nil
 }
 
@@ -210,7 +216,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Action, c.ActionFile, c.AuditLog, c.ExecutionLog, c.Script,
-		c.ScriptAssignment,
+		c.ScriptAssignment, c.Workflow,
 	} {
 		n.Use(hooks...)
 	}
@@ -221,7 +227,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Action, c.ActionFile, c.AuditLog, c.ExecutionLog, c.Script,
-		c.ScriptAssignment,
+		c.ScriptAssignment, c.Workflow,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -242,6 +248,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Script.mutate(ctx, m)
 	case *ScriptAssignmentMutation:
 		return c.ScriptAssignment.mutate(ctx, m)
+	case *WorkflowMutation:
+		return c.Workflow.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -1082,13 +1090,148 @@ func (c *ScriptAssignmentClient) mutate(ctx context.Context, m *ScriptAssignment
 	}
 }
 
+// WorkflowClient is a client for the Workflow schema.
+type WorkflowClient struct {
+	config
+}
+
+// NewWorkflowClient returns a client for the Workflow from the given config.
+func NewWorkflowClient(c config) *WorkflowClient {
+	return &WorkflowClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `workflow.Hooks(f(g(h())))`.
+func (c *WorkflowClient) Use(hooks ...Hook) {
+	c.hooks.Workflow = append(c.hooks.Workflow, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `workflow.Intercept(f(g(h())))`.
+func (c *WorkflowClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Workflow = append(c.inters.Workflow, interceptors...)
+}
+
+// Create returns a builder for creating a Workflow entity.
+func (c *WorkflowClient) Create() *WorkflowCreate {
+	mutation := newWorkflowMutation(c.config, OpCreate)
+	return &WorkflowCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Workflow entities.
+func (c *WorkflowClient) CreateBulk(builders ...*WorkflowCreate) *WorkflowCreateBulk {
+	return &WorkflowCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *WorkflowClient) MapCreateBulk(slice any, setFunc func(*WorkflowCreate, int)) *WorkflowCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &WorkflowCreateBulk{err: fmt.Errorf("calling to WorkflowClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*WorkflowCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &WorkflowCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Workflow.
+func (c *WorkflowClient) Update() *WorkflowUpdate {
+	mutation := newWorkflowMutation(c.config, OpUpdate)
+	return &WorkflowUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WorkflowClient) UpdateOne(_m *Workflow) *WorkflowUpdateOne {
+	mutation := newWorkflowMutation(c.config, OpUpdateOne, withWorkflow(_m))
+	return &WorkflowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WorkflowClient) UpdateOneID(id string) *WorkflowUpdateOne {
+	mutation := newWorkflowMutation(c.config, OpUpdateOne, withWorkflowID(id))
+	return &WorkflowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Workflow.
+func (c *WorkflowClient) Delete() *WorkflowDelete {
+	mutation := newWorkflowMutation(c.config, OpDelete)
+	return &WorkflowDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WorkflowClient) DeleteOne(_m *Workflow) *WorkflowDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WorkflowClient) DeleteOneID(id string) *WorkflowDeleteOne {
+	builder := c.Delete().Where(workflow.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WorkflowDeleteOne{builder}
+}
+
+// Query returns a query builder for Workflow.
+func (c *WorkflowClient) Query() *WorkflowQuery {
+	return &WorkflowQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWorkflow},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Workflow entity by its id.
+func (c *WorkflowClient) Get(ctx context.Context, id string) (*Workflow, error) {
+	return c.Query().Where(workflow.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WorkflowClient) GetX(ctx context.Context, id string) *Workflow {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *WorkflowClient) Hooks() []Hook {
+	hooks := c.hooks.Workflow
+	return append(hooks[:len(hooks):len(hooks)], workflow.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *WorkflowClient) Interceptors() []Interceptor {
+	return c.inters.Workflow
+}
+
+func (c *WorkflowClient) mutate(ctx context.Context, m *WorkflowMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WorkflowCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WorkflowUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WorkflowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WorkflowDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Workflow mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Action, ActionFile, AuditLog, ExecutionLog, Script, ScriptAssignment []ent.Hook
+		Action, ActionFile, AuditLog, ExecutionLog, Script, ScriptAssignment,
+		Workflow []ent.Hook
 	}
 	inters struct {
-		Action, ActionFile, AuditLog, ExecutionLog, Script,
-		ScriptAssignment []ent.Interceptor
+		Action, ActionFile, AuditLog, ExecutionLog, Script, ScriptAssignment,
+		Workflow []ent.Interceptor
 	}
 )

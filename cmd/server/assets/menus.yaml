@@ -43,6 +43,18 @@ menus:
       - platform:admin
       - tenant:manager
 
+  - id: executor-workflows
+    parent_id: executor
+    type: MENU
+    name: Workflows
+    path: workflows
+    component: app/executor/workflows/index.vue
+    icon: lucide:workflow
+    order: 3
+    authority:
+      - platform:admin
+      - tenant:manager
+
   - id: executor-executions
     parent_id: executor
     type: MENU
@@ -50,7 +62,7 @@ menus:
     path: executions
     component: app/executor/executions/index.vue
     icon: lucide:play
-    order: 3
+    order: 4
     authority:
       - platform:admin
       - tenant:manager
@@ -62,7 +74,7 @@ menus:
     path: clients
     component: app/executor/clients/index.vue
     icon: lucide:monitor
-    order: 4
+    order: 5
     authority:
       - platform:admin
       - tenant:manager
@@ -159,6 +171,15 @@ permission_groups:
       - name: Manage Actions
         code: executor.action.manage
         description: Create, update, and delete actions
+      - name: View Workflows
+        code: executor.workflow.view
+        description: View the workflow repository
+      - name: Manage Workflows
+        code: executor.workflow.manage
+        description: Create, update, and delete workflows
+      - name: Run Workflows
+        code: executor.workflow.run
+        description: Run a workflow on a client
       - name: Manage Assignments
         code: executor.assignment.manage
         description: Assign and unassign scripts to clients
@@ -182,6 +203,9 @@ roles:
       - executor.script.manage
       - executor.action.view
       - executor.action.manage
+      - executor.workflow.view
+      - executor.workflow.manage
+      - executor.workflow.run
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
@@ -196,6 +220,9 @@ roles:
       - executor.script.manage
       - executor.action.view
       - executor.action.manage
+      - executor.workflow.view
+      - executor.workflow.manage
+      - executor.workflow.run
       - executor.assignment.manage
       - executor.execution.trigger
       - executor.execution.view
@@ -208,4 +235,5 @@ roles:
     permissions:
       - executor.script.view
       - executor.action.view
+      - executor.workflow.view
       - executor.execution.view

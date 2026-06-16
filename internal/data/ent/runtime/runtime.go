@@ -12,6 +12,7 @@ import (
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/schema"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/scriptassignment"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/workflow"
 
 	"entgo.io/ent"
 	"entgo.io/ent/privacy"
@@ -411,6 +412,76 @@ func init() {
 	scriptassignmentDescID := scriptassignmentFields[0].Descriptor()
 	// scriptassignment.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	scriptassignment.IDValidator = scriptassignmentDescID.Validators[0].(func(string) error)
+	workflowMixin := schema.Workflow{}.Mixin()
+	workflow.Policy = privacy.NewPolicies(workflowMixin[3], schema.Workflow{})
+	workflow.Hooks[0] = func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			if err := workflow.Policy.EvalMutation(ctx, m); err != nil {
+				return nil, err
+			}
+			return next.Mutate(ctx, m)
+		})
+	}
+	workflowMixinFields3 := workflowMixin[3].Fields()
+	_ = workflowMixinFields3
+	workflowFields := schema.Workflow{}.Fields()
+	_ = workflowFields
+	// workflowDescTenantID is the schema descriptor for tenant_id field.
+	workflowDescTenantID := workflowMixinFields3[0].Descriptor()
+	// workflow.DefaultTenantID holds the default value on creation for the tenant_id field.
+	workflow.DefaultTenantID = workflowDescTenantID.Default.(uint32)
+	// workflowDescName is the schema descriptor for name field.
+	workflowDescName := workflowFields[1].Descriptor()
+	// workflow.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	workflow.NameValidator = func() func(string) error {
+		validators := workflowDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// workflowDescDescription is the schema descriptor for description field.
+	workflowDescDescription := workflowFields[2].Descriptor()
+	// workflow.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	workflow.DescriptionValidator = workflowDescDescription.Validators[0].(func(string) error)
+	// workflowDescContentHash is the schema descriptor for content_hash field.
+	workflowDescContentHash := workflowFields[4].Descriptor()
+	// workflow.ContentHashValidator is a validator for the "content_hash" field. It is called by the builders before save.
+	workflow.ContentHashValidator = func() func(string) error {
+		validators := workflowDescContentHash.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(content_hash string) error {
+			for _, fn := range fns {
+				if err := fn(content_hash); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// workflowDescVersion is the schema descriptor for version field.
+	workflowDescVersion := workflowFields[5].Descriptor()
+	// workflow.DefaultVersion holds the default value on creation for the version field.
+	workflow.DefaultVersion = workflowDescVersion.Default.(int)
+	// workflowDescEnabled is the schema descriptor for enabled field.
+	workflowDescEnabled := workflowFields[6].Descriptor()
+	// workflow.DefaultEnabled holds the default value on creation for the enabled field.
+	workflow.DefaultEnabled = workflowDescEnabled.Default.(bool)
+	// workflowDescID is the schema descriptor for id field.
+	workflowDescID := workflowFields[0].Descriptor()
+	// workflow.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	workflow.IDValidator = workflowDescID.Validators[0].(func(string) error)
 }
 
 const (

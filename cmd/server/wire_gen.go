@@ -44,6 +44,8 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	scriptService := service.NewScriptService(context, scriptRepo, assignmentRepo, portalClient)
 	actionRepo := data.NewActionRepo(context, entClient)
 	actionService := service.NewActionService(context, actionRepo, portalClient)
+	workflowRepo := data.NewWorkflowRepo(context, entClient)
+	workflowService := service.NewWorkflowService(context, workflowRepo)
 	assignmentService := service.NewAssignmentService(context, assignmentRepo, scriptRepo)
 	executionLogRepo := data.NewExecutionLogRepo(context, entClient)
 	commandRegistry := service.NewCommandRegistry()
@@ -54,7 +56,7 @@ func initApp(context *bootstrap.Context) (*kratos.App, func(), error) {
 	statisticsService := service.NewStatisticsService(context, statisticsRepo)
 	backupService := service.NewBackupService(context, entClient)
 	sqlBackupService := service.NewSqlBackupService(context)
-	grpcServer := server.NewGRPCServer(context, certManager, collector, scriptService, actionService, assignmentService, executionService, clientService, statisticsService, backupService, sqlBackupService)
+	grpcServer := server.NewGRPCServer(context, certManager, collector, scriptService, actionService, workflowService, assignmentService, executionService, clientService, statisticsService, backupService, sqlBackupService)
 	httpServer := server.NewHTTPServer(context)
 	app := newApp(context, grpcServer, httpServer, client, clientReleaseService)
 	return app, func() {

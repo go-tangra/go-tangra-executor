@@ -19,6 +19,7 @@ var ProviderSet = wire.NewSet(
 	data.NewPortalClient,
 	data.NewScriptRepo,
 	data.NewActionRepo,
+	data.NewWorkflowRepo,
 	data.NewAssignmentRepo,
 	data.NewExecutionLogRepo,
 	data.NewAuditLogRepo,

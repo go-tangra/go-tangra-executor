@@ -346,3 +346,108 @@ export const ActionService = {
   delete: (id: string, options?: RequestOptions) =>
     executorApi.delete<void>(`/actions/${id}`, options),
 };
+
+// ==================== Workflow Repository Types ====================
+
+export interface Workflow {
+  id: string;
+  tenantId: number;
+  name: string;
+  description: string;
+  content: string;
+  contentHash: string;
+  version: number;
+  enabled: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateWorkflowRequest {
+  name: string;
+  description?: string;
+  content: string;
+  enabled?: boolean;
+}
+
+export interface UpdateWorkflowRequest {
+  name?: string;
+  description?: string;
+  content?: string;
+  enabled?: boolean;
+}
+
+export interface ListWorkflowsResponse {
+  workflows: Workflow[];
+  total: number;
+}
+
+// ==================== Workflow Service ====================
+
+export const WorkflowService = {
+  create: (data: CreateWorkflowRequest, options?: RequestOptions) =>
+    executorApi.post<{ workflow: Workflow }>('/workflows', data, options),
+
+  get: (id: string, options?: RequestOptions) =>
+    executorApi.get<{ workflow: Workflow }>(`/workflows/${id}`, options),
+
+  list: (
+    params?: { page?: number; pageSize?: number; name?: string; enabled?: boolean },
+    options?: RequestOptions,
+  ) => {
+    const query = new URLSearchParams();
+    if (params?.page) query.set('page', String(params.page));
+    if (params?.pageSize) query.set('pageSize', String(params.pageSize));
+    if (params?.name) query.set('name', params.name);
+    if (params?.enabled !== undefined)
+      query.set('enabled', String(params.enabled));
+    const qs = query.toString();
+    return executorApi.get<ListWorkflowsResponse>(
+      `/workflows${qs ? `?${qs}` : ''}`,
+      options,
+    );
+  },
+
+  update: (id: string, data: UpdateWorkflowRequest, options?: RequestOptions) =>
+    executorApi.put<{ workflow: Workflow }>(`/workflows/${id}`, data, options),
+
+  delete: (id: string, options?: RequestOptions) =>
+    executorApi.delete<void>(`/workflows/${id}`, options),
+};
+
+// ==================== Connected Clients ====================
+
+export interface ConnectedClient {
+  clientId: string;
+  clientVersion: string;
+  connectedAt?: string;
+}
+
+export interface ListConnectedClientsResponse {
+  clients: ConnectedClient[];
+}
+
+export const ConnectedClientsService = {
+  list: (options?: RequestOptions) =>
+    executorApi.get<ListConnectedClientsResponse>('/clients/connected', options),
+};
+
+// ==================== Run Workflow ====================
+
+export interface TriggerWorkflowRequest {
+  name?: string;
+  workflow: string;
+  inputs?: Record<string, string>;
+}
+
+export const WorkflowRunService = {
+  run: (
+    clientId: string,
+    data: TriggerWorkflowRequest,
+    options?: RequestOptions,
+  ) =>
+    executorApi.post<{ execution: ExecutionLog }>(
+      `/clients/${clientId}/run-workflow`,
+      data,
+      options,
+    ),
+};

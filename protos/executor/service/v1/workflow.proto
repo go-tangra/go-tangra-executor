@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "buf/validate/validate.proto";
+import "google/api/annotations.proto";
+import "google/api/field_behavior.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+// A saved, reusable go-tangra-actions workflow (jobs/steps YAML).
+message Workflow {
+  string id = 1 [json_name = "id"];
+  uint32 tenant_id = 2 [json_name = "tenantId"];
+  string name = 3 [json_name = "name"];
+  string description = 4 [json_name = "description"];
+  string content = 5 [json_name = "content"]; // workflow YAML
+  string content_hash = 6 [json_name = "contentHash"];
+  int32 version = 7 [json_name = "version"];
+  bool enabled = 8 [json_name = "enabled"];
+  google.protobuf.Timestamp created_at = 9 [json_name = "createdAt"];
+  google.protobuf.Timestamp updated_at = 10 [json_name = "updatedAt"];
+}
+
+// Admin-facing CRUD for the workflow repository.
+service ExecutorWorkflowService {
+  rpc CreateWorkflow(CreateWorkflowRequest) returns (CreateWorkflowResponse) {
+    option (google.api.http) = {
+      post: "/v1/workflows"
+      body: "*"
+    };
+  }
+
+  rpc GetWorkflow(GetWorkflowRequest) returns (GetWorkflowResponse) {
+    option (google.api.http) = {
+      get: "/v1/workflows/{id}"
+    };
+  }
+
+  rpc ListWorkflows(ListWorkflowsRequest) returns (ListWorkflowsResponse) {
+    option (google.api.http) = {
+      get: "/v1/workflows"
+    };
+  }
+
+  rpc UpdateWorkflow(UpdateWorkflowRequest) returns (UpdateWorkflowResponse) {
+    option (google.api.http) = {
+      put: "/v1/workflows/{id}"
+      body: "*"
+    };
+  }
+
+  rpc DeleteWorkflow(DeleteWorkflowRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/workflows/{id}"
+    };
+  }
+}
+
+message CreateWorkflowRequest {
+  string name = 1 [
+    json_name = "name",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1, max_len: 255}
+  ];
+  string description = 2 [json_name = "description"];
+  string content = 3 [
+    json_name = "content",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ];
+  bool enabled = 4 [json_name = "enabled"];
+}
+
+message CreateWorkflowResponse {
+  Workflow workflow = 1 [json_name = "workflow"];
+}
+
+message GetWorkflowRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ];
+}
+
+message GetWorkflowResponse {
+  Workflow workflow = 1 [json_name = "workflow"];
+}
+
+message ListWorkflowsRequest {
+  optional uint32 page = 1 [json_name = "page"];
+  optional uint32 page_size = 2 [json_name = "pageSize"];
+  optional string name = 3 [json_name = "name"];
+  optional bool enabled = 4 [json_name = "enabled"];
+}
+
+message ListWorkflowsResponse {
+  repeated Workflow workflows = 1 [json_name = "workflows"];
+  uint32 total = 2 [json_name = "total"];
+}
+
+message UpdateWorkflowRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ];
+  optional string name = 2 [json_name = "name"];
+  optional string description = 3 [json_name = "description"];
+  optional string content = 4 [json_name = "content"];
+  optional bool enabled = 5 [json_name = "enabled"];
+}
+
+message UpdateWorkflowResponse {
+  Workflow workflow = 1 [json_name = "workflow"];
+}
+
+message DeleteWorkflowRequest {
+  string id = 1 [
+    json_name = "id",
+    (google.api.field_behavior) = REQUIRED,
+    (buf.validate.field).string = {min_len: 1}
+  ];
+}

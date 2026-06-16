@@ -7,6 +7,7 @@ require (
 	entgo.io/ent v0.14.5
 	github.com/go-kratos/kratos/v2 v2.9.2
 	github.com/go-sql-driver/mysql v1.9.3
+	github.com/go-tangra/go-tangra-actions v0.1.0
 	github.com/go-tangra/go-tangra-common v1.19.0
 	github.com/go-tangra/go-tangra-portal v0.1.0
 	github.com/google/uuid v1.6.0
@@ -49,7 +50,6 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/inflect v0.21.5 // indirect
 	github.com/go-playground/form/v4 v4.3.0 // indirect
-	github.com/go-tangra/go-tangra-actions v0.1.0 // indirect
 	github.com/google/gnostic v0.7.1 // indirect
 	github.com/google/gnostic-models v0.7.1 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect

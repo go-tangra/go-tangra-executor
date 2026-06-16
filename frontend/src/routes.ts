@@ -35,6 +35,16 @@ const routes: RouteRecordRaw[] = [
         component: () => import('./views/actions/index.vue'),
       },
       {
+        path: 'workflows',
+        name: 'ExecutorWorkflows',
+        meta: {
+          icon: 'lucide:workflow',
+          title: 'executor.menu.workflows',
+          authority: ['platform:admin', 'tenant:manager'],
+        },
+        component: () => import('./views/workflows/index.vue'),
+      },
+      {
         path: 'executions',
         name: 'ExecutorExecutions',
         meta: {

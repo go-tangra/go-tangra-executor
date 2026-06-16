@@ -24,6 +24,8 @@ type Tx struct {
 	Script *ScriptClient
 	// ScriptAssignment is the client for interacting with the ScriptAssignment builders.
 	ScriptAssignment *ScriptAssignmentClient
+	// Workflow is the client for interacting with the Workflow builders.
+	Workflow *WorkflowClient
 
 	// lazily loaded.
 	client     *Client
@@ -161,6 +163,7 @@ func (tx *Tx) init() {
 	tx.ExecutionLog = NewExecutionLogClient(tx.config)
 	tx.Script = NewScriptClient(tx.config)
 	tx.ScriptAssignment = NewScriptAssignmentClient(tx.config)
+	tx.Workflow = NewWorkflowClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
