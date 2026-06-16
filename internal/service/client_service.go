@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/peer"
 
 	"github.com/go-tangra/go-tangra-common/middleware/mtls"
+	"github.com/go-tangra/go-tangra-common/viewer"
 	"github.com/go-tangra/go-tangra-executor/internal/data"
 
 	executorV1 "github.com/go-tangra/go-tangra-executor/gen/go/executor/service/v1"
@@ -339,7 +340,11 @@ func (s *ClientService) ResolveAction(ctx context.Context, req *executorV1.Resol
 // StreamExecutionOutput receives live workflow output chunks from a client and
 // appends them to the execution log, so logs are captured as they are produced.
 func (s *ClientService) StreamExecutionOutput(stream executorV1.ExecutorClientService_StreamExecutionOutputServer) error {
-	ctx := stream.Context()
+	// Streaming RPCs bypass the unary middleware chain, so the system viewer
+	// context that ent's tenant privacy policies require is not present. Inject
+	// it here, the same way systemViewerMiddleware does for unary calls —
+	// otherwise the execution-log queries below fail the privacy policy.
+	ctx := viewer.NewSystemViewerContext(stream.Context())
 	var (
 		execID string
 		chunks int64
