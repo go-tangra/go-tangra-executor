@@ -326,6 +326,8 @@ func (x *ConnectedClient) Redact() string {
 	// Safe field: ClientVersion
 
 	// Safe field: ConnectedAt
+
+	// Safe field: ActionsEnabled
 	return x.String()
 }
 

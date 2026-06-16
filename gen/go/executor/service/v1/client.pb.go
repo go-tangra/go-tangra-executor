@@ -578,8 +578,12 @@ type StreamCommandsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ClientId      string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	ClientVersion string                 `protobuf:"bytes,2,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Whether this host is eligible to run go-tangra-actions workflows (the client
+	// sets this from the ACTIONS_ENABLED env var). The executor refuses to push
+	// workflow executions to hosts that report false.
+	ActionsEnabled bool `protobuf:"varint,3,opt,name=actions_enabled,json=actionsEnabled,proto3" json:"actions_enabled,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *StreamCommandsRequest) Reset() {
@@ -624,6 +628,13 @@ func (x *StreamCommandsRequest) GetClientVersion() string {
 		return x.ClientVersion
 	}
 	return ""
+}
+
+func (x *StreamCommandsRequest) GetActionsEnabled() bool {
+	if x != nil {
+		return x.ActionsEnabled
+	}
+	return false
 }
 
 // Ack command request
@@ -1267,10 +1278,11 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"scriptType\x12 \n" +
 	"\acontent\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
 	"\fcontent_hash\x18\x05 \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12\x18\n" +
-	"\aversion\x18\x06 \x01(\x05R\aversion\"j\n" +
+	"\aversion\x18\x06 \x01(\x05R\aversion\"\x93\x01\n" +
 	"\x15StreamCommandsRequest\x12*\n" +
 	"\tclient_id\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\bclientId\x12%\n" +
-	"\x0eclient_version\x18\x02 \x01(\tR\rclientVersion\"\xab\x01\n" +
+	"\x0eclient_version\x18\x02 \x01(\tR\rclientVersion\x12'\n" +
+	"\x0factions_enabled\x18\x03 \x01(\bR\x0eactionsEnabled\"\xab\x01\n" +
 	"\x11AckCommandRequest\x12+\n" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\tcommandId\x12\x1a\n" +

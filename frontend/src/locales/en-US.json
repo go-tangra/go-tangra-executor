@@ -35,7 +35,7 @@
       "addInput": "Add input",
       "runStart": "Run",
       "runStarted": "Workflow started",
-      "noClients": "No clients are currently connected",
+      "noClients": "No eligible clients connected (set ACTIONS_ENABLED on the host)",
       "output": "Output",
       "status": "Status",
       "running": "Running…",

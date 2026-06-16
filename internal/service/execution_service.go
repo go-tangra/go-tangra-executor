@@ -116,6 +116,13 @@ func (s *ExecutionService) TriggerWorkflowExecution(ctx context.Context, req *ex
 		name = "workflow"
 	}
 
+	// Gate on host eligibility: a connected client that did not report
+	// ACTIONS_ENABLED may not run workflows. (A disconnected client falls
+	// through to the CLIENT_OFFLINE path below.)
+	if s.cmdReg.IsConnected(req.ClientId) && !s.cmdReg.ActionsEnabled(req.ClientId) {
+		return nil, executorV1.ErrorBadRequest("client %q is not eligible for action execution (ACTIONS_ENABLED is not set on the host)", req.ClientId)
+	}
+
 	// Workflows have no script row; use stable non-empty placeholders for the
 	// NotEmpty columns and carry the human label in script_name.
 	execLog, err := s.execRepo.Create(ctx, tenantID, "workflow", name, req.ClientId, "workflow", "UI_PUSH", "PENDING", createdBy)
@@ -177,9 +184,10 @@ func (s *ExecutionService) ListConnectedClients(_ context.Context, _ *executorV1
 	clients := make([]*executorV1.ConnectedClient, 0, len(connected))
 	for _, c := range connected {
 		clients = append(clients, &executorV1.ConnectedClient{
-			ClientId:      c.ClientID,
-			ClientVersion: c.Version,
-			ConnectedAt:   timestamppb.New(c.ConnectedAt),
+			ClientId:       c.ClientID,
+			ClientVersion:  c.Version,
+			ConnectedAt:    timestamppb.New(c.ConnectedAt),
+			ActionsEnabled: c.ActionsEnabled,
 		})
 	}
 	return &executorV1.ListConnectedClientsResponse{Clients: clients}, nil

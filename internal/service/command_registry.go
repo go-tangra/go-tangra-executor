@@ -12,16 +12,18 @@ const commandChannelBufferSize = 16
 
 // connectedClient holds the command channel and metadata for a connected client.
 type connectedClient struct {
-	ch          chan *executorV1.ExecutionCommand
-	version     string
-	connectedAt time.Time
+	ch             chan *executorV1.ExecutionCommand
+	version        string
+	connectedAt    time.Time
+	actionsEnabled bool
 }
 
 // ConnectedClientInfo is a read-only snapshot of a connected client's metadata.
 type ConnectedClientInfo struct {
-	ClientID    string
-	Version     string
-	ConnectedAt time.Time
+	ClientID       string
+	Version        string
+	ConnectedAt    time.Time
+	ActionsEnabled bool
 }
 
 // CommandRegistry manages in-memory command channels for connected clients.
@@ -39,7 +41,7 @@ func NewCommandRegistry() *CommandRegistry {
 
 // Register creates a buffered channel for the given client.
 // If one already exists, it is closed first.
-func (r *CommandRegistry) Register(clientID, version string) <-chan *executorV1.ExecutionCommand {
+func (r *CommandRegistry) Register(clientID, version string, actionsEnabled bool) <-chan *executorV1.ExecutionCommand {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -48,11 +50,21 @@ func (r *CommandRegistry) Register(clientID, version string) <-chan *executorV1.
 	}
 	ch := make(chan *executorV1.ExecutionCommand, commandChannelBufferSize)
 	r.clients[clientID] = &connectedClient{
-		ch:          ch,
-		version:     version,
-		connectedAt: time.Now(),
+		ch:             ch,
+		version:        version,
+		connectedAt:    time.Now(),
+		actionsEnabled: actionsEnabled,
 	}
 	return ch
+}
+
+// ActionsEnabled reports whether a connected client is eligible to run workflows.
+// Returns false when the client is not connected.
+func (r *CommandRegistry) ActionsEnabled(clientID string) bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	c, ok := r.clients[clientID]
+	return ok && c.actionsEnabled
 }
 
 // Unregister closes and removes the channel for the given client.
@@ -101,9 +113,10 @@ func (r *CommandRegistry) ListConnected() []ConnectedClientInfo {
 	result := make([]ConnectedClientInfo, 0, len(r.clients))
 	for id, c := range r.clients {
 		result = append(result, ConnectedClientInfo{
-			ClientID:    id,
-			Version:     c.version,
-			ConnectedAt: c.connectedAt,
+			ClientID:       id,
+			Version:        c.version,
+			ConnectedAt:    c.connectedAt,
+			ActionsEnabled: c.actionsEnabled,
 		})
 	}
 	return result

@@ -264,6 +264,8 @@ func (x *StreamCommandsRequest) Redact() string {
 	// Safe field: ClientId
 
 	// Safe field: ClientVersion
+
+	// Safe field: ActionsEnabled
 	return x.String()
 }
 

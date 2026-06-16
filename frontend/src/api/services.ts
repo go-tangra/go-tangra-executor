@@ -420,6 +420,7 @@ export interface ConnectedClient {
   clientId: string;
   clientVersion: string;
   connectedAt?: string;
+  actionsEnabled?: boolean;
 }
 
 export interface ListConnectedClientsResponse {

@@ -139,10 +139,13 @@ const [Drawer, drawerApi] = useVbenDrawer({
       exitCode.value = undefined;
       try {
         const resp = await workflowStore.listConnectedClients();
-        clientOptions.value = (resp.clients ?? []).map((c) => ({
-          value: c.clientId,
-          label: `${c.clientId}${c.clientVersion ? ` (v${c.clientVersion})` : ''}`,
-        }));
+        // Only hosts that opted in (ACTIONS_ENABLED) may run workflows.
+        clientOptions.value = (resp.clients ?? [])
+          .filter((c) => c.actionsEnabled)
+          .map((c) => ({
+            value: c.clientId,
+            label: `${c.clientId}${c.clientVersion ? ` (v${c.clientVersion})` : ''}`,
+          }));
       } catch {
         clientOptions.value = [];
       }

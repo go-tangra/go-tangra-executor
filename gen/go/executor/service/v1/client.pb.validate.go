@@ -866,6 +866,8 @@ func (m *StreamCommandsRequest) validate(all bool) error {
 
 	// no validation rules for ClientVersion
 
+	// no validation rules for ActionsEnabled
+
 	if len(errors) > 0 {
 		return StreamCommandsRequestMultiError(errors)
 	}

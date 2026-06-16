@@ -150,6 +150,10 @@ message StreamCommandsRequest {
     (buf.validate.field).string = {min_len: 1, max_len: 255}
   ];
   string client_version = 2 [json_name = "clientVersion"];
+  // Whether this host is eligible to run go-tangra-actions workflows (the client
+  // sets this from the ACTIONS_ENABLED env var). The executor refuses to push
+  // workflow executions to hosts that report false.
+  bool actions_enabled = 3 [json_name = "actionsEnabled"];
 }
 
 // Ack command request

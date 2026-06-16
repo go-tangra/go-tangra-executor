@@ -950,8 +950,10 @@ type ConnectedClient struct {
 	ClientId      string                 `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	ClientVersion string                 `protobuf:"bytes,2,opt,name=client_version,json=clientVersion,proto3" json:"client_version,omitempty"`
 	ConnectedAt   *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=connected_at,json=connectedAt,proto3" json:"connected_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	// Whether the host is eligible to run workflows (reported ACTIONS_ENABLED).
+	ActionsEnabled bool `protobuf:"varint,4,opt,name=actions_enabled,json=actionsEnabled,proto3" json:"actions_enabled,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ConnectedClient) Reset() {
@@ -1003,6 +1005,13 @@ func (x *ConnectedClient) GetConnectedAt() *timestamppb.Timestamp {
 		return x.ConnectedAt
 	}
 	return nil
+}
+
+func (x *ConnectedClient) GetActionsEnabled() bool {
+	if x != nil {
+		return x.ActionsEnabled
+	}
+	return false
 }
 
 // List connected clients response
@@ -1141,11 +1150,12 @@ const file_executor_service_v1_execution_proto_rawDesc = "" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tR\tcommandId\x12#\n" +
 	"\rclient_online\x18\x02 \x01(\bR\fclientOnline\"\x1d\n" +
-	"\x1bListConnectedClientsRequest\"\x94\x01\n" +
+	"\x1bListConnectedClientsRequest\"\xbd\x01\n" +
 	"\x0fConnectedClient\x12\x1b\n" +
 	"\tclient_id\x18\x01 \x01(\tR\bclientId\x12%\n" +
 	"\x0eclient_version\x18\x02 \x01(\tR\rclientVersion\x12=\n" +
-	"\fconnected_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\vconnectedAt\"^\n" +
+	"\fconnected_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\vconnectedAt\x12'\n" +
+	"\x0factions_enabled\x18\x04 \x01(\bR\x0eactionsEnabled\"^\n" +
 	"\x1cListConnectedClientsResponse\x12>\n" +
 	"\aclients\x18\x01 \x03(\v2$.executor.service.v1.ConnectedClientR\aclients*c\n" +
 	"\vTriggerType\x12\x1c\n" +
