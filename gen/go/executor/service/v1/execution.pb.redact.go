@@ -328,6 +328,8 @@ func (x *ConnectedClient) Redact() string {
 	// Safe field: ConnectedAt
 
 	// Safe field: ActionsEnabled
+
+	// Safe field: SecurityHardened
 	return x.String()
 }
 

@@ -868,6 +868,8 @@ func (m *StreamCommandsRequest) validate(all bool) error {
 
 	// no validation rules for ActionsEnabled
 
+	// no validation rules for SecurityHardened
+
 	if len(errors) > 0 {
 		return StreamCommandsRequestMultiError(errors)
 	}

@@ -12,18 +12,20 @@ const commandChannelBufferSize = 16
 
 // connectedClient holds the command channel and metadata for a connected client.
 type connectedClient struct {
-	ch             chan *executorV1.ExecutionCommand
-	version        string
-	connectedAt    time.Time
-	actionsEnabled bool
+	ch               chan *executorV1.ExecutionCommand
+	version          string
+	connectedAt      time.Time
+	actionsEnabled   bool
+	securityHardened bool
 }
 
 // ConnectedClientInfo is a read-only snapshot of a connected client's metadata.
 type ConnectedClientInfo struct {
-	ClientID       string
-	Version        string
-	ConnectedAt    time.Time
-	ActionsEnabled bool
+	ClientID         string
+	Version          string
+	ConnectedAt      time.Time
+	ActionsEnabled   bool
+	SecurityHardened bool
 }
 
 // CommandRegistry manages in-memory command channels for connected clients.
@@ -41,7 +43,7 @@ func NewCommandRegistry() *CommandRegistry {
 
 // Register creates a buffered channel for the given client.
 // If one already exists, it is closed first.
-func (r *CommandRegistry) Register(clientID, version string, actionsEnabled bool) <-chan *executorV1.ExecutionCommand {
+func (r *CommandRegistry) Register(clientID, version string, actionsEnabled, securityHardened bool) <-chan *executorV1.ExecutionCommand {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -50,10 +52,11 @@ func (r *CommandRegistry) Register(clientID, version string, actionsEnabled bool
 	}
 	ch := make(chan *executorV1.ExecutionCommand, commandChannelBufferSize)
 	r.clients[clientID] = &connectedClient{
-		ch:             ch,
-		version:        version,
-		connectedAt:    time.Now(),
-		actionsEnabled: actionsEnabled,
+		ch:               ch,
+		version:          version,
+		connectedAt:      time.Now(),
+		actionsEnabled:   actionsEnabled,
+		securityHardened: securityHardened,
 	}
 	return ch
 }
@@ -113,10 +116,11 @@ func (r *CommandRegistry) ListConnected() []ConnectedClientInfo {
 	result := make([]ConnectedClientInfo, 0, len(r.clients))
 	for id, c := range r.clients {
 		result = append(result, ConnectedClientInfo{
-			ClientID:       id,
-			Version:        c.version,
-			ConnectedAt:    c.connectedAt,
-			ActionsEnabled: c.actionsEnabled,
+			ClientID:         id,
+			Version:          c.version,
+			ConnectedAt:      c.connectedAt,
+			ActionsEnabled:   c.actionsEnabled,
+			SecurityHardened: c.securityHardened,
 		})
 	}
 	return result

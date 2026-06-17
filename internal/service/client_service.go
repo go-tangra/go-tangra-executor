@@ -125,7 +125,7 @@ func (s *ClientService) StreamCommands(req *executorV1.StreamCommandsRequest, st
 	}
 	s.log.Infof("Client %s (machine-id: %s) connected to command stream (version: %s)", clientID, req.ClientId, req.GetClientVersion())
 
-	ch := s.cmdReg.Register(clientID, req.GetClientVersion(), req.GetActionsEnabled())
+	ch := s.cmdReg.Register(clientID, req.GetClientVersion(), req.GetActionsEnabled(), req.GetSecurityHardened())
 	defer func() {
 		s.cmdReg.Unregister(clientID)
 		s.log.Infof("Client %s disconnected from command stream", clientID)

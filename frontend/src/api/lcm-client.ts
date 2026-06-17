@@ -29,6 +29,8 @@ export interface ConnectedClient {
   clientId?: string;
   clientVersion?: string;
   connectedAt?: string;
+  actionsEnabled?: boolean;
+  securityHardened?: boolean;
 }
 
 export interface ListConnectedClientsResponse {

@@ -184,10 +184,11 @@ func (s *ExecutionService) ListConnectedClients(_ context.Context, _ *executorV1
 	clients := make([]*executorV1.ConnectedClient, 0, len(connected))
 	for _, c := range connected {
 		clients = append(clients, &executorV1.ConnectedClient{
-			ClientId:       c.ClientID,
-			ClientVersion:  c.Version,
-			ConnectedAt:    timestamppb.New(c.ConnectedAt),
-			ActionsEnabled: c.ActionsEnabled,
+			ClientId:         c.ClientID,
+			ClientVersion:    c.Version,
+			ConnectedAt:      timestamppb.New(c.ConnectedAt),
+			ActionsEnabled:   c.ActionsEnabled,
+			SecurityHardened: c.SecurityHardened,
 		})
 	}
 	return &executorV1.ListConnectedClientsResponse{Clients: clients}, nil

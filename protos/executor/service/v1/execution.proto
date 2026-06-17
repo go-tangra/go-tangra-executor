@@ -207,6 +207,9 @@ message ConnectedClient {
   google.protobuf.Timestamp connected_at = 3 [json_name = "connectedAt"];
   // Whether the host is eligible to run workflows (reported ACTIONS_ENABLED).
   bool actions_enabled = 4 [json_name = "actionsEnabled"];
+  // Whether the client detected systemd security hardening that would make most
+  // host-ops actions fail (read-only/sandboxed filesystem). true = hardened.
+  bool security_hardened = 5 [json_name = "securityHardened"];
 }
 
 // List connected clients response

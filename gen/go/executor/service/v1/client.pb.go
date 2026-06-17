@@ -582,8 +582,13 @@ type StreamCommandsRequest struct {
 	// sets this from the ACTIONS_ENABLED env var). The executor refuses to push
 	// workflow executions to hosts that report false.
 	ActionsEnabled bool `protobuf:"varint,3,opt,name=actions_enabled,json=actionsEnabled,proto3" json:"actions_enabled,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Whether the client detected systemd security hardening (read-only/sandboxed
+	// filesystem from ProtectSystem/ProtectHome/etc.) that would make most actions
+	// fail. The client probes this at connect time; true = hardened = host-ops
+	// actions are likely to fail even when actions_enabled is true.
+	SecurityHardened bool `protobuf:"varint,4,opt,name=security_hardened,json=securityHardened,proto3" json:"security_hardened,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *StreamCommandsRequest) Reset() {
@@ -633,6 +638,13 @@ func (x *StreamCommandsRequest) GetClientVersion() string {
 func (x *StreamCommandsRequest) GetActionsEnabled() bool {
 	if x != nil {
 		return x.ActionsEnabled
+	}
+	return false
+}
+
+func (x *StreamCommandsRequest) GetSecurityHardened() bool {
+	if x != nil {
+		return x.SecurityHardened
 	}
 	return false
 }
@@ -1278,11 +1290,12 @@ const file_executor_service_v1_client_proto_rawDesc = "" +
 	"scriptType\x12 \n" +
 	"\acontent\x18\x04 \x01(\tB\x06ڶ\x1a\x02z\x00R\acontent\x12)\n" +
 	"\fcontent_hash\x18\x05 \x01(\tB\x06ڶ\x1a\x02z\x00R\vcontentHash\x12\x18\n" +
-	"\aversion\x18\x06 \x01(\x05R\aversion\"\x93\x01\n" +
+	"\aversion\x18\x06 \x01(\x05R\aversion\"\xc0\x01\n" +
 	"\x15StreamCommandsRequest\x12*\n" +
 	"\tclient_id\x18\x01 \x01(\tB\r\xe0A\x02\xbaH\ar\x05\x10\x01\x18\xff\x01R\bclientId\x12%\n" +
 	"\x0eclient_version\x18\x02 \x01(\tR\rclientVersion\x12'\n" +
-	"\x0factions_enabled\x18\x03 \x01(\bR\x0eactionsEnabled\"\xab\x01\n" +
+	"\x0factions_enabled\x18\x03 \x01(\bR\x0eactionsEnabled\x12+\n" +
+	"\x11security_hardened\x18\x04 \x01(\bR\x10securityHardened\"\xab\x01\n" +
 	"\x11AckCommandRequest\x12+\n" +
 	"\n" +
 	"command_id\x18\x01 \x01(\tB\f\xe0A\x02\xbaH\x06r\x04\x10\x01\x18$R\tcommandId\x12\x1a\n" +

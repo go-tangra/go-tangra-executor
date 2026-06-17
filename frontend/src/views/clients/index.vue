@@ -23,6 +23,7 @@ import {
   MtlsCertificateService,
   ConnectedClientsService,
   type MtlsCertificate,
+  type ConnectedClient,
 } from '../../api/lcm-client';
 
 const executionStore = useExecutorExecutionStore();
@@ -87,6 +88,26 @@ function certTypeToName(certType: string | undefined) {
     default:
       return certType ?? '-';
   }
+}
+
+// actionsStatus summarises whether a client can actually run actions:
+// offline = unknown; hardened = systemd sandbox blocks host-ops (will fail);
+// disabled = ACTIONS_ENABLED=false; ready = enabled and not hardened.
+function actionsStatus(row: {
+  online?: boolean;
+  actionsEnabled?: boolean;
+  securityHardened?: boolean;
+}): { color: string; text: string } {
+  if (!row.online) {
+    return { color: 'default', text: '-' };
+  }
+  if (row.securityHardened) {
+    return { color: 'error', text: $t('executor.page.client.actionsHardened') };
+  }
+  if (!row.actionsEnabled) {
+    return { color: 'default', text: $t('executor.page.client.actionsDisabled') };
+  }
+  return { color: 'success', text: $t('executor.page.client.actionsReady') };
 }
 
 const formOptions: VbenFormProps = {
@@ -154,22 +175,28 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
           ConnectedClientsService.list().catch(() => ({ clients: [] })),
         ]);
 
-        const connectedMap = new Map<string, string>();
+        const connectedMap = new Map<string, ConnectedClient>();
         for (const c of connResp.clients ?? []) {
           if (c.clientId) {
-            connectedMap.set(c.clientId, c.clientVersion ?? '');
+            connectedMap.set(c.clientId, c);
           }
         }
 
-        let items = (certResp.items ?? []).map((cert) => {
-          const key = cert.commonName ?? cert.clientId ?? '';
-          const version = connectedMap.get(key);
-          return {
-            ...cert,
-            online: version !== undefined,
-            clientVersion: version ?? '',
-          };
-        });
+        let items = (certResp.items ?? [])
+          // Internal certs are platform/service identities, not agent hosts —
+          // they never run actions, so they don't belong in the client list.
+          .filter((cert) => cert.certType !== 'MTLS_CERT_TYPE_INTERNAL')
+          .map((cert) => {
+            const key = cert.commonName ?? cert.clientId ?? '';
+            const conn = connectedMap.get(key);
+            return {
+              ...cert,
+              online: conn !== undefined,
+              clientVersion: conn?.clientVersion ?? '',
+              actionsEnabled: conn?.actionsEnabled ?? false,
+              securityHardened: conn?.securityHardened ?? false,
+            };
+          });
 
         // Online/offline filter (status is not part of the paginated source).
         if (formValues?.connection === 'online') {
@@ -220,6 +247,12 @@ const gridOptions: VxeGridProps<MtlsCertificate> = {
       width: 120,
       sortable: true,
       slots: { default: 'certType' },
+    },
+    {
+      title: $t('executor.page.client.actions'),
+      field: 'actionsStatus',
+      width: 120,
+      slots: { default: 'actionsStatus' },
     },
     {
       title: $t('executor.page.client.issuer'),
@@ -374,6 +407,11 @@ async function handleBatchUpdate() {
       <template #certType="{ row }">
         <Tag :color="certTypeToColor(row.certType)">
           {{ certTypeToName(row.certType) }}
+        </Tag>
+      </template>
+      <template #actionsStatus="{ row }">
+        <Tag :color="actionsStatus(row).color">
+          {{ actionsStatus(row).text }}
         </Tag>
       </template>
       <template #action="{ row }">

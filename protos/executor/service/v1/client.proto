@@ -154,6 +154,11 @@ message StreamCommandsRequest {
   // sets this from the ACTIONS_ENABLED env var). The executor refuses to push
   // workflow executions to hosts that report false.
   bool actions_enabled = 3 [json_name = "actionsEnabled"];
+  // Whether the client detected systemd security hardening (read-only/sandboxed
+  // filesystem from ProtectSystem/ProtectHome/etc.) that would make most actions
+  // fail. The client probes this at connect time; true = hardened = host-ops
+  // actions are likely to fail even when actions_enabled is true.
+  bool security_hardened = 4 [json_name = "securityHardened"];
 }
 
 // Ack command request

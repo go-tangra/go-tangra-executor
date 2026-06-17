@@ -1699,6 +1699,8 @@ func (m *ConnectedClient) validate(all bool) error {
 
 	// no validation rules for ActionsEnabled
 
+	// no validation rules for SecurityHardened
+
 	if len(errors) > 0 {
 		return ConnectedClientMultiError(errors)
 	}
