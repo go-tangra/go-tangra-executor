@@ -157,6 +157,228 @@ var _ interface {
 	ErrorName() string
 } = ExecutionCommandValidationError{}
 
+// Validate checks the field values on GetInventoryAgentConfigRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetInventoryAgentConfigRequest) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetInventoryAgentConfigRequest with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetInventoryAgentConfigRequestMultiError, or nil if none found.
+func (m *GetInventoryAgentConfigRequest) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetInventoryAgentConfigRequest) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for ClientId
+
+	if len(errors) > 0 {
+		return GetInventoryAgentConfigRequestMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetInventoryAgentConfigRequestMultiError is an error wrapping multiple
+// validation errors returned by GetInventoryAgentConfigRequest.ValidateAll()
+// if the designated constraints aren't met.
+type GetInventoryAgentConfigRequestMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetInventoryAgentConfigRequestMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetInventoryAgentConfigRequestMultiError) AllErrors() []error { return m }
+
+// GetInventoryAgentConfigRequestValidationError is the validation error
+// returned by GetInventoryAgentConfigRequest.Validate if the designated
+// constraints aren't met.
+type GetInventoryAgentConfigRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInventoryAgentConfigRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInventoryAgentConfigRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInventoryAgentConfigRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInventoryAgentConfigRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInventoryAgentConfigRequestValidationError) ErrorName() string {
+	return "GetInventoryAgentConfigRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInventoryAgentConfigRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInventoryAgentConfigRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInventoryAgentConfigRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInventoryAgentConfigRequestValidationError{}
+
+// Validate checks the field values on GetInventoryAgentConfigResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *GetInventoryAgentConfigResponse) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on GetInventoryAgentConfigResponse with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, the result is a list of violation errors wrapped in
+// GetInventoryAgentConfigResponseMultiError, or nil if none found.
+func (m *GetInventoryAgentConfigResponse) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *GetInventoryAgentConfigResponse) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Enabled
+
+	// no validation rules for IngestEndpoint
+
+	// no validation rules for KeyId
+
+	// no validation rules for KeySecret
+
+	// no validation rules for CaPem
+
+	// no validation rules for ServerName
+
+	// no validation rules for AgentVersion
+
+	if len(errors) > 0 {
+		return GetInventoryAgentConfigResponseMultiError(errors)
+	}
+
+	return nil
+}
+
+// GetInventoryAgentConfigResponseMultiError is an error wrapping multiple
+// validation errors returned by GetInventoryAgentConfigResponse.ValidateAll()
+// if the designated constraints aren't met.
+type GetInventoryAgentConfigResponseMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m GetInventoryAgentConfigResponseMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m GetInventoryAgentConfigResponseMultiError) AllErrors() []error { return m }
+
+// GetInventoryAgentConfigResponseValidationError is the validation error
+// returned by GetInventoryAgentConfigResponse.Validate if the designated
+// constraints aren't met.
+type GetInventoryAgentConfigResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetInventoryAgentConfigResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetInventoryAgentConfigResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetInventoryAgentConfigResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetInventoryAgentConfigResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetInventoryAgentConfigResponseValidationError) ErrorName() string {
+	return "GetInventoryAgentConfigResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e GetInventoryAgentConfigResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetInventoryAgentConfigResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetInventoryAgentConfigResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetInventoryAgentConfigResponseValidationError{}
+
 // Validate checks the field values on ExecutionOutputChunk with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, the first error encountered is returned, or nil if there are no violations.

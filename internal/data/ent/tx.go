@@ -24,6 +24,8 @@ type Tx struct {
 	Script *ScriptClient
 	// ScriptAssignment is the client for interacting with the ScriptAssignment builders.
 	ScriptAssignment *ScriptAssignmentClient
+	// Setting is the client for interacting with the Setting builders.
+	Setting *SettingClient
 	// Workflow is the client for interacting with the Workflow builders.
 	Workflow *WorkflowClient
 
@@ -163,6 +165,7 @@ func (tx *Tx) init() {
 	tx.ExecutionLog = NewExecutionLogClient(tx.config)
 	tx.Script = NewScriptClient(tx.config)
 	tx.ScriptAssignment = NewScriptAssignmentClient(tx.config)
+	tx.Setting = NewSettingClient(tx.config)
 	tx.Workflow = NewWorkflowClient(tx.config)
 }
 

@@ -135,6 +135,17 @@ func (s *redactedExecutorClientServiceServer) StreamExecutionOutput(stream grpc.
 	return s.srv.StreamExecutionOutput(stream)
 }
 
+// GetInventoryAgentConfig is the redacted wrapper for the actual ExecutorClientServiceServer.GetInventoryAgentConfig method
+// Unary RPC
+func (s *redactedExecutorClientServiceServer) GetInventoryAgentConfig(ctx context.Context, in *GetInventoryAgentConfigRequest) (*GetInventoryAgentConfigResponse, error) {
+	res, err := s.srv.GetInventoryAgentConfig(ctx, in)
+	if !s.bypass.CheckInternal(ctx) {
+		// Apply redaction to the response
+		redact.Apply(res)
+	}
+	return res, err
+}
+
 // Redact method implementation for ExecutionCommand
 func (x *ExecutionCommand) Redact() string {
 	if x == nil {
@@ -164,6 +175,39 @@ func (x *ExecutionCommand) Redact() string {
 	// Safe field: Workflow
 
 	// Safe field: Inputs
+	return x.String()
+}
+
+// Redact method implementation for GetInventoryAgentConfigRequest
+func (x *GetInventoryAgentConfigRequest) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: ClientId
+	return x.String()
+}
+
+// Redact method implementation for GetInventoryAgentConfigResponse
+func (x *GetInventoryAgentConfigResponse) Redact() string {
+	if x == nil {
+		return ""
+	}
+
+	// Safe field: Enabled
+
+	// Safe field: IngestEndpoint
+
+	// Safe field: KeyId
+
+	// Redacting field: KeySecret
+	x.KeySecret = ``
+
+	// Safe field: CaPem
+
+	// Safe field: ServerName
+
+	// Safe field: AgentVersion
 	return x.String()
 }
 

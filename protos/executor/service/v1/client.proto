@@ -88,6 +88,27 @@ service ExecutorClientService {
   // executor as it is produced, GitHub-Actions style. Client-streaming: the
   // client sends many chunks and the executor appends them to the execution log.
   rpc StreamExecutionOutput(stream ExecutionOutputChunk) returns (StreamExecutionOutputResponse) {}
+
+  // The v4 inventory agent settings for this client (including the
+  // auto-enrollment key secret), so it can install the go-tangra v4
+  // inventory agent and let it enroll automatically.
+  rpc GetInventoryAgentConfig(GetInventoryAgentConfigRequest) returns (GetInventoryAgentConfigResponse) {}
+}
+
+message GetInventoryAgentConfigRequest {
+  string client_id = 1 [json_name = "clientId"];
+}
+
+// GetInventoryAgentConfigResponse: enabled false (or missing values) means
+// the client does nothing.
+message GetInventoryAgentConfigResponse {
+  bool enabled = 1 [json_name = "enabled"];
+  string ingest_endpoint = 2 [json_name = "ingestEndpoint"];
+  string key_id = 3 [json_name = "keyId"];
+  string key_secret = 4 [json_name = "keySecret", (redact.v3.value).string = ""];
+  string ca_pem = 5 [json_name = "caPem"];
+  string server_name = 6 [json_name = "serverName"];
+  string agent_version = 7 [json_name = "agentVersion"];
 }
 
 // A chunk of live execution output streamed from a client.

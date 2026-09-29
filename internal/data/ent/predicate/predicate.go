@@ -24,5 +24,8 @@ type Script func(*sql.Selector)
 // ScriptAssignment is the predicate function for scriptassignment builders.
 type ScriptAssignment func(*sql.Selector)
 
+// Setting is the predicate function for setting builders.
+type Setting func(*sql.Selector)
+
 // Workflow is the predicate function for workflow builders.
 type Workflow func(*sql.Selector)

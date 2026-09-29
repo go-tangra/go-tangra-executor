@@ -313,6 +313,19 @@ var (
 			},
 		},
 	}
+	// ExecutorSettingsColumns holds the columns for the "executor_settings" table.
+	ExecutorSettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true, Size: 64, Comment: "Setting key"},
+		{Name: "value", Type: field.TypeString, Size: 2147483647, Comment: "JSON document"},
+		{Name: "update_time", Type: field.TypeTime, Comment: "Last change"},
+		{Name: "updated_by", Type: field.TypeUint32, Nullable: true, Comment: "User who last changed it"},
+	}
+	// ExecutorSettingsTable holds the schema information for the "executor_settings" table.
+	ExecutorSettingsTable = &schema.Table{
+		Name:       "executor_settings",
+		Columns:    ExecutorSettingsColumns,
+		PrimaryKey: []*schema.Column{ExecutorSettingsColumns[0]},
+	}
 	// ExecutorWorkflowsColumns holds the columns for the "executor_workflows" table.
 	ExecutorWorkflowsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true, Comment: "UUID primary key"},
@@ -360,6 +373,7 @@ var (
 		ExecutorExecutionLogsTable,
 		ExecutorScriptsTable,
 		ExecutorScriptAssignmentsTable,
+		ExecutorSettingsTable,
 		ExecutorWorkflowsTable,
 	}
 )
@@ -383,6 +397,9 @@ func init() {
 	}
 	ExecutorScriptAssignmentsTable.Annotation = &entsql.Annotation{
 		Table: "executor_script_assignments",
+	}
+	ExecutorSettingsTable.Annotation = &entsql.Annotation{
+		Table: "executor_settings",
 	}
 	ExecutorWorkflowsTable.Annotation = &entsql.Annotation{
 		Table: "executor_workflows",

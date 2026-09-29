@@ -17,6 +17,7 @@ import {
 } from 'ant-design-vue';
 
 import { useVbenVxeGrid } from 'shell/adapter/vxe-table';
+import InventoryAgentDrawer from './inventory-agent-drawer.vue';
 import { $t } from 'shell/locales';
 import { useExecutorExecutionStore } from '../../stores/executor-execution.state';
 import {
@@ -27,6 +28,7 @@ import {
 } from '../../api/lcm-client';
 
 const executionStore = useExecutorExecutionStore();
+const inventoryAgentOpen = ref(false);
 
 // Upper bound on clients fetched for client-side pagination/filtering. Online
 // status comes from a separate (in-memory) executor endpoint than the paginated
@@ -380,6 +382,9 @@ async function handleBatchUpdate() {
   <Page auto-content-height>
     <Grid :table-title="$t('executor.page.client.title')">
       <template #toolbar-tools>
+        <Button class="mr-2" @click="inventoryAgentOpen = true">
+          {{ $t('executor.page.client.inventoryAgent') }}
+        </Button>
         <Button
           class="mr-2"
           type="primary"
@@ -428,5 +433,6 @@ async function handleBatchUpdate() {
         </Space>
       </template>
     </Grid>
+    <InventoryAgentDrawer v-model:open="inventoryAgentOpen" />
   </Page>
 </template>

@@ -27,6 +27,8 @@ type ClientService struct {
 	cmdReg     *CommandRegistry
 	releaseSvc *ClientReleaseService
 	actionRepo *data.ActionRepo
+	// settingsSvc serves the v4 inventory agent settings to clients.
+	settingsSvc *SettingsService
 }
 
 // NewClientService creates a new ClientService
@@ -38,8 +40,10 @@ func NewClientService(
 	cmdReg *CommandRegistry,
 	releaseSvc *ClientReleaseService,
 	actionRepo *data.ActionRepo,
+	settingsSvc *SettingsService,
 ) *ClientService {
 	return &ClientService{
+		settingsSvc: settingsSvc,
 		log:        ctx.NewLoggerHelper("executor/service/client"),
 		scriptRepo: scriptRepo,
 		assignRepo: assignRepo,
@@ -376,4 +380,14 @@ func (s *ClientService) StreamExecutionOutput(stream executorV1.ExecutorClientSe
 		}
 		chunks++
 	}
+}
+
+// GetInventoryAgentConfig returns the v4 inventory agent settings, secret
+// included, to a client calling directly with its own certificate.
+func (s *ClientService) GetInventoryAgentConfig(ctx context.Context, _ *executorV1.GetInventoryAgentConfigRequest) (*executorV1.GetInventoryAgentConfigResponse, error) {
+	// The CN comes from the verified TLS peer certificate only (set by the
+	// mTLS middleware), never from forwarded metadata; a request carrying the
+	// gateway's forwarded client CN is refused.
+	viaGateway := getMetadataValue(ctx, "x-md-global-client-cn") != ""
+	return s.settingsSvc.ClientConfig(ctx, mtls.GetClientID(ctx), viaGateway)
 }
