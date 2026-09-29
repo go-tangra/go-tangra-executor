@@ -18,6 +18,7 @@ import (
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/executionlog"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/scriptassignment"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/setting"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/workflow"
 )
 
@@ -85,6 +86,7 @@ func checkColumn(t, c string) error {
 			executionlog.Table:     executionlog.ValidColumn,
 			script.Table:           script.ValidColumn,
 			scriptassignment.Table: scriptassignment.ValidColumn,
+			setting.Table:          setting.ValidColumn,
 			workflow.Table:         workflow.ValidColumn,
 		})
 	})

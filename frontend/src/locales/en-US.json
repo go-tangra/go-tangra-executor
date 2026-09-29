@@ -173,7 +173,30 @@
       "updateSelected": "Update selected",
       "selectClients": "Select at least one client first",
       "batchUpdateTitle": "Force update on {count} client(s)",
-      "batchUpdateResult": "Update sent — {online} online, {offline} offline, {failed} failed"
+      "batchUpdateResult": "Update sent — {online} online, {offline} offline, {failed} failed",
+      "inventoryAgent": "Inventory agent"
+    },
+    "inventoryAgent": {
+      "title": "Inventory agent (go-tangra v4)",
+      "intro": "Clients install the go-tangra v4 inventory agent when it is missing and let it enroll automatically with this key. Create the key in the v4 portal under Inventory > Agents > Automatic enrollment; hosts must connect from one of its networks.",
+      "enabled": "Install and enroll the inventory agent on clients",
+      "ingestEndpoint": "Ingest endpoint",
+      "ingestEndpointHint": "host:port of the v4 inventory ingest edge, e.g. portal.example.org:9977",
+      "keyId": "Key ID",
+      "keySecret": "Key secret",
+      "keySecretConfigured": "A secret is stored. Leave empty to keep it.",
+      "keySecretMissing": "No secret stored yet.",
+      "clearKeySecret": "Remove the stored secret",
+      "caPem": "CA certificate (optional)",
+      "caPemHint": "PEM bundle of the CA that signs the ingest certificate; empty uses the hosts' system roots",
+      "serverName": "Certificate name (optional)",
+      "agentVersion": "Agent version",
+      "agentVersionHint": "latest, or a release such as 4.5.1",
+      "save": "Save",
+      "saved": "Inventory agent settings saved",
+      "loadFailed": "Could not load the inventory agent settings",
+      "saveFailed": "Could not save the inventory agent settings",
+      "updated": "Last changed"
     }
   }
 }

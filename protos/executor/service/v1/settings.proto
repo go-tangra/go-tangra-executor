@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package executor.service.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "redact/v3/redact.proto";
+
+// Executor Settings Service: platform-wide client settings managed by
+// administrators. The v4 inventory agent settings are handed to
+// go-tangra-client so it can install the go-tangra v4 inventory agent and
+// enroll it automatically (go-tangra-inventory auto-enrollment keys).
+service ExecutorSettingsService {
+  // The inventory agent settings. The key secret is never returned, only
+  // whether one is stored.
+  rpc GetInventoryAgentSettings(GetInventoryAgentSettingsRequest) returns (InventoryAgentSettings) {
+    option (google.api.http) = {
+      get: "/v1/settings/inventory-agent"
+    };
+  }
+
+  // Replace the inventory agent settings. An empty key_secret keeps the
+  // stored secret; clear_key_secret removes it.
+  rpc UpdateInventoryAgentSettings(UpdateInventoryAgentSettingsRequest) returns (InventoryAgentSettings) {
+    option (google.api.http) = {
+      put: "/v1/settings/inventory-agent"
+      body: "*"
+    };
+  }
+}
+
+message GetInventoryAgentSettingsRequest {}
+
+// InventoryAgentSettings as shown to administrators (no secret).
+message InventoryAgentSettings {
+  bool enabled = 1 [json_name = "enabled"];                        // clients install and enroll the agent
+  string ingest_endpoint = 2 [json_name = "ingestEndpoint"];        // host:port of the v4 inventory ingest edge
+  string key_id = 3 [json_name = "keyId"];                          // auto-enrollment key id (ak_...)
+  bool key_secret_configured = 4 [json_name = "keySecretConfigured"];
+  string ca_pem = 5 [json_name = "caPem"];                          // optional CA bundle of the ingest certificate
+  string server_name = 6 [json_name = "serverName"];                // optional certificate name override
+  string agent_version = 7 [json_name = "agentVersion"];            // "" / latest or a release such as 4.5.1
+  google.protobuf.Timestamp update_time = 8 [json_name = "updateTime"];
+  optional uint32 updated_by = 9 [json_name = "updatedBy"];
+}
+
+message UpdateInventoryAgentSettingsRequest {
+  bool enabled = 1 [json_name = "enabled"];
+  string ingest_endpoint = 2 [json_name = "ingestEndpoint"];
+  string key_id = 3 [json_name = "keyId"];
+  string key_secret = 4 [json_name = "keySecret", (redact.v3.value).string = ""]; // empty = keep the stored secret
+  bool clear_key_secret = 5 [json_name = "clearKeySecret"];
+  string ca_pem = 6 [json_name = "caPem"];
+  string server_name = 7 [json_name = "serverName"];
+  string agent_version = 8 [json_name = "agentVersion"];
+}

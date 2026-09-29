@@ -453,3 +453,40 @@ export const WorkflowRunService = {
       options,
     ),
 };
+
+// ==================== Inventory agent settings ====================
+
+/**
+ * Platform-wide settings handed to go-tangra-client so it can install the
+ * go-tangra v4 inventory agent and enroll it with an auto-enrollment key.
+ * The key secret is write-only: it is never returned.
+ */
+export interface InventoryAgentSettings {
+  enabled: boolean;
+  ingestEndpoint: string;
+  keyId: string;
+  keySecretConfigured: boolean;
+  caPem: string;
+  serverName: string;
+  agentVersion: string;
+  updateTime?: string;
+  updatedBy?: number;
+}
+
+export interface UpdateInventoryAgentSettingsRequest {
+  enabled: boolean;
+  ingestEndpoint: string;
+  keyId: string;
+  keySecret?: string;
+  clearKeySecret?: boolean;
+  caPem: string;
+  serverName: string;
+  agentVersion: string;
+}
+
+export const InventoryAgentSettingsService = {
+  get: (options?: RequestOptions) =>
+    executorApi.get<InventoryAgentSettings>('/settings/inventory-agent', options),
+  update: (body: UpdateInventoryAgentSettingsRequest, options?: RequestOptions) =>
+    executorApi.put<InventoryAgentSettings>('/settings/inventory-agent', body, options),
+};

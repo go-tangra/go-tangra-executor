@@ -49,6 +49,7 @@ func NewGRPCServer(
 	statsSvc *service.StatisticsService,
 	backupSvc *service.BackupService,
 	sqlBackupSvc *service.SqlBackupService,
+	settingsSvc *service.SettingsService,
 ) *grpc.Server {
 	cfg := ctx.GetConfig()
 	l := ctx.NewLoggerHelper("executor/grpc")
@@ -135,6 +136,7 @@ func NewGRPCServer(
 	executorV1.RegisterRedactedExecutorStatisticsServiceServer(srv, statsSvc, nil)
 	executorV1.RegisterRedactedBackupServiceServer(srv, backupSvc, nil)
 	commonV1.RegisterBackupServiceServer(srv, sqlBackupSvc)
+	executorV1.RegisterRedactedExecutorSettingsServiceServer(srv, settingsSvc, nil)
 
 	return srv
 }

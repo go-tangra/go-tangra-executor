@@ -4,6 +4,7 @@ package runtime
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/action"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/actionfile"
@@ -12,6 +13,7 @@ import (
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/schema"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/script"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/scriptassignment"
+	"github.com/go-tangra/go-tangra-executor/internal/data/ent/setting"
 	"github.com/go-tangra/go-tangra-executor/internal/data/ent/workflow"
 
 	"entgo.io/ent"
@@ -412,6 +414,32 @@ func init() {
 	scriptassignmentDescID := scriptassignmentFields[0].Descriptor()
 	// scriptassignment.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	scriptassignment.IDValidator = scriptassignmentDescID.Validators[0].(func(string) error)
+	settingFields := schema.Setting{}.Fields()
+	_ = settingFields
+	// settingDescUpdateTime is the schema descriptor for update_time field.
+	settingDescUpdateTime := settingFields[2].Descriptor()
+	// setting.DefaultUpdateTime holds the default value on creation for the update_time field.
+	setting.DefaultUpdateTime = settingDescUpdateTime.Default.(func() time.Time)
+	// setting.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	setting.UpdateDefaultUpdateTime = settingDescUpdateTime.UpdateDefault.(func() time.Time)
+	// settingDescID is the schema descriptor for id field.
+	settingDescID := settingFields[0].Descriptor()
+	// setting.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	setting.IDValidator = func() func(string) error {
+		validators := settingDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
 	workflowMixin := schema.Workflow{}.Mixin()
 	workflow.Policy = privacy.NewPolicies(workflowMixin[3], schema.Workflow{})
 	workflow.Hooks[0] = func(next ent.Mutator) ent.Mutator {
